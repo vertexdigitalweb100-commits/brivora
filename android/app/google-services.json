@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "440403850503",
+    "project_id": "brivora-c5aa8",
+    "storage_bucket": "brivora-c5aa8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:440403850503:android:eb7e5edb9ea994119a41a2",
+        "android_client_info": {
+          "package_name": "com.example.brivora"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6GP5IobfBpyTgsQ2im2uMU4GsNh7STyk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

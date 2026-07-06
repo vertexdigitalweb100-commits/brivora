@@ -1,0 +1,750 @@
+Launching lib/main.dart on sdk gphone16k x86 64 in debug mode...
+Running Gradle task 'assembleDebug'...                          
+lib/main.dart: Error: Error when reading '../../../%D0%97%D0%B0%D0%B3%D1%80%D1%83%D0%B7%D0%BA%D0%B8/flutter/packages/flutter/lib/src/dart_plugin_registrant.dart': No such file or directory
+lib/main.dart:1:8: Error: Error when reading '../../../%D0%97%D0%B0%D0%B3%D1%80%D1%83%D0%B7%D0%BA%D0%B8/flutter/packages/flutter/lib/material.dart': No such file or directory
+import 'package:flutter/material.dart';
+       ^
+lib/app/app.dart:1:8: Error: Error when reading '../../../%D0%97%D0%B0%D0%B3%D1%80%D1%83%D0%B7%D0%BA%D0%B8/flutter/packages/flutter/lib/material.dart': No such file or directory
+import 'package:flutter/material.dart';
+       ^
+../../../.pub-cache/hosted/pub.dev/firebase_core-4.11.0/lib/firebase_core.dart:8:8: Error: Error when reading '../../../%D0%97%D0%B0%D0%B3%D1%80%D1%83%D0%B7%D0%BA%D0%B8/flutter/packages/flutter/lib/foundation.dart': No such file or directory
+import 'package:flutter/foundation.dart';
+       ^
+lib/firebase_options.dart:4:8: Error: Error when reading '../../../%D0%97%D0%B0%D0%B3%D1%80%D1%83%D0%B7%D0%BA%D0%B8/flutter/packages/flutter/lib/foundation.dart': No such file or directory
+import 'package:flutter/foundation.dart'
+       ^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/google_sign_in_android.dart:7:8: Error: Error when reading '../../../%D0%97%D0%B0%D0%B3%D1%80%D1%83%D0%B7%D0%BA%D0%B8/flutter/packages/flutter/lib/foundation.dart': No such file or directory
+import 'package:flutter/foundation.dart' show visibleForTesting;
+       ^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/google_sign_in_ios.dart:7:8: Error: Error when reading '../../../%D0%97%D0%B0%D0%B3%D1%80%D1%83%D0%B7%D0%BA%D0%B8/flutter/packages/flutter/lib/foundation.dart': No such file or directory
+import 'package:flutter/foundation.dart' show visibleForTesting;
+       ^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/firebase_core_platform_interface.dart:13:8: Error: Error when reading '../../../%D0%97%D0%B0%D0%B3%D1%80%D1%83%D0%B7%D0%BA%D0%B8/flutter/packages/flutter/lib/foundation.dart': No such file or directory
+import 'package:flutter/foundation.dart';
+       ^
+lib/features/auth/presentation/screens/login_screen.dart:1:8: Error: Error when reading '../../../%D0%97%D0%B0%D0%B3%D1%80%D1%83%D0%B7%D0%BA%D0%B8/flutter/packages/flutter/lib/material.dart': No such file or directory
+import 'package:flutter/material.dart';
+       ^
+lib/app/theme.dart:1:8: Error: Error when reading '../../../%D0%97%D0%B0%D0%B3%D1%80%D1%83%D0%B7%D0%BA%D0%B8/flutter/packages/flutter/lib/material.dart': No such file or directory
+import 'package:flutter/material.dart';
+       ^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:11:8: Error: Error when reading '../../../%D0%97%D0%B0%D0%B3%D1%80%D1%83%D0%B7%D0%BA%D0%B8/flutter/packages/flutter/lib/foundation.dart': No such file or directory
+import 'package:flutter/foundation.dart' show ReadBuffer, WriteBuffer;
+       ^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/firebase_core_platform_interface.dart:14:8: Error: Error when reading '../../../%D0%97%D0%B0%D0%B3%D1%80%D1%83%D0%B7%D0%BA%D0%B8/flutter/packages/flutter/lib/services.dart': No such file or directory
+import 'package:flutter/services.dart';
+       ^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart:12:8: Error: Error when reading '../../../%D0%97%D0%B0%D0%B3%D1%80%D1%83%D0%B7%D0%BA%D0%B8/flutter/packages/flutter/lib/services.dart': No such file or directory
+import 'package:flutter/services.dart';
+       ^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:12:8: Error: Error when reading '../../../%D0%97%D0%B0%D0%B3%D1%80%D1%83%D0%B7%D0%BA%D0%B8/flutter/packages/flutter/lib/services.dart': No such file or directory
+import 'package:flutter/services.dart';
+       ^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart:12:8: Error: Error when reading '../../../%D0%97%D0%B0%D0%B3%D1%80%D1%83%D0%B7%D0%BA%D0%B8/flutter/packages/flutter/lib/services.dart': No such file or directory
+import 'package:flutter/services.dart';
+       ^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_platform_interface-3.1.0/lib/src/types.dart:5:8: Error: Error when reading '../../../%D0%97%D0%B0%D0%B3%D1%80%D1%83%D0%B7%D0%BA%D0%B8/flutter/packages/flutter/lib/foundation.dart': No such file or directory
+import 'package:flutter/foundation.dart' show immutable;
+       ^
+lib/app/app.dart:5:26: Error: Type 'StatelessWidget' not found.
+class BrivoraApp extends StatelessWidget {
+                         ^^^^^^^^^^^^^^^
+lib/app/app.dart:9:3: Error: Type 'Widget' not found.
+  Widget build(BuildContext context) {
+  ^^^^^^
+lib/app/app.dart:9:16: Error: Type 'BuildContext' not found.
+  Widget build(BuildContext context) {
+               ^^^^^^^^^^^^
+lib/features/auth/presentation/screens/login_screen.dart:3:27: Error: Type 'StatelessWidget' not found.
+class LoginScreen extends StatelessWidget {
+                          ^^^^^^^^^^^^^^^
+lib/features/auth/presentation/screens/login_screen.dart:7:3: Error: Type 'Widget' not found.
+  Widget build(BuildContext context) {
+  ^^^^^^
+lib/features/auth/presentation/screens/login_screen.dart:7:16: Error: Type 'BuildContext' not found.
+  Widget build(BuildContext context) {
+               ^^^^^^^^^^^^
+lib/app/theme.dart:15:10: Error: Type 'ThemeData' not found.
+  static ThemeData get light {
+         ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart:584:28: Error: Type 'StandardMessageCodec' not found.
+class _PigeonCodec extends StandardMessageCodec {
+                           ^^^^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart:587:19: Error: Type 'WriteBuffer' not found.
+  void writeValue(WriteBuffer buffer, Object? value) {
+                  ^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart:630:37: Error: Type 'ReadBuffer' not found.
+  Object? readValueOfType(int type, ReadBuffer buffer) {
+                                    ^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart:671:9: Error: Type 'BinaryMessenger' not found.
+  final BinaryMessenger? pigeonVar_binaryMessenger;
+        ^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart:673:16: Error: Type 'MessageCodec' not found.
+  static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
+               ^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart:666:20: Error: Type 'BinaryMessenger' not found.
+  GoogleSignInApi({BinaryMessenger? binaryMessenger, String messageChannelSuffix = ''})
+                   ^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:14:1: Error: Type 'PlatformException' not found.
+PlatformException _createConnectionError(String channelName) {
+^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:327:28: Error: Type 'StandardMessageCodec' not found.
+class _PigeonCodec extends StandardMessageCodec {
+                           ^^^^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:330:19: Error: Type 'WriteBuffer' not found.
+  void writeValue(WriteBuffer buffer, Object? value) {
+                  ^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:358:37: Error: Type 'ReadBuffer' not found.
+  Object? readValueOfType(int type, ReadBuffer buffer) {
+                                    ^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:390:9: Error: Type 'BinaryMessenger' not found.
+  final BinaryMessenger? pigeonVar_binaryMessenger;
+        ^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:392:16: Error: Type 'MessageCodec' not found.
+  static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
+               ^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:384:5: Error: Type 'BinaryMessenger' not found.
+    BinaryMessenger? binaryMessenger,
+    ^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart:41:22: Error: Type 'PlatformException' not found.
+    {Object? result, PlatformException? error, bool empty = false}) {
+                     ^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart:299:28: Error: Type 'StandardMessageCodec' not found.
+class _PigeonCodec extends StandardMessageCodec {
+                           ^^^^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart:302:19: Error: Type 'WriteBuffer' not found.
+  void writeValue(WriteBuffer buffer, Object? value) {
+                  ^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart:318:37: Error: Type 'ReadBuffer' not found.
+  Object? readValueOfType(int type, ReadBuffer buffer) {
+                                    ^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart:339:9: Error: Type 'BinaryMessenger' not found.
+  final BinaryMessenger? pigeonVar_binaryMessenger;
+        ^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart:341:16: Error: Type 'MessageCodec' not found.
+  static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
+               ^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart:335:8: Error: Type 'BinaryMessenger' not found.
+      {BinaryMessenger? binaryMessenger, String messageChannelSuffix = ''})
+       ^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart:415:9: Error: Type 'BinaryMessenger' not found.
+  final BinaryMessenger? pigeonVar_binaryMessenger;
+        ^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart:417:16: Error: Type 'MessageCodec' not found.
+  static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
+               ^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart:411:8: Error: Type 'BinaryMessenger' not found.
+      {BinaryMessenger? binaryMessenger, String messageChannelSuffix = ''})
+       ^^^^^^^^^^^^^^^
+lib/app/theme.dart:4:26: Error: Method not found: 'Color'.
+  static const primary = Color(0xFF2563EB);
+                         ^^^^^
+lib/app/theme.dart:5:29: Error: Method not found: 'Color'.
+  static const background = Color(0xFFF8FAFC);
+                            ^^^^^
+lib/app/theme.dart:6:23: Error: Method not found: 'Color'.
+  static const card = Color(0xFFFFFFFF);
+                      ^^^^^
+lib/app/theme.dart:7:30: Error: Method not found: 'Color'.
+  static const textPrimary = Color(0xFF0F172A);
+                             ^^^^^
+lib/app/theme.dart:8:32: Error: Method not found: 'Color'.
+  static const textSecondary = Color(0xFF64748B);
+                               ^^^^^
+lib/app/theme.dart:9:26: Error: Method not found: 'Color'.
+  static const success = Color(0xFF22C55E);
+                         ^^^^^
+lib/app/theme.dart:10:26: Error: Method not found: 'Color'.
+  static const warning = Color(0xFFF59E0B);
+                         ^^^^^
+lib/app/theme.dart:11:24: Error: Method not found: 'Color'.
+  static const error = Color(0xFFEF4444);
+                       ^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core-4.11.0/lib/src/firebase.dart:18:4: Error: Undefined name 'visibleForTesting'.
+  @visibleForTesting
+   ^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/firebase_exception.dart:18:2: Error: Undefined name 'immutable'.
+@immutable
+ ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/firebase_options.dart:22:2: Error: Undefined name 'immutable'.
+@immutable
+ ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/method_channel/method_channel_firebase.dart:11:4: Error: Undefined name 'visibleForTesting'.
+  @visibleForTesting
+   ^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/method_channel/method_channel_firebase.dart:15:4: Error: Undefined name 'visibleForTesting'.
+  @visibleForTesting
+   ^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/method_channel/method_channel_firebase.dart:19:4: Error: Undefined name 'visibleForTesting'.
+  @visibleForTesting
+   ^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_platform_interface-3.1.0/lib/src/types.dart:9:2: Error: Undefined name 'immutable'.
+@immutable
+ ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_platform_interface-3.1.0/lib/src/types.dart:80:2: Error: Undefined name 'immutable'.
+@immutable
+ ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_platform_interface-3.1.0/lib/src/types.dart:130:2: Error: Undefined name 'immutable'.
+@immutable
+ ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_platform_interface-3.1.0/lib/src/types.dart:140:2: Error: Undefined name 'immutable'.
+@immutable
+ ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_platform_interface-3.1.0/lib/src/types.dart:161:2: Error: Undefined name 'immutable'.
+@immutable
+ ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_platform_interface-3.1.0/lib/src/types.dart:202:2: Error: Undefined name 'immutable'.
+@immutable
+ ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_platform_interface-3.1.0/lib/src/types.dart:215:2: Error: Undefined name 'immutable'.
+@immutable
+ ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_platform_interface-3.1.0/lib/src/types.dart:225:2: Error: Undefined name 'immutable'.
+@immutable
+ ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_platform_interface-3.1.0/lib/src/types.dart:281:2: Error: Undefined name 'immutable'.
+@immutable
+ ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_platform_interface-3.1.0/lib/src/types.dart:303:2: Error: Undefined name 'immutable'.
+@immutable
+ ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_platform_interface-3.1.0/lib/src/types.dart:325:2: Error: Undefined name 'immutable'.
+@immutable
+ ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_platform_interface-3.1.0/lib/src/types.dart:351:2: Error: Undefined name 'immutable'.
+@immutable
+ ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_platform_interface-3.1.0/lib/src/types.dart:367:2: Error: Undefined name 'immutable'.
+@immutable
+ ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_platform_interface-3.1.0/lib/src/types.dart:390:2: Error: Undefined name 'immutable'.
+@immutable
+ ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_platform_interface-3.1.0/lib/src/types.dart:400:2: Error: Undefined name 'immutable'.
+@immutable
+ ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_platform_interface-3.1.0/lib/src/types.dart:410:2: Error: Undefined name 'immutable'.
+@immutable
+ ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_platform_interface-3.1.0/lib/src/types.dart:417:2: Error: Undefined name 'immutable'.
+@immutable
+ ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_platform_interface-3.1.0/lib/src/types.dart:436:2: Error: Undefined name 'immutable'.
+@immutable
+ ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_platform_interface-3.1.0/lib/src/types.dart:440:2: Error: Undefined name 'immutable'.
+@immutable
+ ^^^^^^^^^
+lib/main.dart:7:3: Error: Undefined name 'WidgetsFlutterBinding'.
+  WidgetsFlutterBinding.ensureInitialized();
+  ^^^^^^^^^^^^^^^^^^^^^
+lib/main.dart:9:3: Error: Method not found: 'runApp'.
+  runApp(const BrivoraApp());
+  ^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core-4.11.0/lib/src/firebase.dart:54:36: Error: Undefined name 'TargetPlatform'.
+      if (defaultTargetPlatform == TargetPlatform.android) {
+                                   ^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core-4.11.0/lib/src/firebase.dart:54:11: Error: Undefined name 'defaultTargetPlatform'.
+      if (defaultTargetPlatform == TargetPlatform.android) {
+          ^^^^^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core-4.11.0/lib/src/firebase.dart:56:43: Error: Undefined name 'TargetPlatform'.
+      } else if (defaultTargetPlatform == TargetPlatform.iOS ||
+                                          ^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core-4.11.0/lib/src/firebase.dart:56:18: Error: Undefined name 'defaultTargetPlatform'.
+      } else if (defaultTargetPlatform == TargetPlatform.iOS ||
+                 ^^^^^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core-4.11.0/lib/src/firebase.dart:57:36: Error: Undefined name 'TargetPlatform'.
+          defaultTargetPlatform == TargetPlatform.macOS) {
+                                   ^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core-4.11.0/lib/src/firebase.dart:57:11: Error: Undefined name 'defaultTargetPlatform'.
+          defaultTargetPlatform == TargetPlatform.macOS) {
+          ^^^^^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core-4.11.0/lib/src/port_mapping.dart:10:8: Error: Undefined name 'kIsWeb'.
+  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+       ^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core-4.11.0/lib/src/port_mapping.dart:10:43: Error: Undefined name 'TargetPlatform'.
+  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+                                          ^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core-4.11.0/lib/src/port_mapping.dart:10:18: Error: Undefined name 'defaultTargetPlatform'.
+  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+                 ^^^^^^^^^^^^^^^^^^^^^
+lib/firebase_options.dart:19:9: Error: Undefined name 'kIsWeb'.
+    if (kIsWeb) {
+        ^^^^^^
+lib/firebase_options.dart:22:13: Error: Undefined name 'defaultTargetPlatform'.
+    switch (defaultTargetPlatform) {
+            ^^^^^^^^^^^^^^^^^^^^^
+lib/firebase_options.dart:23:12: Error: Undefined name 'TargetPlatform'.
+      case TargetPlatform.android:
+           ^^^^^^^^^^^^^^
+lib/firebase_options.dart:25:12: Error: Undefined name 'TargetPlatform'.
+      case TargetPlatform.iOS:
+           ^^^^^^^^^^^^^^
+lib/firebase_options.dart:27:12: Error: Undefined name 'TargetPlatform'.
+      case TargetPlatform.macOS:
+           ^^^^^^^^^^^^^^
+lib/firebase_options.dart:29:12: Error: Undefined name 'TargetPlatform'.
+      case TargetPlatform.windows:
+           ^^^^^^^^^^^^^^
+lib/firebase_options.dart:31:12: Error: Undefined name 'TargetPlatform'.
+      case TargetPlatform.linux:
+           ^^^^^^^^^^^^^^
+lib/app/app.dart:9:16: Error: 'BuildContext' isn't a type.
+  Widget build(BuildContext context) {
+               ^^^^^^^^^^^^
+lib/app/app.dart:10:12: Error: The method 'MaterialApp' isn't defined for the type 'BrivoraApp'.
+ - 'BrivoraApp' is from 'package:brivora/app/app.dart' ('lib/app/app.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'MaterialApp'.
+    return MaterialApp(
+           ^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/google_sign_in_android.dart:15:25: Error: Undefined name 'visibleForTesting'.
+  GoogleSignInAndroid({@visibleForTesting GoogleSignInApi? api})
+                        ^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/google_sign_in_ios.dart:15:21: Error: Undefined name 'visibleForTesting'.
+  GoogleSignInIOS({@visibleForTesting GoogleSignInApi? api})
+                    ^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/method_channel/method_channel_firebase.dart:83:11: Error: The getter 'defaultTargetPlatform' isn't defined for the type 'MethodChannelFirebase'.
+ - 'MethodChannelFirebase' is from 'package:firebase_core_platform_interface/firebase_core_platform_interface.dart' ('../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/firebase_core_platform_interface.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'defaultTargetPlatform'.
+      if (defaultTargetPlatform == TargetPlatform.android &&
+          ^^^^^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/method_channel/method_channel_firebase.dart:83:36: Error: The getter 'TargetPlatform' isn't defined for the type 'MethodChannelFirebase'.
+ - 'MethodChannelFirebase' is from 'package:firebase_core_platform_interface/firebase_core_platform_interface.dart' ('../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/firebase_core_platform_interface.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'TargetPlatform'.
+      if (defaultTargetPlatform == TargetPlatform.android &&
+                                   ^^^^^^^^^^^^^^
+lib/features/auth/presentation/screens/login_screen.dart:7:16: Error: 'BuildContext' isn't a type.
+  Widget build(BuildContext context) {
+               ^^^^^^^^^^^^
+lib/features/auth/presentation/screens/login_screen.dart:12:54: Error: The getter 'FontWeight' isn't defined for the type 'LoginScreen'.
+ - 'LoginScreen' is from 'package:brivora/features/auth/presentation/screens/login_screen.dart' ('lib/features/auth/presentation/screens/login_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'FontWeight'.
+          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                                                     ^^^^^^^^^^
+lib/features/auth/presentation/screens/login_screen.dart:12:18: Error: The method 'TextStyle' isn't defined for the type 'LoginScreen'.
+ - 'LoginScreen' is from 'package:brivora/features/auth/presentation/screens/login_screen.dart' ('lib/features/auth/presentation/screens/login_screen.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'TextStyle'.
+          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                 ^^^^^^^^^
+lib/features/auth/presentation/screens/login_screen.dart:10:16: Error: The method 'Text' isn't defined for the type 'LoginScreen'.
+ - 'LoginScreen' is from 'package:brivora/features/auth/presentation/screens/login_screen.dart' ('lib/features/auth/presentation/screens/login_screen.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Text'.
+        child: Text(
+               ^^^^
+lib/features/auth/presentation/screens/login_screen.dart:9:13: Error: The method 'Center' isn't defined for the type 'LoginScreen'.
+ - 'LoginScreen' is from 'package:brivora/features/auth/presentation/screens/login_screen.dart' ('lib/features/auth/presentation/screens/login_screen.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Center'.
+      body: Center(
+            ^^^^^^
+lib/features/auth/presentation/screens/login_screen.dart:8:12: Error: The method 'Scaffold' isn't defined for the type 'LoginScreen'.
+ - 'LoginScreen' is from 'package:brivora/features/auth/presentation/screens/login_screen.dart' ('lib/features/auth/presentation/screens/login_screen.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Scaffold'.
+    return Scaffold(
+           ^^^^^^^^
+lib/app/theme.dart:19:20: Error: Undefined name 'ColorScheme'.
+      colorScheme: ColorScheme.light(
+                   ^^^^^^^^^^^
+lib/app/theme.dart:25:20: Error: Method not found: 'TextStyle'.
+        bodyLarge: TextStyle(color: AppColors.textPrimary),
+                   ^^^^^^^^^
+lib/app/theme.dart:26:21: Error: Method not found: 'TextStyle'.
+        bodyMedium: TextStyle(color: AppColors.textSecondary),
+                    ^^^^^^^^^
+lib/app/theme.dart:24:24: Error: Couldn't find constructor 'TextTheme'.
+      textTheme: const TextTheme(
+                       ^^^^^^^^^
+lib/app/theme.dart:31:53: Error: Undefined name 'BorderRadius'.
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                                    ^^^^^^^^^^^^
+lib/app/theme.dart:31:16: Error: Method not found: 'RoundedRectangleBorder'.
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+               ^^^^^^^^^^^^^^^^^^^^^^
+lib/app/theme.dart:28:18: Error: Method not found: 'CardThemeData'.
+      cardTheme: CardThemeData(
+                 ^^^^^^^^^^^^^
+lib/app/theme.dart:33:26: Error: Couldn't find constructor 'AppBarTheme'.
+      appBarTheme: const AppBarTheme(
+                         ^^^^^^^^^^^
+lib/app/theme.dart:16:12: Error: Method not found: 'ThemeData'.
+    return ThemeData(
+           ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart:21:11: Error: Method not found: 'PlatformException'.
+    throw PlatformException(
+          ^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart:26:11: Error: Method not found: 'PlatformException'.
+    throw PlatformException(
+          ^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart:32:11: Error: Method not found: 'PlatformException'.
+    throw PlatformException(
+          ^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart:587:19: Error: 'WriteBuffer' isn't a type.
+  void writeValue(WriteBuffer buffer, Object? value) {
+                  ^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart:625:13: Error: Superclass has no method named 'writeValue'.
+      super.writeValue(buffer, value);
+            ^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart:630:37: Error: 'ReadBuffer' isn't a type.
+  Object? readValueOfType(int type, ReadBuffer buffer) {
+                                    ^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart:657:22: Error: Superclass has no method named 'readValueOfType'.
+        return super.readValueOfType(type, buffer);
+                     ^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart:633:23: Error: The method 'readValue' isn't defined for the type '_PigeonCodec'.
+ - '_PigeonCodec' is from 'package:google_sign_in_android/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'readValue'.
+        final value = readValue(buffer) as int?;
+                      ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart:636:23: Error: The method 'readValue' isn't defined for the type '_PigeonCodec'.
+ - '_PigeonCodec' is from 'package:google_sign_in_android/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'readValue'.
+        final value = readValue(buffer) as int?;
+                      ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart:639:52: Error: The method 'readValue' isn't defined for the type '_PigeonCodec'.
+ - '_PigeonCodec' is from 'package:google_sign_in_android/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'readValue'.
+        return PlatformAuthorizationRequest.decode(readValue(buffer)!);
+                                                   ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart:641:50: Error: The method 'readValue' isn't defined for the type '_PigeonCodec'.
+ - '_PigeonCodec' is from 'package:google_sign_in_android/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'readValue'.
+        return GetCredentialRequestParams.decode(readValue(buffer)!);
+                                                 ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart:643:64: Error: The method 'readValue' isn't defined for the type '_PigeonCodec'.
+ - '_PigeonCodec' is from 'package:google_sign_in_android/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'readValue'.
+        return GetCredentialRequestGoogleIdOptionParams.decode(readValue(buffer)!);
+                                                               ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart:645:51: Error: The method 'readValue' isn't defined for the type '_PigeonCodec'.
+ - '_PigeonCodec' is from 'package:google_sign_in_android/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'readValue'.
+        return PlatformRevokeAccessRequest.decode(readValue(buffer)!);
+                                                  ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart:647:55: Error: The method 'readValue' isn't defined for the type '_PigeonCodec'.
+ - '_PigeonCodec' is from 'package:google_sign_in_android/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'readValue'.
+        return PlatformGoogleIdTokenCredential.decode(readValue(buffer)!);
+                                                      ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart:649:44: Error: The method 'readValue' isn't defined for the type '_PigeonCodec'.
+ - '_PigeonCodec' is from 'package:google_sign_in_android/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'readValue'.
+        return GetCredentialFailure.decode(readValue(buffer)!);
+                                           ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart:651:44: Error: The method 'readValue' isn't defined for the type '_PigeonCodec'.
+ - '_PigeonCodec' is from 'package:google_sign_in_android/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'readValue'.
+        return GetCredentialSuccess.decode(readValue(buffer)!);
+                                           ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart:653:40: Error: The method 'readValue' isn't defined for the type '_PigeonCodec'.
+ - '_PigeonCodec' is from 'package:google_sign_in_android/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'readValue'.
+        return AuthorizeFailure.decode(readValue(buffer)!);
+                                       ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart:655:51: Error: The method 'readValue' isn't defined for the type '_PigeonCodec'.
+ - '_PigeonCodec' is from 'package:google_sign_in_android/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'readValue'.
+        return PlatformAuthorizationResult.decode(readValue(buffer)!);
+                                                  ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart:666:20: Error: 'BinaryMessenger' isn't a type.
+  GoogleSignInApi({BinaryMessenger? binaryMessenger, String messageChannelSuffix = ''})
+                   ^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart:671:9: Error: 'BinaryMessenger' isn't a type.
+  final BinaryMessenger? pigeonVar_binaryMessenger;
+        ^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart:673:16: Error: 'MessageCodec' isn't a type.
+  static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
+               ^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart:682:31: Error: The method 'BasicMessageChannel' isn't defined for the type 'GoogleSignInApi'.
+ - 'GoogleSignInApi' is from 'package:google_sign_in_android/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'BasicMessageChannel'.
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+                              ^^^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart:703:31: Error: The method 'BasicMessageChannel' isn't defined for the type 'GoogleSignInApi'.
+ - 'GoogleSignInApi' is from 'package:google_sign_in_android/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'BasicMessageChannel'.
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+                              ^^^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart:723:31: Error: The method 'BasicMessageChannel' isn't defined for the type 'GoogleSignInApi'.
+ - 'GoogleSignInApi' is from 'package:google_sign_in_android/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'BasicMessageChannel'.
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+                              ^^^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart:738:31: Error: The method 'BasicMessageChannel' isn't defined for the type 'GoogleSignInApi'.
+ - 'GoogleSignInApi' is from 'package:google_sign_in_android/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'BasicMessageChannel'.
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+                              ^^^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart:756:31: Error: The method 'BasicMessageChannel' isn't defined for the type 'GoogleSignInApi'.
+ - 'GoogleSignInApi' is from 'package:google_sign_in_android/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'BasicMessageChannel'.
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+                              ^^^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart:778:31: Error: The method 'BasicMessageChannel' isn't defined for the type 'GoogleSignInApi'.
+ - 'GoogleSignInApi' is from 'package:google_sign_in_android/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_android-7.2.14/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'BasicMessageChannel'.
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+                              ^^^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:15:10: Error: Method not found: 'PlatformException'.
+  return PlatformException(
+         ^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:330:19: Error: 'WriteBuffer' isn't a type.
+  void writeValue(WriteBuffer buffer, Object? value) {
+                  ^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:353:13: Error: Superclass has no method named 'writeValue'.
+      super.writeValue(buffer, value);
+            ^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:358:37: Error: 'ReadBuffer' isn't a type.
+  Object? readValueOfType(int type, ReadBuffer buffer) {
+                                    ^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:374:22: Error: Superclass has no method named 'readValueOfType'.
+        return super.readValueOfType(type, buffer);
+                     ^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:361:28: Error: The method 'readValue' isn't defined for the type '_PigeonCodec'.
+ - '_PigeonCodec' is from 'package:google_sign_in_ios/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'readValue'.
+        final int? value = readValue(buffer) as int?;
+                           ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:364:51: Error: The method 'readValue' isn't defined for the type '_PigeonCodec'.
+ - '_PigeonCodec' is from 'package:google_sign_in_ios/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'readValue'.
+        return PlatformConfigurationParams.decode(readValue(buffer)!);
+                                                  ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:366:32: Error: The method 'readValue' isn't defined for the type '_PigeonCodec'.
+ - '_PigeonCodec' is from 'package:google_sign_in_ios/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'readValue'.
+        return UserData.decode(readValue(buffer)!);
+                               ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:368:36: Error: The method 'readValue' isn't defined for the type '_PigeonCodec'.
+ - '_PigeonCodec' is from 'package:google_sign_in_ios/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'readValue'.
+        return SignInResult.decode(readValue(buffer)!);
+                                   ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:370:37: Error: The method 'readValue' isn't defined for the type '_PigeonCodec'.
+ - '_PigeonCodec' is from 'package:google_sign_in_ios/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'readValue'.
+        return SignInFailure.decode(readValue(buffer)!);
+                                    ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:372:37: Error: The method 'readValue' isn't defined for the type '_PigeonCodec'.
+ - '_PigeonCodec' is from 'package:google_sign_in_ios/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'readValue'.
+        return SignInSuccess.decode(readValue(buffer)!);
+                                    ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:384:5: Error: 'BinaryMessenger' isn't a type.
+    BinaryMessenger? binaryMessenger,
+    ^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:390:9: Error: 'BinaryMessenger' isn't a type.
+  final BinaryMessenger? pigeonVar_binaryMessenger;
+        ^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:392:16: Error: 'MessageCodec' isn't a type.
+  static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
+               ^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:400:11: Error: 'BasicMessageChannel' isn't a type.
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+          ^^^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:401:9: Error: The method 'BasicMessageChannel' isn't defined for the type 'GoogleSignInApi'.
+ - 'GoogleSignInApi' is from 'package:google_sign_in_ios/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'BasicMessageChannel'.
+        BasicMessageChannel<Object?>(
+        ^^^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:414:13: Error: The method 'PlatformException' isn't defined for the type 'GoogleSignInApi'.
+ - 'GoogleSignInApi' is from 'package:google_sign_in_ios/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'PlatformException'.
+      throw PlatformException(
+            ^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:429:11: Error: 'BasicMessageChannel' isn't a type.
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+          ^^^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:430:9: Error: The method 'BasicMessageChannel' isn't defined for the type 'GoogleSignInApi'.
+ - 'GoogleSignInApi' is from 'package:google_sign_in_ios/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'BasicMessageChannel'.
+        BasicMessageChannel<Object?>(
+        ^^^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:441:13: Error: The method 'PlatformException' isn't defined for the type 'GoogleSignInApi'.
+ - 'GoogleSignInApi' is from 'package:google_sign_in_ios/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'PlatformException'.
+      throw PlatformException(
+            ^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:447:13: Error: The method 'PlatformException' isn't defined for the type 'GoogleSignInApi'.
+ - 'GoogleSignInApi' is from 'package:google_sign_in_ios/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'PlatformException'.
+      throw PlatformException(
+            ^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:460:11: Error: 'BasicMessageChannel' isn't a type.
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+          ^^^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:461:9: Error: The method 'BasicMessageChannel' isn't defined for the type 'GoogleSignInApi'.
+ - 'GoogleSignInApi' is from 'package:google_sign_in_ios/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'BasicMessageChannel'.
+        BasicMessageChannel<Object?>(
+        ^^^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:474:13: Error: The method 'PlatformException' isn't defined for the type 'GoogleSignInApi'.
+ - 'GoogleSignInApi' is from 'package:google_sign_in_ios/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'PlatformException'.
+      throw PlatformException(
+            ^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:480:13: Error: The method 'PlatformException' isn't defined for the type 'GoogleSignInApi'.
+ - 'GoogleSignInApi' is from 'package:google_sign_in_ios/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'PlatformException'.
+      throw PlatformException(
+            ^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:493:11: Error: 'BasicMessageChannel' isn't a type.
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+          ^^^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:494:9: Error: The method 'BasicMessageChannel' isn't defined for the type 'GoogleSignInApi'.
+ - 'GoogleSignInApi' is from 'package:google_sign_in_ios/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'BasicMessageChannel'.
+        BasicMessageChannel<Object?>(
+        ^^^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:507:13: Error: The method 'PlatformException' isn't defined for the type 'GoogleSignInApi'.
+ - 'GoogleSignInApi' is from 'package:google_sign_in_ios/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'PlatformException'.
+      throw PlatformException(
+            ^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:513:13: Error: The method 'PlatformException' isn't defined for the type 'GoogleSignInApi'.
+ - 'GoogleSignInApi' is from 'package:google_sign_in_ios/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'PlatformException'.
+      throw PlatformException(
+            ^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:526:11: Error: 'BasicMessageChannel' isn't a type.
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+          ^^^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:527:9: Error: The method 'BasicMessageChannel' isn't defined for the type 'GoogleSignInApi'.
+ - 'GoogleSignInApi' is from 'package:google_sign_in_ios/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'BasicMessageChannel'.
+        BasicMessageChannel<Object?>(
+        ^^^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:540:13: Error: The method 'PlatformException' isn't defined for the type 'GoogleSignInApi'.
+ - 'GoogleSignInApi' is from 'package:google_sign_in_ios/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'PlatformException'.
+      throw PlatformException(
+            ^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:546:13: Error: The method 'PlatformException' isn't defined for the type 'GoogleSignInApi'.
+ - 'GoogleSignInApi' is from 'package:google_sign_in_ios/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'PlatformException'.
+      throw PlatformException(
+            ^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:559:11: Error: 'BasicMessageChannel' isn't a type.
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+          ^^^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:560:9: Error: The method 'BasicMessageChannel' isn't defined for the type 'GoogleSignInApi'.
+ - 'GoogleSignInApi' is from 'package:google_sign_in_ios/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'BasicMessageChannel'.
+        BasicMessageChannel<Object?>(
+        ^^^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:571:13: Error: The method 'PlatformException' isn't defined for the type 'GoogleSignInApi'.
+ - 'GoogleSignInApi' is from 'package:google_sign_in_ios/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'PlatformException'.
+      throw PlatformException(
+            ^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:585:11: Error: 'BasicMessageChannel' isn't a type.
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+          ^^^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:586:9: Error: The method 'BasicMessageChannel' isn't defined for the type 'GoogleSignInApi'.
+ - 'GoogleSignInApi' is from 'package:google_sign_in_ios/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'BasicMessageChannel'.
+        BasicMessageChannel<Object?>(
+        ^^^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart:597:13: Error: The method 'PlatformException' isn't defined for the type 'GoogleSignInApi'.
+ - 'GoogleSignInApi' is from 'package:google_sign_in_ios/src/messages.g.dart' ('../../../.pub-cache/hosted/pub.dev/google_sign_in_ios-6.3.0/lib/src/messages.g.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'PlatformException'.
+      throw PlatformException(
+            ^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart:21:11: Error: Method not found: 'PlatformException'.
+    throw PlatformException(
+          ^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart:26:11: Error: Method not found: 'PlatformException'.
+    throw PlatformException(
+          ^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart:32:11: Error: Method not found: 'PlatformException'.
+    throw PlatformException(
+          ^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart:41:22: Error: 'PlatformException' isn't a type.
+    {Object? result, PlatformException? error, bool empty = false}) {
+                     ^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart:302:19: Error: 'WriteBuffer' isn't a type.
+  void writeValue(WriteBuffer buffer, Object? value) {
+                  ^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart:313:13: Error: Superclass has no method named 'writeValue'.
+      super.writeValue(buffer, value);
+            ^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart:318:37: Error: 'ReadBuffer' isn't a type.
+  Object? readValueOfType(int type, ReadBuffer buffer) {
+                                    ^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart:325:22: Error: Superclass has no method named 'readValueOfType'.
+        return super.readValueOfType(type, buffer);
+                     ^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart:321:43: Error: The method 'readValue' isn't defined for the type '_PigeonCodec'.
+ - '_PigeonCodec' is from 'package:firebase_core_platform_interface/src/pigeon/messages.pigeon.dart' ('../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'readValue'.
+        return CoreFirebaseOptions.decode(readValue(buffer)!);
+                                          ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart:323:46: Error: The method 'readValue' isn't defined for the type '_PigeonCodec'.
+ - '_PigeonCodec' is from 'package:firebase_core_platform_interface/src/pigeon/messages.pigeon.dart' ('../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'readValue'.
+        return CoreInitializeResponse.decode(readValue(buffer)!);
+                                             ^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart:335:8: Error: 'BinaryMessenger' isn't a type.
+      {BinaryMessenger? binaryMessenger, String messageChannelSuffix = ''})
+       ^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart:339:9: Error: 'BinaryMessenger' isn't a type.
+  final BinaryMessenger? pigeonVar_binaryMessenger;
+        ^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart:341:16: Error: 'MessageCodec' isn't a type.
+  static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
+               ^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart:349:31: Error: The method 'BasicMessageChannel' isn't defined for the type 'FirebaseCoreHostApi'.
+ - 'FirebaseCoreHostApi' is from 'package:firebase_core_platform_interface/src/pigeon/messages.pigeon.dart' ('../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'BasicMessageChannel'.
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+                              ^^^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart:369:31: Error: The method 'BasicMessageChannel' isn't defined for the type 'FirebaseCoreHostApi'.
+ - 'FirebaseCoreHostApi' is from 'package:firebase_core_platform_interface/src/pigeon/messages.pigeon.dart' ('../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'BasicMessageChannel'.
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+                              ^^^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart:389:31: Error: The method 'BasicMessageChannel' isn't defined for the type 'FirebaseCoreHostApi'.
+ - 'FirebaseCoreHostApi' is from 'package:firebase_core_platform_interface/src/pigeon/messages.pigeon.dart' ('../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'BasicMessageChannel'.
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+                              ^^^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart:411:8: Error: 'BinaryMessenger' isn't a type.
+      {BinaryMessenger? binaryMessenger, String messageChannelSuffix = ''})
+       ^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart:415:9: Error: 'BinaryMessenger' isn't a type.
+  final BinaryMessenger? pigeonVar_binaryMessenger;
+        ^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart:417:16: Error: 'MessageCodec' isn't a type.
+  static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
+               ^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart:425:31: Error: The method 'BasicMessageChannel' isn't defined for the type 'FirebaseAppHostApi'.
+ - 'FirebaseAppHostApi' is from 'package:firebase_core_platform_interface/src/pigeon/messages.pigeon.dart' ('../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'BasicMessageChannel'.
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+                              ^^^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart:445:31: Error: The method 'BasicMessageChannel' isn't defined for the type 'FirebaseAppHostApi'.
+ - 'FirebaseAppHostApi' is from 'package:firebase_core_platform_interface/src/pigeon/messages.pigeon.dart' ('../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'BasicMessageChannel'.
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+                              ^^^^^^^^^^^^^^^^^^^
+../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart:464:31: Error: The method 'BasicMessageChannel' isn't defined for the type 'FirebaseAppHostApi'.
+ - 'FirebaseAppHostApi' is from 'package:firebase_core_platform_interface/src/pigeon/messages.pigeon.dart' ('../../../.pub-cache/hosted/pub.dev/firebase_core_platform_interface-7.1.0/lib/src/pigeon/messages.pigeon.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'BasicMessageChannel'.
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+                              ^^^^^^^^^^^^^^^^^^^
+Target kernel_snapshot_program failed: Exception
+
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:compileFlutterBuildDebug'.
+> Process 'command '/home/k8n3j/Development/flutter/bin/flutter'' finished with non-zero exit value 1
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to generate a Build Scan (Powered by Develocity).
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 4s
+Running Gradle task 'assembleDebug'...                              4,2s
+Error: Gradle task assembleDebug failed with exit code 1
