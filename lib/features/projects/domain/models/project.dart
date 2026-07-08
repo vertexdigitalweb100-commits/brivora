@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Project {
   final String id;
   final String title;
@@ -21,7 +23,6 @@ class Project {
     this.members = const [],
   });
 
-  /// Копирует проект с измененными полями
   Project copyWith({
     String? id,
     String? title,
@@ -46,7 +47,6 @@ class Project {
     );
   }
 
-  /// Конвертирует модель в JSON для Firestore
   Map<String, dynamic> toFirestore() {
     return {
       'id': id,
@@ -55,50 +55,62 @@ class Project {
       'progress': progress,
       'status': status.name,
       'ownerId': ownerId,
-      'createdAt': createdAt,
-      'updatedAt': updatedAt ?? createdAt,
+      'createdAt': Timestamp.fromDate(createdAt),
+      'updatedAt': Timestamp.fromDate(updatedAt ?? createdAt),
       'members': members,
     };
   }
 
-  /// Создает модель из Firestore документа
   factory Project.fromFirestore(Map<String, dynamic> data) {
     return Project(
-      id: data['id'] as String,
-      title: data['title'] as String,
-      description: data['description'] as String? ?? '',
-      progress: (data['progress'] as num?)?.toDouble() ?? 0.0,
+      id: data['id'] ?? '',
+
+      title: data['title'] ?? '',
+
+      description: data['description'] ?? '',
+
+      progress: (data['progress'] ?? 0).toDouble(),
+
       status: ProjectStatus.values.firstWhere(
         (e) => e.name == data['status'],
+
         orElse: () => ProjectStatus.active,
       ),
-      ownerId: data['ownerId'] as String,
-      createdAt: (data['createdAt'] as DateTime?) ?? DateTime.now(),
-      updatedAt: data['updatedAt'] as DateTime?,
-      members: List<String>.from(data['members'] as List? ?? []),
+
+      ownerId: data['ownerId'] ?? '',
+
+      createdAt: data['createdAt'] is Timestamp
+          ? (data['createdAt'] as Timestamp).toDate()
+          : DateTime.now(),
+
+      updatedAt: data['updatedAt'] is Timestamp
+          ? (data['updatedAt'] as Timestamp).toDate()
+          : null,
+
+      members: List<String>.from(data['members'] ?? []),
     );
   }
 
   @override
-  String toString() => 'Project(id: $id, title: $title, ownerId: $ownerId)';
+  String toString() {
+    return 'Project(id: $id, title: $title, ownerId: $ownerId)';
+  }
 }
 
-enum ProjectStatus {
-  active,
-  planning,
-  completed,
-  archived,
-}
+enum ProjectStatus { active, planning, completed, archived }
 
 extension ProjectStatusExtension on ProjectStatus {
   String get displayName {
     switch (this) {
       case ProjectStatus.active:
         return 'Активный';
+
       case ProjectStatus.planning:
         return 'Планирование';
+
       case ProjectStatus.completed:
         return 'Завершен';
+
       case ProjectStatus.archived:
         return 'Архив';
     }
@@ -108,10 +120,13 @@ extension ProjectStatusExtension on ProjectStatus {
     switch (this) {
       case ProjectStatus.active:
         return 'Активный';
+
       case ProjectStatus.planning:
         return 'В процессе';
+
       case ProjectStatus.completed:
         return 'Завершен';
+
       case ProjectStatus.archived:
         return 'Архив';
     }

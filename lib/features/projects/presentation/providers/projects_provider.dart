@@ -39,15 +39,22 @@ class ProjectsProvider extends ChangeNotifier {
   /// Создать новый проект
   Future<void> createProject(String title, {String description = ''}) async {
     try {
+      print('Создаем проект: $title');
+
       final project = await repository.createProject(
         title: title,
         description: description,
       );
+
+      print('Создан проект ID: ${project.id}');
+
       _projects.insert(0, project);
+
+      print('Список проектов: ${_projects.length}');
+
       notifyListeners();
     } catch (e) {
-      _error = 'Ошибка при создании проекта: $e';
-      print(_error);
+      print('Ошибка создания проекта: $e');
       rethrow;
     }
   }
@@ -80,7 +87,10 @@ class ProjectsProvider extends ChangeNotifier {
   }
 
   /// Изменить статус проекта
-  Future<void> updateProjectStatus(String projectId, ProjectStatus status) async {
+  Future<void> updateProjectStatus(
+    String projectId,
+    ProjectStatus status,
+  ) async {
     try {
       await repository.updateProjectStatus(projectId, status);
       final index = _projects.indexWhere((p) => p.id == projectId);
@@ -98,10 +108,15 @@ class ProjectsProvider extends ChangeNotifier {
   /// Изменить прогресс проекта
   Future<void> updateProjectProgress(String projectId, double progress) async {
     try {
-      await repository.updateProjectProgress(projectId, progress.clamp(0.0, 1.0));
+      await repository.updateProjectProgress(
+        projectId,
+        progress.clamp(0.0, 1.0),
+      );
       final index = _projects.indexWhere((p) => p.id == projectId);
       if (index != -1) {
-        _projects[index] = _projects[index].copyWith(progress: progress.clamp(0.0, 1.0));
+        _projects[index] = _projects[index].copyWith(
+          progress: progress.clamp(0.0, 1.0),
+        );
         notifyListeners();
       }
     } catch (e) {
@@ -114,10 +129,18 @@ class ProjectsProvider extends ChangeNotifier {
   /// Получить количество проектов по статусам
   Map<ProjectStatus, int> getProjectCountByStatus() {
     return {
-      ProjectStatus.active: _projects.where((p) => p.status == ProjectStatus.active).length,
-      ProjectStatus.planning: _projects.where((p) => p.status == ProjectStatus.planning).length,
-      ProjectStatus.completed: _projects.where((p) => p.status == ProjectStatus.completed).length,
-      ProjectStatus.archived: _projects.where((p) => p.status == ProjectStatus.archived).length,
+      ProjectStatus.active: _projects
+          .where((p) => p.status == ProjectStatus.active)
+          .length,
+      ProjectStatus.planning: _projects
+          .where((p) => p.status == ProjectStatus.planning)
+          .length,
+      ProjectStatus.completed: _projects
+          .where((p) => p.status == ProjectStatus.completed)
+          .length,
+      ProjectStatus.archived: _projects
+          .where((p) => p.status == ProjectStatus.archived)
+          .length,
     };
   }
 }
