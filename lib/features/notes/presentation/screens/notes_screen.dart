@@ -1,8 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../domain/models/note.dart';
 import '../providers/notes_provider.dart';
+import '../widgets/create_note_dialog.dart';
 
 class NotesScreen extends StatefulWidget {
   final String projectId;
@@ -28,11 +30,16 @@ class _NotesScreenState extends State<NotesScreen> {
     return Consumer<NotesProvider>(
       builder: (context, provider, child) {
         if (provider.isLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
         }
 
         if (provider.error != null) {
-          return Center(child: Text(provider.error!));
+          return Scaffold(
+            appBar: AppBar(title: const Text('Заметки')),
+            body: Center(child: Text(provider.error!)),
+          );
         }
 
         if (provider.notes.isEmpty) {
@@ -40,20 +47,17 @@ class _NotesScreenState extends State<NotesScreen> {
         }
 
         return Scaffold(
+          appBar: AppBar(title: const Text('Заметки')),
           body: ListView.builder(
             padding: const EdgeInsets.all(16),
             itemCount: provider.notes.length,
             itemBuilder: (context, index) {
               final note = provider.notes[index];
-
               return _buildNoteCard(note);
             },
           ),
-
           floatingActionButton: FloatingActionButton(
-            onPressed: () {
-              _showCreateDialog();
-            },
+            onPressed: _showCreateDialog,
             child: const Icon(Icons.add),
           ),
         );
@@ -63,10 +67,9 @@ class _NotesScreenState extends State<NotesScreen> {
 
   Widget _buildEmptyState() {
     return Scaffold(
+      appBar: AppBar(title: const Text('Заметки')),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _showCreateDialog();
-        },
+        onPressed: _showCreateDialog,
         child: const Icon(Icons.add),
       ),
       body: Center(
@@ -105,22 +108,21 @@ class _NotesScreenState extends State<NotesScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-
               const SizedBox(height: 8),
-
               Text(note.content, maxLines: 3, overflow: TextOverflow.ellipsis),
-
               const SizedBox(height: 12),
-
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     "${note.updatedAt.day}.${note.updatedAt.month}.${note.updatedAt.year}",
                   ),
-
                   PopupMenuButton<String>(
-                    onSelected: (value) {},
+                    onSelected: (value) async {
+                      if (value == "delete") {
+                        await context.read<NotesProvider>().deleteNote(note);
+                      }
+                    },
                     itemBuilder: (_) => const [
                       PopupMenuItem(
                         value: "edit",
@@ -138,5 +140,34 @@ class _NotesScreenState extends State<NotesScreen> {
     );
   }
 
-  void _showCreateDialog() {}
+  void _showCreateDialog() {
+    showDialog(
+      context: context,
+      builder: (_) {
+        return CreateNoteDialog(
+          onCreate: (title, content) async {
+            final user = FirebaseAuth.instance.currentUser;
+
+            if (user == null) {
+              return;
+            }
+
+            final now = DateTime.now();
+
+            final note = Note(
+              id: '',
+              projectId: widget.projectId,
+              ownerId: user.uid,
+              title: title,
+              content: content,
+              createdAt: now,
+              updatedAt: now,
+            );
+
+            await context.read<NotesProvider>().createNote(note);
+          },
+        );
+      },
+    );
+  }
 }
