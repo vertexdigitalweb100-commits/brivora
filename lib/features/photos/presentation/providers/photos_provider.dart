@@ -1,27 +1,26 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 
 import '../../data/repositories/photo_repository.dart';
-import '../../domain/models/project_photo.dart';
+import '../../domain/models/photo.dart';
 
 class PhotosProvider extends ChangeNotifier {
   final PhotoRepository _repository = PhotoRepository();
 
-  List<ProjectPhoto> _photos = [];
+  List<Photo> _photos = [];
   bool _isLoading = false;
   String? _error;
 
-  List<ProjectPhoto> get photos => _photos;
+  List<Photo> get photos => _photos;
   bool get isLoading => _isLoading;
   String? get error => _error;
 
-  Future<void> loadPhotos(String projectId) async {
-    _isLoading = true;
-    notifyListeners();
-
+  Future<void> uploadPhoto(String projectId) async {
     try {
-      _photos = await _repository.getProjectPhotos(projectId);
+      _isLoading = true;
+      notifyListeners();
+
+      await _repository.pickAndUploadPhoto(projectId);
+
       _error = null;
     } catch (e) {
       _error = e.toString();
@@ -31,17 +30,11 @@ class PhotosProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> uploadPhoto({
-    required String projectId,
-    required File imageFile,
-  }) async {
-    await _repository.uploadPhoto(projectId: projectId, imageFile: imageFile);
-
-    await loadPhotos(projectId);
+  Stream<List<Photo>> getPhotos(String projectId) {
+    return _repository.getProjectPhotos(projectId);
   }
 
-  Future<void> deletePhoto(ProjectPhoto photo) async {
+  Future<void> deletePhoto(Photo photo) async {
     await _repository.deletePhoto(photo);
-    await loadPhotos(photo.projectId);
   }
 }

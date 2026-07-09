@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 
-class CreateNoteDialog extends StatefulWidget {
-  final Future<void> Function(String title, String content) onCreate;
+import '../../domain/models/note.dart';
 
-  const CreateNoteDialog({super.key, required this.onCreate});
+class CreateNoteDialog extends StatefulWidget {
+  final Note? note;
+  final Future<void> Function(String title, String content) onSave;
+
+  const CreateNoteDialog({super.key, this.note, required this.onSave});
 
   @override
   State<CreateNoteDialog> createState() => _CreateNoteDialogState();
@@ -12,10 +15,23 @@ class CreateNoteDialog extends StatefulWidget {
 class _CreateNoteDialogState extends State<CreateNoteDialog> {
   final _formKey = GlobalKey<FormState>();
 
-  final _titleController = TextEditingController();
-  final _contentController = TextEditingController();
+  late final TextEditingController _titleController;
+  late final TextEditingController _contentController;
 
   bool _isLoading = false;
+
+  bool get _isEdit => widget.note != null;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _titleController = TextEditingController(text: widget.note?.title ?? '');
+
+    _contentController = TextEditingController(
+      text: widget.note?.content ?? '',
+    );
+  }
 
   @override
   void dispose() {
@@ -24,7 +40,7 @@ class _CreateNoteDialogState extends State<CreateNoteDialog> {
     super.dispose();
   }
 
-  Future<void> _createNote() async {
+  Future<void> _save() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -34,7 +50,7 @@ class _CreateNoteDialogState extends State<CreateNoteDialog> {
     });
 
     try {
-      await widget.onCreate(
+      await widget.onSave(
         _titleController.text.trim(),
         _contentController.text.trim(),
       );
@@ -45,7 +61,13 @@ class _CreateNoteDialogState extends State<CreateNoteDialog> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Ошибка создания заметки')),
+          SnackBar(
+            content: Text(
+              _isEdit
+                  ? 'Ошибка редактирования заметки'
+                  : 'Ошибка создания заметки',
+            ),
+          ),
         );
       }
     }
@@ -60,7 +82,7 @@ class _CreateNoteDialogState extends State<CreateNoteDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Новая заметка'),
+      title: Text(_isEdit ? 'Редактировать заметку' : 'Новая заметка'),
       content: Form(
         key: _formKey,
         child: SizedBox(
@@ -78,13 +100,14 @@ class _CreateNoteDialogState extends State<CreateNoteDialog> {
                   if (value == null || value.trim().isEmpty) {
                     return 'Введите название';
                   }
+
                   return null;
                 },
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _contentController,
-                maxLines: 5,
+                maxLines: 6,
                 decoration: const InputDecoration(
                   labelText: 'Текст заметки',
                   border: OutlineInputBorder(),
@@ -104,14 +127,14 @@ class _CreateNoteDialogState extends State<CreateNoteDialog> {
           child: const Text('Отмена'),
         ),
         FilledButton(
-          onPressed: _isLoading ? null : _createNote,
+          onPressed: _isLoading ? null : _save,
           child: _isLoading
               ? const SizedBox(
                   width: 20,
                   height: 20,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : const Text('Создать'),
+              : Text(_isEdit ? 'Сохранить' : 'Создать'),
         ),
       ],
     );

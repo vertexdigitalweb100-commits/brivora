@@ -53,6 +53,7 @@ class _NotesScreenState extends State<NotesScreen> {
             itemCount: provider.notes.length,
             itemBuilder: (context, index) {
               final note = provider.notes[index];
+
               return _buildNoteCard(note);
             },
           ),
@@ -72,10 +73,10 @@ class _NotesScreenState extends State<NotesScreen> {
         onPressed: _showCreateDialog,
         child: const Icon(Icons.add),
       ),
-      body: Center(
+      body: const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
+          children: [
             Icon(Icons.note_alt_outlined, size: 70),
             SizedBox(height: 16),
             Text(
@@ -95,7 +96,6 @@ class _NotesScreenState extends State<NotesScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: () {},
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -108,17 +108,26 @@ class _NotesScreenState extends State<NotesScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
+
               const SizedBox(height: 8),
+
               Text(note.content, maxLines: 3, overflow: TextOverflow.ellipsis),
+
               const SizedBox(height: 12),
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     "${note.updatedAt.day}.${note.updatedAt.month}.${note.updatedAt.year}",
                   ),
+
                   PopupMenuButton<String>(
                     onSelected: (value) async {
+                      if (value == "edit") {
+                        _showEditDialog(note);
+                      }
+
                       if (value == "delete") {
                         await context.read<NotesProvider>().deleteNote(note);
                       }
@@ -145,12 +154,10 @@ class _NotesScreenState extends State<NotesScreen> {
       context: context,
       builder: (_) {
         return CreateNoteDialog(
-          onCreate: (title, content) async {
+          onSave: (title, content) async {
             final user = FirebaseAuth.instance.currentUser;
 
-            if (user == null) {
-              return;
-            }
+            if (user == null) return;
 
             final now = DateTime.now();
 
@@ -165,6 +172,26 @@ class _NotesScreenState extends State<NotesScreen> {
             );
 
             await context.read<NotesProvider>().createNote(note);
+          },
+        );
+      },
+    );
+  }
+
+  void _showEditDialog(Note note) {
+    showDialog(
+      context: context,
+      builder: (_) {
+        return CreateNoteDialog(
+          note: note,
+          onSave: (title, content) async {
+            final updatedNote = note.copyWith(
+              title: title,
+              content: content,
+              updatedAt: DateTime.now(),
+            );
+
+            await context.read<NotesProvider>().updateNote(updatedNote);
           },
         );
       },

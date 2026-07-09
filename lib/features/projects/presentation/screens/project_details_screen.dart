@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../domain/models/project.dart';
 import '../widgets/project_details_appbar.dart';
 import '../../../notes/presentation/screens/notes_screen.dart';
+import '../../../photos/presentation/screens/photos_screen.dart';
 
 /// Экран с деталями проекта
 class ProjectDetailsScreen extends StatelessWidget {
@@ -112,6 +113,14 @@ class ProjectDetailsScreen extends StatelessWidget {
             title: const Text('Фото'),
             subtitle: const Text('Фото проекта'),
             trailing: const Icon(Icons.arrow_forward_ios, size: 18),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => PhotosScreen(projectId: project.id),
+                ),
+              );
+            },
           ),
         ),
 
