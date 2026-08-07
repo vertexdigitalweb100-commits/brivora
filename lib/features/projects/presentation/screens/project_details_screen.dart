@@ -344,6 +344,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
     final descriptionController = TextEditingController();
     TaskPriority priority = TaskPriority.normal;
     DateTime? deadline;
+    bool canSave = false;
 
     await showDialog<void>(
       context: context,
@@ -358,6 +359,9 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                   children: [
                     TextField(
                       controller: titleController,
+                      onChanged: (value) {
+                        setState(() => canSave = value.trim().isNotEmpty);
+                      },
                       decoration: const InputDecoration(
                         labelText: 'Название',
                       ),
@@ -423,9 +427,8 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                   child: const Text('Отмена'),
                 ),
                 ElevatedButton(
-                  onPressed: titleController.text.trim().isEmpty
-                      ? null
-                      : () async {
+                  onPressed: canSave
+                      ? () async {
                           final task = Task(
                             id: '',
                             projectId: project.id,
@@ -437,9 +440,19 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                             deadline: deadline,
                             completedAt: null,
                           );
-                          await context.read<TasksProvider>().createTask(task);
-                          Navigator.pop(context);
-                        },
+
+                          try {
+                            await context.read<TasksProvider>().createTask(task);
+                            if (!context.mounted) return;
+                            Navigator.pop(context);
+                          } catch (e) {
+                            if (!context.mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Не удалось сохранить задачу: $e')),
+                            );
+                          }
+                        }
+                      : null,
                   child: const Text('Сохранить'),
                 ),
               ],
