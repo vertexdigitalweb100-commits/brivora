@@ -30,11 +30,31 @@ class PhotosProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> uploadFromCamera(String projectId) async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+
+      await _repository.takeAndUploadPhoto(projectId);
+
+      _error = null;
+    } catch (e) {
+      _error = e.toString();
+    }
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
   Stream<List<Photo>> getPhotos(String projectId) {
     return _repository.getProjectPhotos(projectId);
   }
 
   Future<void> deletePhoto(Photo photo) async {
     await _repository.deletePhoto(photo);
+  }
+
+  Future<void> updatePhotoCaption(Photo photo, String caption) async {
+    await _repository.updatePhotoCaption(photo.id, caption);
   }
 }

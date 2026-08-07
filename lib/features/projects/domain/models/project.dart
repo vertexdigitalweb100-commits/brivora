@@ -11,6 +11,9 @@ class Project {
   final DateTime? updatedAt;
   final List<String> members;
 
+  // Обложка проекта
+  final String? coverImageUrl;
+
   Project({
     required this.id,
     required this.title,
@@ -21,6 +24,7 @@ class Project {
     this.status = ProjectStatus.active,
     this.updatedAt,
     this.members = const [],
+    this.coverImageUrl,
   });
 
   Project copyWith({
@@ -33,6 +37,7 @@ class Project {
     DateTime? createdAt,
     DateTime? updatedAt,
     List<String>? members,
+    String? coverImageUrl,
   }) {
     return Project(
       id: id ?? this.id,
@@ -44,10 +49,10 @@ class Project {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       members: members ?? this.members,
+      coverImageUrl: coverImageUrl ?? this.coverImageUrl,
     );
   }
-
-  Map<String, dynamic> toFirestore() {
+    Map<String, dynamic> toFirestore() {
     return {
       'id': id,
       'title': title,
@@ -58,36 +63,29 @@ class Project {
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': Timestamp.fromDate(updatedAt ?? createdAt),
       'members': members,
+      'coverImageUrl': coverImageUrl,
     };
   }
 
   factory Project.fromFirestore(Map<String, dynamic> data) {
     return Project(
       id: data['id'] ?? '',
-
       title: data['title'] ?? '',
-
       description: data['description'] ?? '',
-
       progress: (data['progress'] ?? 0).toDouble(),
-
       status: ProjectStatus.values.firstWhere(
         (e) => e.name == data['status'],
-
         orElse: () => ProjectStatus.active,
       ),
-
       ownerId: data['ownerId'] ?? '',
-
       createdAt: data['createdAt'] is Timestamp
           ? (data['createdAt'] as Timestamp).toDate()
           : DateTime.now(),
-
       updatedAt: data['updatedAt'] is Timestamp
           ? (data['updatedAt'] as Timestamp).toDate()
           : null,
-
       members: List<String>.from(data['members'] ?? []),
+      coverImageUrl: data['coverImageUrl'] as String?,
     );
   }
 
@@ -96,8 +94,12 @@ class Project {
     return 'Project(id: $id, title: $title, ownerId: $ownerId)';
   }
 }
-
-enum ProjectStatus { active, planning, completed, archived }
+enum ProjectStatus {
+  active,
+  planning,
+  completed,
+  archived,
+}
 
 extension ProjectStatusExtension on ProjectStatus {
   String get displayName {

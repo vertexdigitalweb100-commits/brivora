@@ -28,32 +28,54 @@ class PhotoRepository {
 
     if (pickedFiles.isEmpty) return;
 
+    for (final picked in pickedFiles) {
+      await _uploadFile(File(picked.path), projectId, user.uid);
+    }
+  }
+
+  Future<void> takeAndUploadPhoto(String projectId) async {
+    final user = _auth.currentUser;
+
+    if (user == null) return;
+
+    final XFile? picked = await _picker.pickImage(
+      source: ImageSource.camera,
+      imageQuality: 90,
+    );
+
+    if (picked == null) return;
+
+    await _uploadFile(File(picked.path), projectId, user.uid);
+  }
+
+  Future<void> _uploadFile(File file, String projectId, String ownerId) async {
     const uuid = Uuid();
 
-    for (final picked in pickedFiles) {
-      final file = File(picked.path);
+    final fileId = uuid.v4();
 
-      final fileId = uuid.v4();
+    final ref = _storage.ref().child('projects/$projectId/photos/$fileId.jpg');
 
-      final ref = _storage.ref().child(
-        'projects/$projectId/photos/$fileId.jpg',
-      );
+    await ref.putFile(file);
 
-      await ref.putFile(file);
+    final url = await ref.getDownloadURL();
 
-      final url = await ref.getDownloadURL();
+    final photo = Photo(
+      id: '',
+      projectId: projectId,
+      ownerId: ownerId,
+      imageUrl: url,
+      fileName: '$fileId.jpg',
+      createdAt: DateTime.now(),
+      caption: '',
+    );
 
-      final photo = Photo(
-        id: '',
-        projectId: projectId,
-        ownerId: user.uid,
-        imageUrl: url,
-        fileName: '$fileId.jpg',
-        createdAt: DateTime.now(),
-      );
+    await _photosCollection.add(photo.toFirestore());
+  }
 
-      await _photosCollection.add(photo.toFirestore());
-    }
+  Future<void> updatePhotoCaption(String photoId, String caption) async {
+    await _photosCollection.doc(photoId).update({
+      'caption': caption,
+    });
   }
 
   Stream<List<Photo>> getProjectPhotos(String projectId) {
@@ -70,7 +92,7 @@ class PhotoRepository {
         .snapshots()
         .map(
           (snapshot) =>
-              snapshot.docs.map((doc) => Photo.fromFirestore(doc)).toList(),
+              snapshot.docs.map((e) => Photo.fromFirestore(e)).toList(),
         );
   }
 

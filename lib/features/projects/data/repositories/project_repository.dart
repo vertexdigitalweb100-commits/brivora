@@ -5,7 +5,6 @@ import '../../domain/models/project.dart';
 
 class ProjectRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   static const String _projectsCollection = 'projects';
@@ -16,8 +15,6 @@ class ProjectRepository {
     required String title,
     required String description,
   }) async {
-    print('CREATE PROJECT START');
-
     final userId = currentUserId;
 
     if (userId == null) {
@@ -28,40 +25,29 @@ class ProjectRepository {
 
     final project = Project(
       id: doc.id,
-
       title: title,
-
       description: description,
-
       ownerId: userId,
-
       createdAt: DateTime.now(),
-
       progress: 0.0,
-
       status: ProjectStatus.active,
+      coverImageUrl: null,
     );
 
     await doc.set(project.toFirestore());
-
-    print('PROJECT CREATED: ${project.id}');
 
     return project;
   }
 
   Future<List<Project>> getUserProjects() async {
-    print('LOAD PROJECTS START');
-
     final snapshot = await _firestore
         .collection(_projectsCollection)
         .orderBy('createdAt', descending: true)
         .get();
 
-    print('PROJECTS FROM FIRESTORE: ${snapshot.docs.length}');
-
-    return snapshot.docs.map((doc) {
-      return Project.fromFirestore(doc.data());
-    }).toList();
+    return snapshot.docs
+        .map((doc) => Project.fromFirestore(doc.data()))
+        .toList();
   }
 
   Stream<List<Project>> getUserProjectsStream() {
@@ -69,11 +55,11 @@ class ProjectRepository {
         .collection(_projectsCollection)
         .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snapshot) {
-          return snapshot.docs.map((doc) {
-            return Project.fromFirestore(doc.data());
-          }).toList();
-        });
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => Project.fromFirestore(doc.data()))
+              .toList(),
+        );
   }
 
   Future<Project?> getProjectById(String projectId) async {
@@ -88,16 +74,36 @@ class ProjectRepository {
 
     return Project.fromFirestore(doc.data()!);
   }
-
-  Future<void> updateProject(Project project) async {
+    Future<void> updateProject(Project project) async {
     await _firestore
         .collection(_projectsCollection)
         .doc(project.id)
-        .set(project.copyWith(updatedAt: DateTime.now()).toFirestore());
+        .set(
+          project.copyWith(
+            updatedAt: DateTime.now(),
+          ).toFirestore(),
+        );
+  }
+
+  /// ⭐ Установить обложку проекта
+  Future<void> setProjectCover(
+    String projectId,
+    String imageUrl,
+  ) async {
+    await _firestore
+        .collection(_projectsCollection)
+        .doc(projectId)
+        .update({
+      'coverImageUrl': imageUrl,
+      'updatedAt': Timestamp.now(),
+    });
   }
 
   Future<void> deleteProject(String projectId) async {
-    await _firestore.collection(_projectsCollection).doc(projectId).delete();
+    await _firestore
+        .collection(_projectsCollection)
+        .doc(projectId)
+        .delete();
   }
 
   Future<void> updateProjectStatus(
@@ -110,17 +116,28 @@ class ProjectRepository {
       throw Exception('Проект не найден');
     }
 
-    await updateProject(project.copyWith(status: status));
+    await updateProject(
+      project.copyWith(
+        status: status,
+      ),
+    );
   }
 
-  Future<void> updateProjectProgress(String projectId, double progress) async {
+  Future<void> updateProjectProgress(
+    String projectId,
+    double progress,
+  ) async {
     final project = await getProjectById(projectId);
 
     if (project == null) {
       throw Exception('Проект не найден');
     }
 
-    await updateProject(project.copyWith(progress: progress.clamp(0.0, 1.0)));
+    await updateProject(
+      project.copyWith(
+        progress: progress.clamp(0.0, 1.0),
+      ),
+    );
   }
 
   Future<int> getProjectCount() async {

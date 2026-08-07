@@ -7,6 +7,7 @@ class Photo {
   final String imageUrl;
   final String fileName;
   final DateTime createdAt;
+  final String caption;
 
   const Photo({
     required this.id,
@@ -15,6 +16,7 @@ class Photo {
     required this.imageUrl,
     required this.fileName,
     required this.createdAt,
+    this.caption = '',
   });
 
   Photo copyWith({
@@ -24,6 +26,7 @@ class Photo {
     String? imageUrl,
     String? fileName,
     DateTime? createdAt,
+    String? caption,
   }) {
     return Photo(
       id: id ?? this.id,
@@ -32,6 +35,7 @@ class Photo {
       imageUrl: imageUrl ?? this.imageUrl,
       fileName: fileName ?? this.fileName,
       createdAt: createdAt ?? this.createdAt,
+      caption: caption ?? this.caption,
     );
   }
 
@@ -42,6 +46,7 @@ class Photo {
       'imageUrl': imageUrl,
       'fileName': fileName,
       'createdAt': Timestamp.fromDate(createdAt),
+      'caption': caption,
     };
   }
 
@@ -55,6 +60,7 @@ class Photo {
       imageUrl: data['imageUrl'] as String,
       fileName: data['fileName'] as String,
       createdAt: (data['createdAt'] as Timestamp).toDate(),
+      caption: data['caption'] as String? ?? '',
     );
   }
 }
