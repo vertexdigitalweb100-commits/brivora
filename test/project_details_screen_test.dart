@@ -12,7 +12,9 @@ class FakeTasksProvider extends TasksProvider {
 }
 
 void main() {
-  testWidgets('Save button becomes enabled after entering a task title', (tester) async {
+  testWidgets('Save button becomes enabled after entering a task title', (
+    tester,
+  ) async {
     final project = Project(
       id: 'project-1',
       title: 'Test project',
@@ -23,9 +25,7 @@ void main() {
     await tester.pumpWidget(
       ChangeNotifierProvider<TasksProvider>(
         create: (_) => FakeTasksProvider(),
-        child: MaterialApp(
-          home: ProjectDetailsScreen(project: project),
-        ),
+        child: MaterialApp(home: ProjectDetailsScreen(project: project)),
       ),
     );
 

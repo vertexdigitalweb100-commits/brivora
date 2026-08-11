@@ -77,7 +77,8 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
   /// Основная информация проекта
   Widget _buildInfoCard(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final hasCover = project.coverImageUrl != null && project.coverImageUrl!.isNotEmpty;
+    final hasCover =
+        project.coverImageUrl != null && project.coverImageUrl!.isNotEmpty;
 
     return Card(
       elevation: 0,
@@ -98,7 +99,9 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                         if (loadingProgress == null) return child;
                         return Container(
                           color: colorScheme.surfaceVariant,
-                          child: const Center(child: CircularProgressIndicator()),
+                          child: const Center(
+                            child: CircularProgressIndicator(),
+                          ),
                         );
                       },
                       errorBuilder: (context, error, stackTrace) {
@@ -147,25 +150,30 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        color: _getStatusColor(context, project.status).withOpacity(0.12),
+                        color: _getStatusColor(
+                          context,
+                          project.status,
+                        ).withOpacity(0.12),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
                         project.status.shortName,
                         style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                              color: _getStatusColor(context, project.status),
-                              fontWeight: FontWeight.w700,
-                            ),
+                          color: _getStatusColor(context, project.status),
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  project.description.isNotEmpty ? project.description : 'Описание отсутствует',
+                  project.description.isNotEmpty
+                      ? project.description
+                      : 'Описание отсутствует',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
+                    color: colorScheme.onSurfaceVariant,
+                  ),
                 ),
                 const SizedBox(height: 20),
                 Row(
@@ -174,14 +182,14 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                     Text(
                       'Прогресс',
                       style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
+                        color: colorScheme.onSurfaceVariant,
+                      ),
                     ),
                     Text(
                       '${(project.progress * 100).toStringAsFixed(0)}%',
                       style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ],
                 ),
@@ -250,7 +258,9 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
               )
             else
               Column(
-                children: tasks.map((task) => _buildTaskCard(context, task)).toList(),
+                children: tasks
+                    .map((task) => _buildTaskCard(context, task))
+                    .toList(),
               ),
           ],
         ),
@@ -270,12 +280,17 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
 
   Widget _buildTaskCard(BuildContext context, Task task) {
     final tasksProvider = context.read<TasksProvider>();
-    final statusColor = task.status == TaskStatus.completed ? Colors.green : Colors.blue;
+    final statusColor = task.status == TaskStatus.completed
+        ? Colors.green
+        : Colors.blue;
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ),
         leading: InkWell(
           onTap: () {
             final nextStatus = task.status == TaskStatus.completed
@@ -287,21 +302,22 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
           child: CircleAvatar(
             backgroundColor: statusColor.withOpacity(0.12),
             child: Icon(
-              task.status == TaskStatus.completed ? Icons.check : Icons.radio_button_unchecked,
+              task.status == TaskStatus.completed
+                  ? Icons.check
+                  : Icons.radio_button_unchecked,
               color: statusColor,
             ),
           ),
         ),
-        title: Text(
-          task.title,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
+        title: Text(task.title, style: Theme.of(context).textTheme.titleMedium),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 8),
             Text(
-              task.description.isNotEmpty ? task.description : 'Описание отсутствует',
+              task.description.isNotEmpty
+                  ? task.description
+                  : 'Описание отсутствует',
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
@@ -309,7 +325,10 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.surfaceVariant,
                     borderRadius: BorderRadius.circular(16),
@@ -362,17 +381,13 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                       onChanged: (value) {
                         setState(() => canSave = value.trim().isNotEmpty);
                       },
-                      decoration: const InputDecoration(
-                        labelText: 'Название',
-                      ),
+                      decoration: const InputDecoration(labelText: 'Название'),
                     ),
                     const SizedBox(height: 12),
                     TextField(
                       controller: descriptionController,
                       maxLines: 3,
-                      decoration: const InputDecoration(
-                        labelText: 'Описание',
-                      ),
+                      decoration: const InputDecoration(labelText: 'Описание'),
                     ),
                     const SizedBox(height: 12),
                     DropdownButtonFormField<TaskPriority>(
@@ -383,9 +398,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                           child: Text(value.displayName),
                         );
                       }).toList(),
-                      decoration: const InputDecoration(
-                        labelText: 'Приоритет',
-                      ),
+                      decoration: const InputDecoration(labelText: 'Приоритет'),
                       onChanged: (value) {
                         if (value != null) {
                           setState(() => priority = value);
@@ -408,7 +421,9 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                               context: context,
                               initialDate: DateTime.now(),
                               firstDate: DateTime.now(),
-                              lastDate: DateTime.now().add(const Duration(days: 365)),
+                              lastDate: DateTime.now().add(
+                                const Duration(days: 365),
+                              ),
                             );
                             if (picked != null) {
                               setState(() => deadline = picked);
@@ -442,13 +457,19 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                           );
 
                           try {
-                            await context.read<TasksProvider>().createTask(task);
+                            await context.read<TasksProvider>().createTask(
+                              task,
+                            );
                             if (!context.mounted) return;
                             Navigator.pop(context);
                           } catch (e) {
                             if (!context.mounted) return;
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Не удалось сохранить задачу: $e')),
+                              SnackBar(
+                                content: Text(
+                                  'Не удалось сохранить задачу: $e',
+                                ),
+                              ),
                             );
                           }
                         }
@@ -504,15 +525,6 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                 ),
               );
             },
-          ),
-        ),
-
-        Card(
-          child: ListTile(
-            leading: const Icon(Icons.calculate),
-            title: const Text('Калькуляторы'),
-            subtitle: const Text('Расчёт материалов'),
-            trailing: const Icon(Icons.arrow_forward_ios, size: 18),
           ),
         ),
 

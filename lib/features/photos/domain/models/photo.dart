@@ -51,15 +51,17 @@ class Photo {
   }
 
   factory Photo.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
-    final data = doc.data()!;
+    final data = doc.data() ?? {};
 
     return Photo(
       id: doc.id,
-      projectId: data['projectId'] as String,
-      ownerId: data['ownerId'] as String,
-      imageUrl: data['imageUrl'] as String,
-      fileName: data['fileName'] as String,
-      createdAt: (data['createdAt'] as Timestamp).toDate(),
+      projectId: data['projectId'] as String? ?? '',
+      ownerId: data['ownerId'] as String? ?? '',
+      imageUrl: data['imageUrl'] as String? ?? '',
+      fileName: data['fileName'] as String? ?? '',
+      createdAt: data['createdAt'] is Timestamp
+          ? (data['createdAt'] as Timestamp).toDate()
+          : DateTime.now(),
       caption: data['caption'] as String? ?? '',
     );
   }

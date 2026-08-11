@@ -63,6 +63,21 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
             return const Center(child: CircularProgressIndicator());
           }
 
+          if (provider.error != null) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Text(
+                  provider.error!,
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            );
+          }
+
           final projects = _selectedFilter == null
               ? provider.projects
               : provider.getProjectsByStatus(_selectedFilter!);

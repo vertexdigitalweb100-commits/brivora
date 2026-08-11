@@ -40,8 +40,14 @@ class ProjectRepository {
   }
 
   Future<List<Project>> getUserProjects() async {
+    final userId = currentUserId;
+    if (userId == null) {
+      return [];
+    }
+
     final snapshot = await _firestore
         .collection(_projectsCollection)
+        .where('ownerId', isEqualTo: userId)
         .orderBy('createdAt', descending: true)
         .get();
 
@@ -51,8 +57,14 @@ class ProjectRepository {
   }
 
   Stream<List<Project>> getUserProjectsStream() {
+    final userId = currentUserId;
+    if (userId == null) {
+      return Stream.value([]);
+    }
+
     return _firestore
         .collection(_projectsCollection)
+        .where('ownerId', isEqualTo: userId)
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map(
@@ -63,47 +75,46 @@ class ProjectRepository {
   }
 
   Future<Project?> getProjectById(String projectId) async {
+    final userId = currentUserId;
+    if (userId == null) {
+      return null;
+    }
+
     final doc = await _firestore
         .collection(_projectsCollection)
         .doc(projectId)
         .get();
 
-    if (!doc.exists) {
+    final data = doc.data();
+    if (!doc.exists || data == null) {
       return null;
     }
 
-    return Project.fromFirestore(doc.data()!);
+    final project = Project.fromFirestore(data);
+    if (project.ownerId != userId) {
+      return null;
+    }
+
+    return project;
   }
-    Future<void> updateProject(Project project) async {
+
+  Future<void> updateProject(Project project) async {
     await _firestore
         .collection(_projectsCollection)
         .doc(project.id)
-        .set(
-          project.copyWith(
-            updatedAt: DateTime.now(),
-          ).toFirestore(),
-        );
+        .set(project.copyWith(updatedAt: DateTime.now()).toFirestore());
   }
 
   /// ⭐ Установить обложку проекта
-  Future<void> setProjectCover(
-    String projectId,
-    String imageUrl,
-  ) async {
-    await _firestore
-        .collection(_projectsCollection)
-        .doc(projectId)
-        .update({
+  Future<void> setProjectCover(String projectId, String imageUrl) async {
+    await _firestore.collection(_projectsCollection).doc(projectId).update({
       'coverImageUrl': imageUrl,
       'updatedAt': Timestamp.now(),
     });
   }
 
   Future<void> deleteProject(String projectId) async {
-    await _firestore
-        .collection(_projectsCollection)
-        .doc(projectId)
-        .delete();
+    await _firestore.collection(_projectsCollection).doc(projectId).delete();
   }
 
   Future<void> updateProjectStatus(
@@ -116,28 +127,17 @@ class ProjectRepository {
       throw Exception('Проект не найден');
     }
 
-    await updateProject(
-      project.copyWith(
-        status: status,
-      ),
-    );
+    await updateProject(project.copyWith(status: status));
   }
 
-  Future<void> updateProjectProgress(
-    String projectId,
-    double progress,
-  ) async {
+  Future<void> updateProjectProgress(String projectId, double progress) async {
     final project = await getProjectById(projectId);
 
     if (project == null) {
       throw Exception('Проект не найден');
     }
 
-    await updateProject(
-      project.copyWith(
-        progress: progress.clamp(0.0, 1.0),
-      ),
-    );
+    await updateProject(project.copyWith(progress: progress.clamp(0.0, 1.0)));
   }
 
   Future<int> getProjectCount() async {

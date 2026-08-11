@@ -51,16 +51,20 @@ class Note {
   }
 
   factory Note.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
-    final data = doc.data()!;
+    final data = doc.data() ?? {};
 
     return Note(
       id: doc.id,
-      projectId: data['projectId'] as String,
-      ownerId: data['ownerId'] as String,
-      title: data['title'] as String,
-      content: data['content'] as String,
-      createdAt: (data['createdAt'] as Timestamp).toDate(),
-      updatedAt: (data['updatedAt'] as Timestamp).toDate(),
+      projectId: data['projectId'] as String? ?? '',
+      ownerId: data['ownerId'] as String? ?? '',
+      title: data['title'] as String? ?? '',
+      content: data['content'] as String? ?? '',
+      createdAt: data['createdAt'] is Timestamp
+          ? (data['createdAt'] as Timestamp).toDate()
+          : DateTime.now(),
+      updatedAt: data['updatedAt'] is Timestamp
+          ? (data['updatedAt'] as Timestamp).toDate()
+          : DateTime.now(),
     );
   }
 }

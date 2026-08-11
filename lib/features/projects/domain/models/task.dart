@@ -86,17 +86,19 @@ class Task {
       'priority': priority.name,
       'createdAt': Timestamp.fromDate(createdAt),
       'deadline': deadline != null ? Timestamp.fromDate(deadline!) : null,
-      'completedAt': completedAt != null ? Timestamp.fromDate(completedAt!) : null,
+      'completedAt': completedAt != null
+          ? Timestamp.fromDate(completedAt!)
+          : null,
     };
   }
 
   factory Task.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
-    final data = doc.data()!;
+    final data = doc.data() ?? {};
 
     return Task(
       id: doc.id,
-      projectId: data['projectId'] as String,
-      title: data['title'] as String,
+      projectId: data['projectId'] as String? ?? '',
+      title: data['title'] as String? ?? '',
       description: data['description'] as String? ?? '',
       status: TaskStatus.values.firstWhere(
         (value) => value.name == data['status'],
@@ -106,7 +108,9 @@ class Task {
         (value) => value.name == data['priority'],
         orElse: () => TaskPriority.normal,
       ),
-      createdAt: (data['createdAt'] as Timestamp).toDate(),
+      createdAt: data['createdAt'] is Timestamp
+          ? (data['createdAt'] as Timestamp).toDate()
+          : DateTime.now(),
       deadline: data['deadline'] is Timestamp
           ? (data['deadline'] as Timestamp).toDate()
           : null,
