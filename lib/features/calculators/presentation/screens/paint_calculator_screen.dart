@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import '../../../projects/domain/models/project.dart';
 import '../providers/paint_calculator_provider.dart';
+import '../widgets/add_to_estimate_button.dart';
 
 class PaintCalculatorScreen extends StatefulWidget {
-  const PaintCalculatorScreen({super.key});
+  final Project? project;
+
+  const PaintCalculatorScreen({super.key, this.project});
 
   @override
   State<PaintCalculatorScreen> createState() => _PaintCalculatorScreenState();
@@ -363,6 +368,16 @@ class _PaintCalculatorScreenState extends State<PaintCalculatorScreen> {
                             ],
                           ),
                         ),
+                      ),
+                      const SizedBox(height: 16),
+                      AddToEstimateButton(
+                        project: widget.project,
+                        itemName: 'Краска',
+                        quantity: provider.result!.paintLitersRounded,
+                        unit: 'л',
+                        category: 'material',
+                        comment:
+                            'Краска ${provider.result!.paintLitersRounded.toStringAsFixed(0)} л с запасом ${provider.result!.wastePercent.toStringAsFixed(0)}%',
                       ),
                     ],
                   ],

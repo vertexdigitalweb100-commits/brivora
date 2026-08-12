@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import '../../../projects/domain/models/project.dart';
 import '../providers/tile_calculator_provider.dart';
+import '../widgets/add_to_estimate_button.dart';
 
 class TileCalculatorScreen extends StatefulWidget {
-  const TileCalculatorScreen({super.key});
+  final Project? project;
+
+  const TileCalculatorScreen({super.key, this.project});
 
   @override
   State<TileCalculatorScreen> createState() => _TileCalculatorScreenState();
@@ -212,6 +217,16 @@ class _TileCalculatorScreenState extends State<TileCalculatorScreen> {
                             ],
                           ),
                         ),
+                      ),
+                      const SizedBox(height: 16),
+                      AddToEstimateButton(
+                        project: widget.project,
+                        itemName: 'Плитка',
+                        quantity: provider.result!.tilesWithWaste.toDouble(),
+                        unit: 'шт.',
+                        category: 'material',
+                        comment:
+                            'Плитка ${provider.result!.tilesWithWaste} шт. с запасом ${provider.result!.wastePercent.toStringAsFixed(0)}%',
                       ),
                     ],
                   ],

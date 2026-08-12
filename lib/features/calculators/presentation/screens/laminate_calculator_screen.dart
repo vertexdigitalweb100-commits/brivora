@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import '../../../projects/domain/models/project.dart';
 import '../providers/laminate_calculator_provider.dart';
+import '../widgets/add_to_estimate_button.dart';
 
 class LaminateCalculatorScreen extends StatefulWidget {
-  const LaminateCalculatorScreen({super.key});
+  final Project? project;
+
+  const LaminateCalculatorScreen({super.key, this.project});
 
   @override
   State<LaminateCalculatorScreen> createState() => _LaminateCalculatorScreenState();
@@ -229,6 +234,15 @@ class _LaminateCalculatorScreenState extends State<LaminateCalculatorScreen> {
                             ],
                           ),
                         ),
+                      ),
+                      const SizedBox(height: 16),
+                      AddToEstimateButton(
+                        project: widget.project,
+                        itemName: 'Ламинат',
+                        quantity: provider.result!.packs.toDouble(),
+                        unit: 'уп.',
+                        category: 'material',
+                        comment: 'Ламинат ${provider.result!.packs} упак. с запасом ${provider.result!.wastePercent.toStringAsFixed(0)}%',
                       ),
                     ],
                   ],

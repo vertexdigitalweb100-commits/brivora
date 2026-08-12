@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import '../../../projects/domain/models/project.dart';
 import '../providers/concrete_calculator_provider.dart';
+import '../widgets/add_to_estimate_button.dart';
 
 class ConcreteCalculatorScreen extends StatefulWidget {
-  const ConcreteCalculatorScreen({super.key});
+  final Project? project;
+
+  const ConcreteCalculatorScreen({super.key, this.project});
 
   @override
   State<ConcreteCalculatorScreen> createState() => _ConcreteCalculatorScreenState();
@@ -203,6 +208,16 @@ class _ConcreteCalculatorScreenState extends State<ConcreteCalculatorScreen> {
                             ],
                           ),
                         ),
+                      ),
+                      const SizedBox(height: 16),
+                      AddToEstimateButton(
+                        project: widget.project,
+                        itemName: 'Бетон',
+                        quantity: provider.result!.volumeWithWaste,
+                        unit: 'м³',
+                        category: 'material',
+                        comment:
+                            'Бетон ${provider.result!.volumeWithWaste.toStringAsFixed(2)} м³ с запасом ${provider.result!.wastePercent.toStringAsFixed(0)}%',
                       ),
                     ],
                   ],

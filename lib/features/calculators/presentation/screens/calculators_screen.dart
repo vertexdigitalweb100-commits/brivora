@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../../../core/routes/app_routes.dart';
+import '../../../projects/domain/models/project.dart';
 
 class CalculatorsScreen extends StatelessWidget {
-  const CalculatorsScreen({super.key});
+  final Project? project;
+
+  const CalculatorsScreen({super.key, this.project});
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +19,11 @@ class CalculatorsScreen extends StatelessWidget {
             Card(
               child: InkWell(
                 onTap: () {
-                  Navigator.pushNamed(context, AppRoutes.tileCalculator);
+                  Navigator.pushNamed(
+                    context,
+                    AppRoutes.tileCalculator,
+                    arguments: project,
+                  );
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(16),
@@ -70,7 +77,11 @@ class CalculatorsScreen extends StatelessWidget {
             Card(
               child: InkWell(
                 onTap: () {
-                  Navigator.pushNamed(context, AppRoutes.wallpaperCalculator);
+                  Navigator.pushNamed(
+                    context,
+                    AppRoutes.wallpaperCalculator,
+                    arguments: project,
+                  );
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(16),
@@ -124,7 +135,11 @@ class CalculatorsScreen extends StatelessWidget {
             Card(
               child: InkWell(
                 onTap: () {
-                  Navigator.pushNamed(context, AppRoutes.paintCalculator);
+                  Navigator.pushNamed(
+                    context,
+                    AppRoutes.paintCalculator,
+                    arguments: project,
+                  );
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(16),
@@ -176,7 +191,11 @@ class CalculatorsScreen extends StatelessWidget {
             Card(
               child: InkWell(
                 onTap: () {
-                  Navigator.pushNamed(context, AppRoutes.laminateCalculator);
+                  Navigator.pushNamed(
+                    context,
+                    AppRoutes.laminateCalculator,
+                    arguments: project,
+                  );
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(16),
@@ -228,7 +247,11 @@ class CalculatorsScreen extends StatelessWidget {
             Card(
               child: InkWell(
                 onTap: () {
-                  Navigator.pushNamed(context, AppRoutes.concreteCalculator);
+                  Navigator.pushNamed(
+                    context,
+                    AppRoutes.concreteCalculator,
+                    arguments: project,
+                  );
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(16),

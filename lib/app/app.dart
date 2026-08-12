@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../core/routes/app_routes.dart';
+import '../features/estimates/presentation/providers/estimate_provider.dart';
 import '../features/projects/presentation/providers/projects_provider.dart';
 import '../features/projects/presentation/providers/tasks_provider.dart';
 import '../features/notes/presentation/providers/notes_provider.dart';
@@ -22,6 +23,8 @@ class BrivoraApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => NotesProvider()),
 
         ChangeNotifierProvider(create: (_) => PhotosProvider()),
+
+        ChangeNotifierProvider(create: (_) => EstimateProvider()),
       ],
       child: MaterialApp(
         title: 'Brivora',

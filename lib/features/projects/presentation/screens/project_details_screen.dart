@@ -7,6 +7,7 @@ import '../providers/tasks_provider.dart';
 import '../widgets/project_details_appbar.dart';
 import '../../../notes/presentation/screens/notes_screen.dart';
 import '../../../photos/presentation/screens/photos_screen.dart';
+import '../../../../core/routes/app_routes.dart';
 
 /// Экран с деталями проекта
 class ProjectDetailsScreen extends StatefulWidget {
@@ -523,6 +524,38 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                 MaterialPageRoute(
                   builder: (_) => PhotosScreen(projectId: project.id),
                 ),
+              );
+            },
+          ),
+        ),
+
+        Card(
+          child: ListTile(
+            leading: const Icon(Icons.calculate),
+            title: const Text('Калькуляторы'),
+            subtitle: const Text('Расчёты по материалам и объёмам'),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 18),
+            onTap: () {
+              Navigator.pushNamed(
+                context,
+                AppRoutes.calculators,
+                arguments: project,
+              );
+            },
+          ),
+        ),
+
+        Card(
+          child: ListTile(
+            leading: const Icon(Icons.money),
+            title: const Text('Смета'),
+            subtitle: const Text('Стоимость работ и материалов'),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 18),
+            onTap: () {
+              Navigator.pushNamed(
+                context,
+                AppRoutes.estimate,
+                arguments: project,
               );
             },
           ),

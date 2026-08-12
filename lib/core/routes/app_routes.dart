@@ -11,6 +11,7 @@ import '../../features/calculators/presentation/screens/wallpaper_calculator_scr
 import '../../features/calculators/presentation/screens/paint_calculator_screen.dart';
 import '../../features/calculators/presentation/screens/laminate_calculator_screen.dart';
 import '../../features/calculators/presentation/screens/concrete_calculator_screen.dart';
+import '../../features/estimates/presentation/screens/estimate_screen.dart';
 
 class AppRoutes {
   static const String splash = '/';
@@ -18,6 +19,7 @@ class AppRoutes {
   static const String register = '/register';
   static const String home = '/home';
   static const String projectDetails = '/project-details';
+  static const String estimate = '/estimate';
   static const String calculators = '/calculators';
   static const String tileCalculator = '/tile-calculator';
   static const String wallpaperCalculator = '/wallpaper-calculator';
@@ -35,21 +37,36 @@ class AppRoutes {
         return _buildRoute(const RegisterScreen());
       case home:
         return _buildRoute(const DashboardScreen());
-      case calculators:
-        return _buildRoute(const CalculatorsScreen());
-      case tileCalculator:
-        return _buildRoute(const TileCalculatorScreen());
-      case wallpaperCalculator:
-        return _buildRoute(const WallpaperCalculatorScreen());
-      case paintCalculator:
-        return _buildRoute(const PaintCalculatorScreen());
-      case laminateCalculator:
-        return _buildRoute(const LaminateCalculatorScreen());
-      case concreteCalculator:
-        return _buildRoute(const ConcreteCalculatorScreen());
+      case calculators: {
+        final project = settings.arguments as Project?;
+        return _buildRoute(CalculatorsScreen(project: project));
+      }
+      case tileCalculator: {
+        final project = settings.arguments as Project?;
+        return _buildRoute(TileCalculatorScreen(project: project));
+      }
+      case wallpaperCalculator: {
+        final project = settings.arguments as Project?;
+        return _buildRoute(WallpaperCalculatorScreen(project: project));
+      }
+      case paintCalculator: {
+        final project = settings.arguments as Project?;
+        return _buildRoute(PaintCalculatorScreen(project: project));
+      }
+      case laminateCalculator: {
+        final project = settings.arguments as Project?;
+        return _buildRoute(LaminateCalculatorScreen(project: project));
+      }
+      case concreteCalculator: {
+        final project = settings.arguments as Project?;
+        return _buildRoute(ConcreteCalculatorScreen(project: project));
+      }
       case projectDetails:
         final project = settings.arguments as Project;
         return _buildRoute(ProjectDetailsScreen(project: project));
+      case estimate:
+        final project = settings.arguments as Project;
+        return _buildRoute(EstimateScreen(project: project));
       default:
         return _buildRoute(
           Scaffold(

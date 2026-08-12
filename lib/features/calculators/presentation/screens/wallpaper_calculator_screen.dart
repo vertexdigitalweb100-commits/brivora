@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import '../../../projects/domain/models/project.dart';
 import '../providers/wallpaper_calculator_provider.dart';
+import '../widgets/add_to_estimate_button.dart';
 
 class WallpaperCalculatorScreen extends StatefulWidget {
-  const WallpaperCalculatorScreen({super.key});
+  final Project? project;
+
+  const WallpaperCalculatorScreen({super.key, this.project});
 
   @override
   State<WallpaperCalculatorScreen> createState() =>
@@ -329,6 +334,15 @@ class _WallpaperCalculatorScreenState extends State<WallpaperCalculatorScreen> {
                             ],
                           ),
                         ),
+                      ),
+                      const SizedBox(height: 16),
+                      AddToEstimateButton(
+                        project: widget.project,
+                        itemName: 'Обои',
+                        quantity: provider.result!.rollsWithWaste.toDouble(),
+                        unit: 'шт.',
+                        category: 'material',
+                        comment: 'Обои ${provider.result!.rollsWithWaste} рулонов с запасом ${provider.result!.wastePercent.toStringAsFixed(0)}%',
                       ),
                     ],
                   ],
