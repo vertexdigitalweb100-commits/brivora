@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+
 import '../../data/repositories/project_repository.dart';
 import '../../domain/models/project.dart';
 
@@ -9,138 +12,228 @@ class ProjectsProvider extends ChangeNotifier {
   bool _isLoading = false;
   String? _error;
 
-  /// Получить все проекты
+  StreamSubscription<List<Project>>? _projectsSubscription;
+
+  bool _isListening = false;
+
+  /// Все проекты пользователя.
   List<Project> get projects => List.unmodifiable(_projects);
 
-  /// Статус загрузки
+  /// Состояние загрузки.
   bool get isLoading => _isLoading;
 
-  /// Ошибка (если есть)
+  /// Ошибка.
   String? get error => _error;
 
-  /// Инициализировать и загрузить проекты
+  /// Запускает realtime-синхронизацию проектов с Firestore.
+  void listenToProjects() {
+    if (_isListening) return;
+
+    _isListening = true;
+    _isLoading = true;
+    _error = null;
+
+    notifyListeners();
+
+    _projectsSubscription = repository.getUserProjectsStream().listen(
+      (projects) {
+        _projects = projects;
+        _isLoading = false;
+        _error = null;
+
+        notifyListeners();
+      },
+      onError: (error) {
+        _isLoading = false;
+        _error = 'Ошибка при загрузке проектов: $error';
+
+        notifyListeners();
+      },
+    );
+  }
+
+  /// Останавливает realtime-синхронизацию.
+  Future<void> stopListening() async {
+    await _projectsSubscription?.cancel();
+
+    _projectsSubscription = null;
+    _isListening = false;
+  }
+
+  /// Однократная загрузка проектов.
+  ///
+  /// Оставляем метод, чтобы старые места приложения,
+  /// которые его вызывают, не ломались.
   Future<void> loadProjects() async {
     _isLoading = true;
     _error = null;
+
     notifyListeners();
 
     try {
-      _projects = await repository.getUserProjects();
+      final projects = await repository.getUserProjects();
+
+      _projects = projects;
       _error = null;
     } catch (e) {
       _error = 'Ошибка при загрузке проектов: $e';
-      print(_error);
     } finally {
       _isLoading = false;
+
       notifyListeners();
     }
   }
 
-  /// Создать новый проект
+  /// Создание проекта.
   Future<void> createProject(String title, {String description = ''}) async {
     try {
-      print('Создаем проект: $title');
+      _error = null;
 
       final project = await repository.createProject(
         title: title,
         description: description,
       );
 
-      print('Создан проект ID: ${project.id}');
-
-      _projects.insert(0, project);
-
-      print('Список проектов: ${_projects.length}');
+      // Если realtime listener уже работает,
+      // Firestore сам пришлёт новый проект.
+      //
+      // Поэтому здесь вручную список не меняем,
+      // чтобы не получить дубликат.
+      if (!_isListening) {
+        _projects.insert(0, project);
+        notifyListeners();
+      }
+    } catch (e) {
+      _error = 'Ошибка при создании проекта: $e';
 
       notifyListeners();
-    } catch (e) {
-      print('Ошибка создания проекта: $e');
+
       rethrow;
     }
   }
 
-  /// Удалить проект
+  /// Удаление проекта.
   Future<void> deleteProject(String projectId) async {
     try {
+      _error = null;
+
       await repository.deleteProject(projectId);
-      _projects.removeWhere((p) => p.id == projectId);
-      notifyListeners();
+
+      // При активном listener Firestore сам обновит список.
+      if (!_isListening) {
+        _projects.removeWhere((project) => project.id == projectId);
+
+        notifyListeners();
+      }
     } catch (e) {
       _error = 'Ошибка при удалении проекта: $e';
-      print(_error);
+
+      notifyListeners();
+
       rethrow;
     }
   }
 
-  /// Получить проекты по статусу
+  /// Получить проекты по статусу.
   List<Project> getProjectsByStatus(ProjectStatus status) {
-    return _projects.where((p) => p.status == status).toList();
+    return _projects.where((project) => project.status == status).toList();
   }
 
-  /// Получить проект по ID
+  /// Получить проект по ID.
   Project? getProjectById(String id) {
     try {
-      return _projects.firstWhere((p) => p.id == id);
-    } catch (e) {
+      return _projects.firstWhere((project) => project.id == id);
+    } catch (_) {
       return null;
     }
   }
 
-  /// Изменить статус проекта
+  /// Изменить статус проекта.
   Future<void> updateProjectStatus(
     String projectId,
     ProjectStatus status,
   ) async {
     try {
+      _error = null;
+
       await repository.updateProjectStatus(projectId, status);
-      final index = _projects.indexWhere((p) => p.id == projectId);
-      if (index != -1) {
-        _projects[index] = _projects[index].copyWith(status: status);
-        notifyListeners();
+
+      // При realtime listener Firestore сам отправит
+      // обновлённый проект.
+      if (!_isListening) {
+        final index = _projects.indexWhere(
+          (project) => project.id == projectId,
+        );
+
+        if (index != -1) {
+          _projects[index] = _projects[index].copyWith(status: status);
+
+          notifyListeners();
+        }
       }
     } catch (e) {
       _error = 'Ошибка при изменении статуса: $e';
-      print(_error);
+
+      notifyListeners();
+
       rethrow;
     }
   }
 
-  /// Изменить прогресс проекта
+  /// Изменить прогресс проекта.
   Future<void> updateProjectProgress(String projectId, double progress) async {
+    final normalizedProgress = progress.clamp(0.0, 1.0);
+
     try {
-      await repository.updateProjectProgress(
-        projectId,
-        progress.clamp(0.0, 1.0),
-      );
-      final index = _projects.indexWhere((p) => p.id == projectId);
-      if (index != -1) {
-        _projects[index] = _projects[index].copyWith(
-          progress: progress.clamp(0.0, 1.0),
+      _error = null;
+
+      await repository.updateProjectProgress(projectId, normalizedProgress);
+
+      // При realtime listener Firestore сам обновит
+      // проект в списке.
+      if (!_isListening) {
+        final index = _projects.indexWhere(
+          (project) => project.id == projectId,
         );
-        notifyListeners();
+
+        if (index != -1) {
+          _projects[index] = _projects[index].copyWith(
+            progress: normalizedProgress,
+          );
+
+          notifyListeners();
+        }
       }
     } catch (e) {
       _error = 'Ошибка при обновлении прогресса: $e';
-      print(_error);
+
+      notifyListeners();
+
       rethrow;
     }
   }
 
-  /// Получить количество проектов по статусам
+  /// Количество проектов по статусам.
   Map<ProjectStatus, int> getProjectCountByStatus() {
     return {
       ProjectStatus.active: _projects
-          .where((p) => p.status == ProjectStatus.active)
+          .where((project) => project.status == ProjectStatus.active)
           .length,
       ProjectStatus.planning: _projects
-          .where((p) => p.status == ProjectStatus.planning)
+          .where((project) => project.status == ProjectStatus.planning)
           .length,
       ProjectStatus.completed: _projects
-          .where((p) => p.status == ProjectStatus.completed)
+          .where((project) => project.status == ProjectStatus.completed)
           .length,
       ProjectStatus.archived: _projects
-          .where((p) => p.status == ProjectStatus.archived)
+          .where((project) => project.status == ProjectStatus.archived)
           .length,
     };
+  }
+
+  @override
+  void dispose() {
+    _projectsSubscription?.cancel();
+    super.dispose();
   }
 }

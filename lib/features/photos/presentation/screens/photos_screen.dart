@@ -19,7 +19,6 @@ class PhotosScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Фотографии')),
       floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add_a_photo),
         onPressed: () {
           showModalBottomSheet(
             context: context,
@@ -29,7 +28,7 @@ class PhotosScreen extends StatelessWidget {
                   children: [
                     ListTile(
                       leading: const Icon(Icons.photo_library),
-                      title: const Text("Выбрать из галереи"),
+                      title: const Text('Выбрать из галереи'),
                       onTap: () async {
                         Navigator.pop(context);
                         await provider.uploadPhoto(projectId);
@@ -37,7 +36,7 @@ class PhotosScreen extends StatelessWidget {
                     ),
                     ListTile(
                       leading: const Icon(Icons.photo_camera),
-                      title: const Text("Сделать фото"),
+                      title: const Text('Сделать фото'),
                       onTap: () async {
                         Navigator.pop(context);
                         await provider.uploadFromCamera(projectId);
@@ -45,7 +44,7 @@ class PhotosScreen extends StatelessWidget {
                     ),
                     ListTile(
                       leading: const Icon(Icons.close),
-                      title: const Text("Отмена"),
+                      title: const Text('Отмена'),
                       onTap: () {
                         Navigator.pop(context);
                       },
@@ -56,6 +55,7 @@ class PhotosScreen extends StatelessWidget {
             },
           );
         },
+        child: const Icon(Icons.add_a_photo),
       ),
       body: StreamBuilder<List<Photo>>(
         stream: provider.getPhotos(projectId),
@@ -65,7 +65,15 @@ class PhotosScreen extends StatelessWidget {
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text(snapshot.error.toString()));
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Text(
+                  'Ошибка загрузки фотографий:\n${snapshot.error}',
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            );
           }
 
           final photos = snapshot.data ?? [];
@@ -78,11 +86,11 @@ class PhotosScreen extends StatelessWidget {
                   Icon(Icons.photo_library_outlined, size: 80),
                   SizedBox(height: 16),
                   Text(
-                    "Фотографий пока нет",
+                    'Фотографий пока нет',
                     style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 8),
-                  Text("Нажмите + чтобы добавить первое фото"),
+                  Text('Нажмите + чтобы добавить первое фото'),
                 ],
               ),
             );
@@ -113,28 +121,28 @@ class PhotosScreen extends StatelessWidget {
                           children: [
                             ListTile(
                               leading: const Icon(Icons.edit_note),
-                              title: const Text("Редактировать подпись"),
+                              title: const Text('Редактировать подпись'),
                               onTap: () {
-                                Navigator.pop(context, "edit_caption");
+                                Navigator.pop(context, 'edit_caption');
                               },
                             ),
                             ListTile(
                               leading: const Icon(Icons.star),
-                              title: const Text("Сделать обложкой"),
+                              title: const Text('Сделать обложкой'),
                               onTap: () {
-                                Navigator.pop(context, "cover");
+                                Navigator.pop(context, 'cover');
                               },
                             ),
                             ListTile(
                               leading: const Icon(Icons.delete),
-                              title: const Text("Удалить"),
+                              title: const Text('Удалить'),
                               onTap: () {
-                                Navigator.pop(context, "delete");
+                                Navigator.pop(context, 'delete');
                               },
                             ),
                             ListTile(
                               leading: const Icon(Icons.close),
-                              title: const Text("Отмена"),
+                              title: const Text('Отмена'),
                               onTap: () {
                                 Navigator.pop(context);
                               },
@@ -145,27 +153,20 @@ class PhotosScreen extends StatelessWidget {
                     },
                   );
 
-                  if (action == "edit_caption") {
+                  if (!context.mounted) {
+                    return;
+                  }
+
+                  if (action == 'edit_caption') {
                     await _showEditCaptionDialog(context, photo);
                   }
 
-                  if (action == "cover") {
-                    await ProjectRepository().setProjectCover(
-                      projectId,
-                      photo.imageUrl,
-                    );
-
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Обложка проекта обновлена ⭐"),
-                        ),
-                      );
-                    }
+                  if (action == 'cover') {
+                    await _setAsCover(context, photo);
                   }
 
-                  if (action == "delete") {
-                    await provider.deletePhoto(photo);
+                  if (action == 'delete') {
+                    await _deletePhoto(context, provider, photo);
                   }
                 },
                 child: Column(
@@ -179,9 +180,16 @@ class PhotosScreen extends StatelessWidget {
                           child: CachedNetworkImage(
                             imageUrl: photo.imageUrl,
                             fit: BoxFit.cover,
-                            placeholder: (_, __) =>
-                                const Center(child: CircularProgressIndicator()),
-                            errorWidget: (_, __, ___) => const Icon(Icons.error),
+                            placeholder: (_, __) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            },
+                            errorWidget: (_, __, ___) {
+                              return const Center(
+                                child: Icon(Icons.error_outline, size: 40),
+                              );
+                            },
                           ),
                         ),
                       ),
@@ -192,10 +200,7 @@ class PhotosScreen extends StatelessWidget {
                         photo.caption,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.black87,
-                        ),
+                        style: const TextStyle(fontSize: 12),
                       ),
                     ],
                   ],
@@ -208,8 +213,61 @@ class PhotosScreen extends StatelessWidget {
     );
   }
 
+  Future<void> _setAsCover(BuildContext context, Photo photo) async {
+    try {
+      await ProjectRepository().setProjectCover(projectId, photo.imageUrl);
+
+      if (!context.mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Обложка проекта обновлена ⭐')),
+      );
+
+      // Сообщаем ProjectDetailsScreen,
+      // что проект был изменён.
+      Navigator.pop(context, true);
+    } catch (e) {
+      if (!context.mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Не удалось установить обложку: $e')),
+      );
+    }
+  }
+
+  Future<void> _deletePhoto(
+    BuildContext context,
+    PhotosProvider provider,
+    Photo photo,
+  ) async {
+    try {
+      await provider.deletePhoto(photo);
+
+      if (!context.mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Фото удалено')));
+    } catch (e) {
+      if (!context.mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Не удалось удалить фото: $e')));
+    }
+  }
+
   Future<void> _showEditCaptionDialog(BuildContext context, Photo photo) async {
     final controller = TextEditingController(text: photo.caption);
+
     final caption = await showDialog<String>(
       context: context,
       builder: (context) {
@@ -224,11 +282,15 @@ class PhotosScreen extends StatelessWidget {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () {
+                Navigator.pop(context);
+              },
               child: const Text('Отмена'),
             ),
-            TextButton(
-              onPressed: () => Navigator.pop(context, controller.text.trim()),
+            FilledButton(
+              onPressed: () {
+                Navigator.pop(context, controller.text.trim());
+              },
               child: const Text('Сохранить'),
             ),
           ],
@@ -236,9 +298,24 @@ class PhotosScreen extends StatelessWidget {
       },
     );
 
+    controller.dispose();
+
+    if (!context.mounted) {
+      return;
+    }
+
     if (caption != null && caption != photo.caption) {
-      await Provider.of<PhotosProvider>(context, listen: false)
-          .updatePhotoCaption(photo, caption);
+      try {
+        await context.read<PhotosProvider>().updatePhotoCaption(photo, caption);
+      } catch (e) {
+        if (!context.mounted) {
+          return;
+        }
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Не удалось изменить подпись: $e')),
+        );
+      }
     }
   }
 
@@ -254,7 +331,7 @@ class PhotosScreen extends StatelessWidget {
             appBar: AppBar(
               backgroundColor: Colors.black,
               foregroundColor: Colors.white,
-              title: const Text("Просмотр фото"),
+              title: const Text('Просмотр фото'),
             ),
             body: PageView.builder(
               controller: controller,

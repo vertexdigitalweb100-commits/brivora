@@ -5,11 +5,13 @@ import '../../domain/models/project.dart';
 import '../../domain/models/task.dart';
 import '../providers/tasks_provider.dart';
 import '../widgets/project_details_appbar.dart';
+
 import '../../../notes/presentation/screens/notes_screen.dart';
 import '../../../photos/presentation/screens/photos_screen.dart';
+
 import '../../../../core/routes/app_routes.dart';
 
-/// Экран с деталями проекта
+/// Экран с подробной информацией о проекте.
 class ProjectDetailsScreen extends StatefulWidget {
   final Project project;
 
@@ -21,26 +23,42 @@ class ProjectDetailsScreen extends StatefulWidget {
 
 class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
   Project get project => widget.project;
+
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<TasksProvider>().listenToProjectTasks(widget.project.id);
+      if (!mounted) return;
+
+      context.read<TasksProvider>().listenToProjectTasks(project.id);
     });
   }
 
-  String _formatDate(DateTime date) {
-    return '${date.day}.${date.month}.${date.year}';
+  @override
+  void dispose() {
+    // Не вызываем stopListening(), потому что такого метода
+    // в текущем TasksProvider нет.
+    super.dispose();
   }
 
-  Color _getStatusColor(BuildContext context, ProjectStatus status) {
+  String _formatDate(DateTime date) {
+    return '${date.day.toString().padLeft(2, '0')}.'
+        '${date.month.toString().padLeft(2, '0')}.'
+        '${date.year}';
+  }
+
+  Color _getStatusColor(ProjectStatus status) {
     switch (status) {
       case ProjectStatus.active:
         return Colors.green;
+
       case ProjectStatus.planning:
         return Colors.blue;
+
       case ProjectStatus.completed:
         return Colors.purple;
+
       case ProjectStatus.archived:
         return Colors.grey;
     }
@@ -50,13 +68,15 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: ProjectDetailsAppBar(project: project),
+
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showCreateTaskDialog(context),
-        label: const Text('Добавить задачу'),
         icon: const Icon(Icons.add),
+        label: const Text('Добавить задачу'),
       ),
+
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -69,67 +89,56 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
             const SizedBox(height: 20),
 
             _buildProjectSections(context),
+
+            // Чтобы FAB не закрывал последние элементы.
+            const SizedBox(height: 80),
           ],
         ),
       ),
     );
   }
 
-  /// Основная информация проекта
   Widget _buildInfoCard(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     final hasCover =
-        project.coverImageUrl != null && project.coverImageUrl!.isNotEmpty;
+        project.coverImageUrl != null &&
+        project.coverImageUrl!.trim().isNotEmpty;
+
+    final statusColor = _getStatusColor(project.status);
 
     return Card(
       elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       color: colorScheme.surface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      clipBehavior: Clip.antiAlias,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-            child: SizedBox(
-              height: 220,
-              child: hasCover
-                  ? Image.network(
-                      project.coverImageUrl!,
-                      fit: BoxFit.cover,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return Container(
-                          color: colorScheme.surfaceVariant,
-                          child: const Center(
-                            child: CircularProgressIndicator(),
-                          ),
-                        );
-                      },
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: colorScheme.surfaceVariant,
-                          child: Center(
-                            child: Icon(
-                              Icons.image_not_supported_outlined,
-                              size: 56,
-                              color: colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                        );
-                      },
-                    )
-                  : Container(
-                      color: colorScheme.surfaceVariant,
-                      child: Center(
-                        child: Icon(
-                          Icons.image_outlined,
-                          size: 64,
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
-            ),
+          SizedBox(
+            height: 220,
+            child: hasCover
+                ? Image.network(
+                    project.coverImageUrl!,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) {
+                        return child;
+                      }
+
+                      return Container(
+                        color: colorScheme.surfaceContainerHighest,
+                        child: const Center(child: CircularProgressIndicator()),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return _buildEmptyCover(context);
+                    },
+                  )
+                : _buildEmptyCover(context),
           ),
+
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
             child: Column(
@@ -141,77 +150,95 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                     Expanded(
                       child: Text(
                         project.title,
-                        style: Theme.of(context).textTheme.headlineSmall,
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
+
                     const SizedBox(width: 12),
+
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12,
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        color: _getStatusColor(
-                          context,
-                          project.status,
-                        ).withOpacity(0.12),
+                        color: statusColor.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
                         project.status.shortName,
-                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                          color: _getStatusColor(context, project.status),
+                        style: theme.textTheme.labelLarge?.copyWith(
+                          color: statusColor,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),
                   ],
                 ),
+
                 const SizedBox(height: 12),
+
                 Text(
-                  project.description.isNotEmpty
+                  project.description.trim().isNotEmpty
                       ? project.description
                       : 'Описание отсутствует',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  style: theme.textTheme.bodyLarge?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
                 ),
+
                 const SizedBox(height: 20),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       'Прогресс',
-                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                      style: theme.textTheme.labelMedium?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),
                     ),
+
                     Text(
                       '${(project.progress * 100).toStringAsFixed(0)}%',
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      style: theme.textTheme.labelLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
                 ),
+
                 const SizedBox(height: 8),
+
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
                   child: LinearProgressIndicator(
                     value: project.progress.clamp(0.0, 1.0),
                     minHeight: 10,
                     color: colorScheme.primary,
-                    backgroundColor: colorScheme.surfaceVariant,
+                    backgroundColor: colorScheme.surfaceContainerHighest,
                   ),
                 ),
+
                 const SizedBox(height: 20),
+
                 Row(
                   children: [
-                    const Icon(Icons.calendar_today_outlined, size: 18),
+                    Icon(
+                      Icons.calendar_today_outlined,
+                      size: 18,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+
                     const SizedBox(width: 8),
+
                     Text(
                       _formatDate(project.createdAt),
-                      style: Theme.of(context).textTheme.bodyMedium,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
                     ),
                   ],
                 ),
@@ -223,21 +250,38 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
     );
   }
 
+  Widget _buildEmptyCover(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      color: colorScheme.surfaceContainerHighest,
+      child: Center(
+        child: Icon(
+          Icons.image_outlined,
+          size: 64,
+          color: colorScheme.onSurfaceVariant,
+        ),
+      ),
+    );
+  }
+
   Widget _buildTaskSection(BuildContext context) {
     final tasksProvider = context.watch<TasksProvider>();
     final tasks = tasksProvider.tasks;
 
     return Card(
       elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       color: Theme.of(context).colorScheme.surface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Задачи', style: Theme.of(context).textTheme.titleMedium),
+
             const SizedBox(height: 16),
+
             Wrap(
               spacing: 8,
               runSpacing: 8,
@@ -248,10 +292,12 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                 _buildFilterChip(context, 'completed', 'Выполненные'),
               ],
             ),
+
             const SizedBox(height: 16),
+
             if (tasks.isEmpty)
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                padding: const EdgeInsets.symmetric(vertical: 16),
                 child: Text(
                   'Нет задач для этого проекта',
                   style: Theme.of(context).textTheme.bodyLarge,
@@ -272,18 +318,23 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
   Widget _buildFilterChip(BuildContext context, String value, String label) {
     final tasksProvider = context.read<TasksProvider>();
     final selected = tasksProvider.filter == value;
+
     return FilterChip(
       label: Text(label),
       selected: selected,
-      onSelected: (_) => tasksProvider.setFilter(value),
+      onSelected: (_) {
+        tasksProvider.setFilter(value);
+      },
     );
   }
 
   Widget _buildTaskCard(BuildContext context, Task task) {
     final tasksProvider = context.read<TasksProvider>();
+
     final statusColor = task.status == TaskStatus.completed
         ? Colors.green
         : Colors.blue;
+
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -292,16 +343,18 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
           horizontal: 16,
           vertical: 12,
         ),
+
         leading: InkWell(
           onTap: () {
             final nextStatus = task.status == TaskStatus.completed
                 ? TaskStatus.active
                 : TaskStatus.completed;
+
             tasksProvider.updateTaskStatus(task, nextStatus);
           },
           borderRadius: BorderRadius.circular(24),
           child: CircleAvatar(
-            backgroundColor: statusColor.withOpacity(0.12),
+            backgroundColor: statusColor.withValues(alpha: 0.12),
             child: Icon(
               task.status == TaskStatus.completed
                   ? Icons.check
@@ -310,11 +363,14 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
             ),
           ),
         ),
+
         title: Text(task.title, style: Theme.of(context).textTheme.titleMedium),
+
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 8),
+
             Text(
               task.description.isNotEmpty
                   ? task.description
@@ -322,8 +378,13 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
+
             const SizedBox(height: 12),
-            Row(
+
+            Wrap(
+              spacing: 10,
+              runSpacing: 8,
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -331,24 +392,26 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surfaceVariant,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(task.priority.displayName),
                 ),
-                const SizedBox(width: 10),
+
                 Text(
                   task.status.displayName,
                   style: TextStyle(color: statusColor),
                 ),
-                if (task.deadline != null) ...[
-                  const SizedBox(width: 10),
+
+                if (task.deadline != null)
                   Text('до ${_formatDate(task.deadline!)}'),
-                ],
               ],
             ),
           ],
         ),
+
         trailing: IconButton(
           icon: const Icon(Icons.delete_outline),
           onPressed: () {
@@ -361,18 +424,23 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
 
   Future<void> _showCreateTaskDialog(BuildContext context) async {
     final titleController = TextEditingController();
+
     final descriptionController = TextEditingController();
+
     TaskPriority priority = TaskPriority.normal;
+
     DateTime? deadline;
+
     bool canSave = false;
 
     await showDialog<void>(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
               title: const Text('Новая задача'),
+
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -380,19 +448,25 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                     TextField(
                       controller: titleController,
                       onChanged: (value) {
-                        setState(() => canSave = value.trim().isNotEmpty);
+                        setState(() {
+                          canSave = value.trim().isNotEmpty;
+                        });
                       },
                       decoration: const InputDecoration(labelText: 'Название'),
                     ),
+
                     const SizedBox(height: 12),
+
                     TextField(
                       controller: descriptionController,
                       maxLines: 3,
                       decoration: const InputDecoration(labelText: 'Описание'),
                     ),
+
                     const SizedBox(height: 12),
+
                     DropdownButtonFormField<TaskPriority>(
-                      value: priority,
+                      initialValue: priority,
                       items: TaskPriority.values.map((value) {
                         return DropdownMenuItem(
                           value: value,
@@ -402,11 +476,15 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                       decoration: const InputDecoration(labelText: 'Приоритет'),
                       onChanged: (value) {
                         if (value != null) {
-                          setState(() => priority = value);
+                          setState(() {
+                            priority = value;
+                          });
                         }
                       },
                     ),
+
                     const SizedBox(height: 12),
+
                     Row(
                       children: [
                         Expanded(
@@ -416,6 +494,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                                 : 'Срок не выбран',
                           ),
                         ),
+
                         TextButton(
                           onPressed: () async {
                             final picked = await showDatePicker(
@@ -426,8 +505,11 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                                 const Duration(days: 365),
                               ),
                             );
+
                             if (picked != null) {
-                              setState(() => deadline = picked);
+                              setState(() {
+                                deadline = picked;
+                              });
                             }
                           },
                           child: const Text('Выбрать'),
@@ -437,11 +519,15 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                   ],
                 ),
               ),
+
               actions: [
                 TextButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () {
+                    Navigator.pop(dialogContext);
+                  },
                   child: const Text('Отмена'),
                 ),
+
                 ElevatedButton(
                   onPressed: canSave
                       ? () async {
@@ -461,10 +547,17 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                             await context.read<TasksProvider>().createTask(
                               task,
                             );
-                            if (!context.mounted) return;
-                            Navigator.pop(context);
+
+                            if (!context.mounted) {
+                              return;
+                            }
+
+                            Navigator.pop(dialogContext);
                           } catch (e) {
-                            if (!context.mounted) return;
+                            if (!context.mounted) {
+                              return;
+                            }
+
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
@@ -483,9 +576,11 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
         );
       },
     );
+
+    titleController.dispose();
+    descriptionController.dispose();
   }
 
-  /// Разделы проекта
   Widget _buildProjectSections(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -500,7 +595,6 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
             title: const Text('Заметки'),
             subtitle: const Text('Записи и важная информация проекта'),
             trailing: const Icon(Icons.arrow_forward_ios, size: 18),
-
             onTap: () {
               Navigator.push(
                 context,

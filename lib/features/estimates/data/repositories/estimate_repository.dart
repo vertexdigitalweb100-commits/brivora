@@ -14,7 +14,9 @@ class EstimateRepository {
 
   Future<EstimateItem> createEstimateItem(EstimateItem item) async {
     final doc = _estimatesCollection.doc();
+
     final now = DateTime.now();
+
     final newItem = item.copyWith(
       id: doc.id,
       createdAt: now,
@@ -23,12 +25,15 @@ class EstimateRepository {
     );
 
     final data = newItem.toFirestore();
+
     final user = _auth.currentUser;
+
     if (user != null) {
       data['ownerId'] = user.uid;
     }
 
     await doc.set(data);
+
     return newItem;
   }
 
@@ -37,8 +42,11 @@ class EstimateRepository {
       updatedAt: DateTime.now(),
       totalPrice: item.quantity * item.unitPrice,
     );
+
     final data = updatedItem.toFirestore();
+
     final user = _auth.currentUser;
+
     if (user != null) {
       data['ownerId'] = user.uid;
     }
@@ -52,6 +60,7 @@ class EstimateRepository {
 
   Stream<List<EstimateItem>> getProjectEstimatesStream(String projectId) {
     final user = _auth.currentUser;
+
     if (user == null) {
       return Stream.value([]);
     }
@@ -59,10 +68,17 @@ class EstimateRepository {
     return _estimatesCollection
         .where('projectId', isEqualTo: projectId)
         .where('ownerId', isEqualTo: user.uid)
-        .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => EstimateItem.fromFirestore(doc))
-            .toList());
+        .map((snapshot) {
+          final items = snapshot.docs
+              .map((doc) => EstimateItem.fromFirestore(doc))
+              .toList();
+
+          // Сортируем уже на стороне приложения,
+          // чтобы Firestore не требовал composite index.
+          items.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+          return items;
+        });
   }
 }

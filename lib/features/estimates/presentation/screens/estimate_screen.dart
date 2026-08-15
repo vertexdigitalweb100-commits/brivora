@@ -26,6 +26,8 @@ class _EstimateScreenState extends State<EstimateScreen> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
       context.read<EstimateProvider>().listenToProjectEstimates(
         widget.project.id,
       );
@@ -49,19 +51,21 @@ class _EstimateScreenState extends State<EstimateScreen> {
             builder: (context, provider, _) {
               return IconButton(
                 icon: const Icon(Icons.picture_as_pdf),
+                tooltip: 'Экспорт в PDF',
                 onPressed: provider.items.isNotEmpty
                     ? () => _exportToPdf(provider)
                     : null,
-                tooltip: 'Экспорт в PDF',
               );
             },
           ),
         ],
       ),
+
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddOrEditDialog(),
         child: const Icon(Icons.add),
       ),
+
       body: Consumer<EstimateProvider>(
         builder: (context, provider, _) {
           if (provider.isLoading && provider.items.isEmpty) {
@@ -83,8 +87,11 @@ class _EstimateScreenState extends State<EstimateScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 EstimateSummaryCard(provider: provider),
+
                 const SizedBox(height: 16),
+
                 _buildCategoryFilters(provider),
+
                 const SizedBox(height: 16),
 
                 ...EstimateItem.categories.map((category) {
@@ -97,8 +104,12 @@ class _EstimateScreenState extends State<EstimateScreen> {
                       (sum, item) => sum + item.totalPrice,
                     ),
                     items: categoryItems,
-                    onEdit: (item) => _showAddOrEditDialog(item: item),
-                    onDelete: (item) => _confirmDelete(item),
+                    onEdit: (item) {
+                      _showAddOrEditDialog(item: item);
+                    },
+                    onDelete: (item) {
+                      _confirmDelete(item);
+                    },
                   );
                 }),
 
@@ -110,6 +121,9 @@ class _EstimateScreenState extends State<EstimateScreen> {
                       style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   ),
+
+                // Отступ снизу, чтобы FAB не перекрывал последний элемент.
+                const SizedBox(height: 80),
               ],
             ),
           );
@@ -124,6 +138,7 @@ class _EstimateScreenState extends State<EstimateScreen> {
       runSpacing: 8,
       children: [
         _buildFilterChip(provider, 'all', 'Все'),
+
         for (final category in EstimateItem.categories)
           _buildFilterChip(
             provider,
@@ -196,6 +211,7 @@ class _EstimateScreenState extends State<EstimateScreen> {
               },
               child: const Text('Отмена'),
             ),
+
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context, true);
@@ -227,91 +243,149 @@ class _EstimateScreenState extends State<EstimateScreen> {
   }
 
   Future<void> _exportToPdf(EstimateProvider provider) async {
-    final pdf = pw.Document();
+    try {
+      final pdf = pw.Document();
 
-    pdf.addPage(
-      pw.MultiPage(
-        pageFormat: PdfPageFormat.a4,
-        build: (context) {
-          return [
-            pw.Text(
-              'Смета проекта: ${widget.project.title}',
-              style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
-            ),
+      // Unicode-шрифты с поддержкой кириллицы.
+      final regularFont = await PdfGoogleFonts.notoSansRegular();
 
-            pw.SizedBox(height: 8),
+      final boldFont = await PdfGoogleFonts.notoSansBold();
 
-            pw.Text('Дата: ${_formatDate(DateTime.now())}'),
+      final pdfTheme = pw.ThemeData.withFont(base: regularFont, bold: boldFont);
 
-            pw.SizedBox(height: 16),
+      pdf.addPage(
+        pw.MultiPage(
+          pageFormat: PdfPageFormat.a4,
+          theme: pdfTheme,
 
-            pw.Text(
-              'Общая стоимость: '
-              '${EstimateItem.formatMoney(provider.grandTotal)}',
-              style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold),
-            ),
+          margin: const pw.EdgeInsets.all(32),
 
-            pw.SizedBox(height: 12),
-
-            pw.Text(
-              'Материалы: '
-              '${EstimateItem.formatMoney(provider.totalMaterials)}',
-            ),
-
-            pw.Text(
-              'Работа: '
-              '${EstimateItem.formatMoney(provider.totalLabor)}',
-            ),
-
-            pw.Text(
-              'Доставка: '
-              '${EstimateItem.formatMoney(provider.totalDelivery)}',
-            ),
-
-            pw.Text(
-              'Инструменты: '
-              '${EstimateItem.formatMoney(provider.totalTools)}',
-            ),
-
-            pw.Text(
-              'Прочее: '
-              '${EstimateItem.formatMoney(provider.totalOther)}',
-            ),
-
-            pw.SizedBox(height: 18),
-
-            pw.Table.fromTextArray(
-              headers: ['Название', 'Кол-во', 'Ед.', 'Цена', 'Сумма'],
-              data: provider.items.map((item) {
-                return [
-                  item.name,
-                  item.quantity.toStringAsFixed(2),
-                  item.unit,
-                  EstimateItem.formatMoney(item.unitPrice),
-                  EstimateItem.formatMoney(item.totalPrice),
-                ];
-              }).toList(),
-              headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-              cellStyle: const pw.TextStyle(fontSize: 10),
-              headerDecoration: const pw.BoxDecoration(
-                color: PdfColors.grey300,
+          build: (context) {
+            return [
+              // Заголовок
+              pw.Text(
+                'Смета проекта: ${widget.project.title}',
+                style: pw.TextStyle(font: boldFont, fontSize: 24),
               ),
-              cellAlignment: pw.Alignment.centerLeft,
-              columnWidths: {
-                0: const pw.FlexColumnWidth(3),
-                1: const pw.FlexColumnWidth(1),
-                2: const pw.FlexColumnWidth(1),
-                3: const pw.FlexColumnWidth(1),
-                4: const pw.FlexColumnWidth(1),
-              },
-            ),
-          ];
-        },
-      ),
-    );
 
-    final fileName = 'smeta_${widget.project.title.replaceAll(' ', '_')}.pdf';
+              pw.SizedBox(height: 8),
 
-    await Printing.sharePdf(bytes: await pdf.save(), filename: fileName);
+              // Дата
+              pw.Text(
+                'Дата: ${_formatDate(DateTime.now())}',
+                style: pw.TextStyle(font: regularFont, fontSize: 11),
+              ),
+
+              pw.SizedBox(height: 20),
+
+              // Общая стоимость
+              pw.Text(
+                'Общая стоимость: '
+                '${EstimateItem.formatMoney(provider.grandTotal)}',
+                style: pw.TextStyle(font: boldFont, fontSize: 17),
+              ),
+
+              pw.SizedBox(height: 14),
+
+              // Итоги по категориям
+              pw.Text(
+                'Материалы: '
+                '${EstimateItem.formatMoney(provider.totalMaterials)}',
+                style: pw.TextStyle(font: regularFont, fontSize: 11),
+              ),
+
+              pw.Text(
+                'Работа: '
+                '${EstimateItem.formatMoney(provider.totalLabor)}',
+                style: pw.TextStyle(font: regularFont, fontSize: 11),
+              ),
+
+              pw.Text(
+                'Доставка: '
+                '${EstimateItem.formatMoney(provider.totalDelivery)}',
+                style: pw.TextStyle(font: regularFont, fontSize: 11),
+              ),
+
+              pw.Text(
+                'Инструменты: '
+                '${EstimateItem.formatMoney(provider.totalTools)}',
+                style: pw.TextStyle(font: regularFont, fontSize: 11),
+              ),
+
+              pw.Text(
+                'Прочее: '
+                '${EstimateItem.formatMoney(provider.totalOther)}',
+                style: pw.TextStyle(font: regularFont, fontSize: 11),
+              ),
+
+              pw.SizedBox(height: 20),
+
+              // Таблица
+              pw.Table.fromTextArray(
+                headers: ['Название', 'Кол-во', 'Ед.', 'Цена', 'Сумма'],
+
+                data: provider.items.map((item) {
+                  return [
+                    item.name,
+                    item.quantity.toStringAsFixed(2),
+                    item.unit,
+                    EstimateItem.formatMoney(item.unitPrice),
+                    EstimateItem.formatMoney(item.totalPrice),
+                  ];
+                }).toList(),
+
+                headerStyle: pw.TextStyle(font: boldFont, fontSize: 10),
+
+                cellStyle: pw.TextStyle(font: regularFont, fontSize: 9),
+
+                headerDecoration: const pw.BoxDecoration(
+                  color: PdfColors.grey300,
+                ),
+
+                cellAlignment: pw.Alignment.centerLeft,
+
+                columnWidths: {
+                  0: const pw.FlexColumnWidth(3),
+                  1: const pw.FlexColumnWidth(1),
+                  2: const pw.FlexColumnWidth(1),
+                  3: const pw.FlexColumnWidth(1.3),
+                  4: const pw.FlexColumnWidth(1.3),
+                },
+              ),
+
+              pw.SizedBox(height: 20),
+
+              // Подвал
+              pw.Divider(),
+
+              pw.SizedBox(height: 8),
+
+              pw.Text(
+                'Документ сформирован в Brivora',
+                style: pw.TextStyle(
+                  font: regularFont,
+                  fontSize: 9,
+                  color: PdfColors.grey700,
+                ),
+              ),
+            ];
+          },
+        ),
+      );
+
+      final safeProjectName = widget.project.title
+          .replaceAll(RegExp(r'[\\/:*?"<>|]'), '_')
+          .replaceAll(' ', '_');
+
+      final fileName = 'smeta_$safeProjectName.pdf';
+
+      await Printing.sharePdf(bytes: await pdf.save(), filename: fileName);
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Не удалось создать PDF: $e')));
+    }
   }
 }

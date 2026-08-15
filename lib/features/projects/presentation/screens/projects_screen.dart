@@ -22,30 +22,34 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ProjectsProvider>().loadProjects();
+      if (!mounted) return;
+
+      context.read<ProjectsProvider>().listenToProjects();
     });
+  }
+
+  @override
+  void dispose() {
+    context.read<ProjectsProvider>().stopListening();
+    super.dispose();
   }
 
   void _openCreateProjectDialog() {
     showDialog(
       context: context,
-
       builder: (context) {
         return CreateProjectDialog(
           onCreateProject: (title, description) async {
             await context.read<ProjectsProvider>().createProject(
               title,
-
               description: description,
             );
 
-            if (mounted) {
-              setState(() {});
+            if (!mounted) return;
 
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text('Проект "$title" создан')));
-            }
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text('Проект "$title" создан')));
           },
         );
       },
@@ -56,23 +60,40 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Проекты')),
-
       body: Consumer<ProjectsProvider>(
         builder: (context, provider, _) {
-          if (provider.isLoading) {
+          if (provider.isLoading && provider.projects.isEmpty) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (provider.error != null) {
+          if (provider.error != null && provider.projects.isEmpty) {
             return Center(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: Text(
-                  provider.error!,
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.error,
-                  ),
-                  textAlign: TextAlign.center,
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      size: 48,
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      provider.error!,
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    FilledButton(
+                      onPressed: () {
+                        provider.listenToProjects();
+                      },
+                      child: const Text('Повторить'),
+                    ),
+                  ],
                 ),
               ),
             );
@@ -86,34 +107,25 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
             children: [
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-
                 padding: const EdgeInsets.all(12),
-
                 child: Row(
                   children: [
                     FilterChip(
                       label: const Text('Все'),
-
                       selected: _selectedFilter == null,
-
                       onSelected: (_) {
                         setState(() {
                           _selectedFilter = null;
                         });
                       },
                     ),
-
                     const SizedBox(width: 8),
-
                     ...ProjectStatus.values.map((status) {
                       return Padding(
                         padding: const EdgeInsets.only(right: 8),
-
                         child: FilterChip(
                           label: Text(status.displayName),
-
                           selected: _selectedFilter == status,
-
                           onSelected: (_) {
                             setState(() {
                               _selectedFilter = status;
@@ -131,31 +143,24 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                     ? const Center(child: Text('Нет проектов'))
                     : ListView.builder(
                         padding: const EdgeInsets.all(16),
-
                         itemCount: projects.length,
-
                         itemBuilder: (context, index) {
                           final project = projects[index];
 
                           return ProjectCard(
                             project: project,
-
                             onTap: () {
                               Navigator.pushNamed(
                                 context,
-
                                 AppRoutes.projectDetails,
-
                                 arguments: project,
                               );
                             },
-
                             onDelete: () {
                               context.read<ProjectsProvider>().deleteProject(
                                 project.id,
                               );
                             },
-
                             onStatusChange: (status) async {
                               await context
                                   .read<ProjectsProvider>()
@@ -169,10 +174,8 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           );
         },
       ),
-
       floatingActionButton: FloatingActionButton(
         onPressed: _openCreateProjectDialog,
-
         child: const Icon(Icons.add),
       ),
     );
