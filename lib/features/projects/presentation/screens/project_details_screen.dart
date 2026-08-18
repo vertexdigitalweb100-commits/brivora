@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 
 import '../../domain/models/project.dart';
 import '../../domain/models/task.dart';
+import '../../data/repositories/project_repository.dart';
+
 import '../providers/tasks_provider.dart';
 import '../widgets/project_details_appbar.dart';
 
@@ -22,23 +24,25 @@ class ProjectDetailsScreen extends StatefulWidget {
 }
 
 class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
-  Project get project => widget.project;
+  late Project _project;
+
+  Project get project => _project;
 
   @override
   void initState() {
     super.initState();
 
+    _project = widget.project;
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
 
-      context.read<TasksProvider>().listenToProjectTasks(project.id);
+      context.read<TasksProvider>().listenToProjectTasks(_project.id);
     });
   }
 
   @override
   void dispose() {
-    // Не вызываем stopListening(), потому что такого метода
-    // в текущем TasksProvider нет.
     super.dispose();
   }
 
@@ -61,6 +65,29 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
 
       case ProjectStatus.archived:
         return Colors.grey;
+    }
+  }
+
+  /// Загружает актуальную версию проекта из Firestore.
+  Future<void> _reloadProject() async {
+    try {
+      final updatedProject = await ProjectRepository().getProjectById(
+        _project.id,
+      );
+
+      if (!mounted || updatedProject == null) {
+        return;
+      }
+
+      setState(() {
+        _project = updatedProject;
+      });
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Не удалось обновить проект: $e')));
     }
   }
 
@@ -90,7 +117,6 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
 
             _buildProjectSections(context),
 
-            // Чтобы FAB не закрывал последние элементы.
             const SizedBox(height: 80),
           ],
         ),
@@ -267,6 +293,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
 
   Widget _buildTaskSection(BuildContext context) {
     final tasksProvider = context.watch<TasksProvider>();
+
     final tasks = tasksProvider.tasks;
 
     return Card(
@@ -317,6 +344,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
 
   Widget _buildFilterChip(BuildContext context, String value, String label) {
     final tasksProvider = context.read<TasksProvider>();
+
     final selected = tasksProvider.filter == value;
 
     return FilterChip(
@@ -612,13 +640,19 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
             title: const Text('Фото'),
             subtitle: const Text('Фото проекта'),
             trailing: const Icon(Icons.arrow_forward_ios, size: 18),
-            onTap: () {
-              Navigator.push(
+            onTap: () async {
+              final result = await Navigator.push<bool>(
                 context,
                 MaterialPageRoute(
                   builder: (_) => PhotosScreen(projectId: project.id),
                 ),
               );
+
+              if (!mounted) return;
+
+              if (result == true) {
+                await _reloadProject();
+              }
             },
           ),
         ),
@@ -627,40 +661,27 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
           child: ListTile(
             leading: const Icon(Icons.calculate),
             title: const Text('Калькуляторы'),
-            subtitle: const Text('Расчёты по материалам и объёмам'),
+            subtitle: const Text('Расчёт материалов для проекта'),
             trailing: const Icon(Icons.arrow_forward_ios, size: 18),
             onTap: () {
-              Navigator.pushNamed(
-                context,
-                AppRoutes.calculators,
-                arguments: project,
-              );
+              Navigator.pushNamed(context, AppRoutes.calculators);
             },
           ),
         ),
 
         Card(
           child: ListTile(
-            leading: const Icon(Icons.money),
+            leading: const Icon(Icons.receipt_long),
             title: const Text('Смета'),
-            subtitle: const Text('Стоимость работ и материалов'),
+            subtitle: const Text('Материалы, работа и расходы'),
             trailing: const Icon(Icons.arrow_forward_ios, size: 18),
             onTap: () {
               Navigator.pushNamed(
                 context,
                 AppRoutes.estimate,
-                arguments: project,
+                arguments: project.id,
               );
             },
-          ),
-        ),
-
-        Card(
-          child: ListTile(
-            leading: const Icon(Icons.folder),
-            title: const Text('Файлы'),
-            subtitle: const Text('Документы проекта'),
-            trailing: const Icon(Icons.arrow_forward_ios, size: 18),
           ),
         ),
       ],

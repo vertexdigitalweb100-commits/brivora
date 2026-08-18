@@ -18,6 +18,7 @@ class PhotosScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Фотографии')),
+
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           showModalBottomSheet(
@@ -31,17 +32,21 @@ class PhotosScreen extends StatelessWidget {
                       title: const Text('Выбрать из галереи'),
                       onTap: () async {
                         Navigator.pop(context);
+
                         await provider.uploadPhoto(projectId);
                       },
                     ),
+
                     ListTile(
                       leading: const Icon(Icons.photo_camera),
                       title: const Text('Сделать фото'),
                       onTap: () async {
                         Navigator.pop(context);
+
                         await provider.uploadFromCamera(projectId);
                       },
                     ),
+
                     ListTile(
                       leading: const Icon(Icons.close),
                       title: const Text('Отмена'),
@@ -57,6 +62,7 @@ class PhotosScreen extends StatelessWidget {
         },
         child: const Icon(Icons.add_a_photo),
       ),
+
       body: StreamBuilder<List<Photo>>(
         stream: provider.getPhotos(projectId),
         builder: (context, snapshot) {
@@ -84,12 +90,16 @@ class PhotosScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.photo_library_outlined, size: 80),
+
                   SizedBox(height: 16),
+
                   Text(
                     'Фотографий пока нет',
                     style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                   ),
+
                   SizedBox(height: 8),
+
                   Text('Нажмите + чтобы добавить первое фото'),
                 ],
               ),
@@ -98,13 +108,16 @@ class PhotosScreen extends StatelessWidget {
 
           return GridView.builder(
             padding: const EdgeInsets.all(12),
+
             itemCount: photos.length,
+
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
               crossAxisSpacing: 12,
               mainAxisSpacing: 12,
               childAspectRatio: 0.8,
             ),
+
             itemBuilder: (context, index) {
               final photo = photos[index];
 
@@ -112,6 +125,7 @@ class PhotosScreen extends StatelessWidget {
                 onTap: () {
                   _openPhoto(context, photos, index);
                 },
+
                 onLongPress: () async {
                   final action = await showModalBottomSheet<String>(
                     context: context,
@@ -126,6 +140,7 @@ class PhotosScreen extends StatelessWidget {
                                 Navigator.pop(context, 'edit_caption');
                               },
                             ),
+
                             ListTile(
                               leading: const Icon(Icons.star),
                               title: const Text('Сделать обложкой'),
@@ -133,6 +148,7 @@ class PhotosScreen extends StatelessWidget {
                                 Navigator.pop(context, 'cover');
                               },
                             ),
+
                             ListTile(
                               leading: const Icon(Icons.delete),
                               title: const Text('Удалить'),
@@ -140,6 +156,7 @@ class PhotosScreen extends StatelessWidget {
                                 Navigator.pop(context, 'delete');
                               },
                             ),
+
                             ListTile(
                               leading: const Icon(Icons.close),
                               title: const Text('Отмена'),
@@ -169,6 +186,7 @@ class PhotosScreen extends StatelessWidget {
                     await _deletePhoto(context, provider, photo);
                   }
                 },
+
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -180,11 +198,13 @@ class PhotosScreen extends StatelessWidget {
                           child: CachedNetworkImage(
                             imageUrl: photo.imageUrl,
                             fit: BoxFit.cover,
+
                             placeholder: (_, __) {
                               return const Center(
                                 child: CircularProgressIndicator(),
                               );
                             },
+
                             errorWidget: (_, __, ___) {
                               return const Center(
                                 child: Icon(Icons.error_outline, size: 40),
@@ -194,8 +214,10 @@ class PhotosScreen extends StatelessWidget {
                         ),
                       ),
                     ),
+
                     if (photo.caption.isNotEmpty) ...[
                       const SizedBox(height: 8),
+
                       Text(
                         photo.caption,
                         maxLines: 2,
@@ -225,8 +247,8 @@ class PhotosScreen extends StatelessWidget {
         const SnackBar(content: Text('Обложка проекта обновлена ⭐')),
       );
 
-      // Сообщаем ProjectDetailsScreen,
-      // что проект был изменён.
+      // Возвращаем true на ProjectDetailsScreen,
+      // чтобы он заново загрузил проект.
       Navigator.pop(context, true);
     } catch (e) {
       if (!context.mounted) {
@@ -273,6 +295,7 @@ class PhotosScreen extends StatelessWidget {
       builder: (context) {
         return AlertDialog(
           title: const Text('Редактировать подпись'),
+
           content: TextField(
             controller: controller,
             maxLines: null,
@@ -280,6 +303,7 @@ class PhotosScreen extends StatelessWidget {
               hintText: 'Введите подпись для фото',
             ),
           ),
+
           actions: [
             TextButton(
               onPressed: () {
@@ -287,6 +311,7 @@ class PhotosScreen extends StatelessWidget {
               },
               child: const Text('Отмена'),
             ),
+
             FilledButton(
               onPressed: () {
                 Navigator.pop(context, controller.text.trim());
@@ -328,14 +353,17 @@ class PhotosScreen extends StatelessWidget {
         builder: (_) {
           return Scaffold(
             backgroundColor: Colors.black,
+
             appBar: AppBar(
               backgroundColor: Colors.black,
               foregroundColor: Colors.white,
               title: const Text('Просмотр фото'),
             ),
+
             body: PageView.builder(
               controller: controller,
               itemCount: photos.length,
+
               itemBuilder: (context, index) {
                 final photo = photos[index];
 
