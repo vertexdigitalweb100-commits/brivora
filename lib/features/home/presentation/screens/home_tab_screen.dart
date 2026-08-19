@@ -5,7 +5,14 @@ import '../../../../app/theme.dart';
 import '../../../../core/routes/app_routes.dart';
 
 class HomeTabScreen extends StatelessWidget {
-  const HomeTabScreen({super.key});
+  final VoidCallback onCreateProject;
+  final VoidCallback onViewAllProjects;
+
+  const HomeTabScreen({
+    super.key,
+    required this.onCreateProject,
+    required this.onViewAllProjects,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +47,7 @@ class HomeTabScreen extends StatelessWidget {
                     context,
                     title: 'Недавние проекты',
                     actionText: 'Все',
+                    onActionTap: onViewAllProjects,
                   ),
                   const SizedBox(height: 12),
 
@@ -167,10 +175,7 @@ class HomeTabScreen extends StatelessWidget {
             title: 'Новый проект',
             subtitle: 'Создать',
             color: AppColors.primary,
-            onTap: () {
-              // Подключим к экрану создания проекта,
-              // когда будем переделывать Projects.
-            },
+            onTap: onCreateProject,
           ),
         ),
         const SizedBox(width: 12),
@@ -193,6 +198,7 @@ class HomeTabScreen extends StatelessWidget {
     BuildContext context, {
     required String title,
     String? actionText,
+    VoidCallback? onActionTap,
   }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -200,9 +206,7 @@ class HomeTabScreen extends StatelessWidget {
         Text(title, style: Theme.of(context).textTheme.titleLarge),
         if (actionText != null)
           TextButton(
-            onPressed: () {
-              // Подключим Projects после редизайна.
-            },
+            onPressed: onActionTap,
             style: TextButton.styleFrom(
               padding: EdgeInsets.zero,
               minimumSize: const Size(0, 0),

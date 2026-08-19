@@ -2,10 +2,20 @@ import 'package:flutter/material.dart';
 import 'projects_screen.dart';
 
 class ProjectsTabScreen extends StatelessWidget {
-  const ProjectsTabScreen({super.key});
+  final bool autoOpenCreateDialog;
+  final VoidCallback? onAutoOpenHandled;
+
+  const ProjectsTabScreen({
+    super.key,
+    this.autoOpenCreateDialog = false,
+    this.onAutoOpenHandled,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return const ProjectsScreen();
+    return ProjectsScreen(
+      autoOpenCreateDialog: autoOpenCreateDialog,
+      onAutoOpenHandled: onAutoOpenHandled,
+    );
   }
 }

@@ -1,4 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../../projects/domain/models/project.dart';
+import '../../../projects/presentation/providers/projects_provider.dart';
+import '../../../photos/data/repositories/photo_repository.dart';
+import '../../data/repositories/profile_repository.dart';
+import '../../domain/models/user_profile.dart';
 
 class ProfileTabScreen extends StatefulWidget {
   const ProfileTabScreen({super.key});
@@ -8,7 +16,16 @@ class ProfileTabScreen extends StatefulWidget {
 }
 
 class _ProfileTabScreenState extends State<ProfileTabScreen> {
+  final ProfileRepository _profileRepository = ProfileRepository();
+  final PhotoRepository _photoRepository = PhotoRepository();
+
   bool _darkMode = false;
+
+  UserProfile _profile = const UserProfile();
+  bool _isProfileLoading = true;
+
+  // null = ещё грузится, показываем "…" вместо цифры.
+  int? _photoCount;
 
   static const Color primary = Color(0xFF2563EB);
   static const Color background = Color(0xFFF8FAFC);
@@ -26,6 +43,60 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
       _darkMode ? const Color(0xFF94A3B8) : textSecondary;
 
   Color get dividerColor => _darkMode ? const Color(0xFF334155) : border;
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      // Провайдер проектов уже может слушать (если юзер заходил
+      // на вкладку "Проекты"), повторный вызов безопасен —
+      // listenToProjects() сам себя гасит, если уже запущен.
+      context.read<ProjectsProvider>().listenToProjects();
+    });
+
+    _loadProfile();
+    _loadPhotoCount();
+  }
+
+  Future<void> _loadProfile() async {
+    try {
+      final profile = await _profileRepository.getUserProfile();
+
+      if (!mounted) return;
+
+      setState(() {
+        _profile = profile;
+        _isProfileLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+
+      setState(() {
+        _isProfileLoading = false;
+      });
+    }
+  }
+
+  Future<void> _loadPhotoCount() async {
+    try {
+      final count = await _photoRepository.getUserPhotoCount();
+
+      if (!mounted) return;
+
+      setState(() {
+        _photoCount = count;
+      });
+    } catch (e) {
+      if (!mounted) return;
+
+      setState(() {
+        _photoCount = 0;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,6 +134,9 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
   // ------------------------------------------------------------
 
   Widget _buildProfileHeader() {
+    final hasName = _profile.fullName.isNotEmpty;
+    final hasRoleLine = _profile.roleLine.isNotEmpty;
+
     return Container(
       width: double.infinity,
       color: _darkMode ? const Color(0xFF0F172A) : Colors.white,
@@ -114,10 +188,10 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                     ),
                   ],
                 ),
-                child: const Center(
+                child: Center(
                   child: Text(
-                    'АС',
-                    style: TextStyle(
+                    _profile.initials.isNotEmpty ? _profile.initials : '?',
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 28,
                       fontWeight: FontWeight.w800,
@@ -177,72 +251,40 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
 
           const SizedBox(height: 14),
 
-          Text(
-            'Нурлан Сейткали',
-            style: TextStyle(
-              color: primaryText,
-              fontSize: 21,
-              fontWeight: FontWeight.w800,
-              letterSpacing: -0.2,
+          GestureDetector(
+            onTap: _showEditProfileDialog,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  hasName ? _profile.fullName : 'Добавьте имя',
+                  style: TextStyle(
+                    color: hasName ? primaryText : secondaryText,
+                    fontSize: 21,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.2,
+                    fontStyle: hasName ? FontStyle.normal : FontStyle.italic,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Icon(Icons.edit_outlined, size: 16, color: secondaryText),
+              ],
             ),
           ),
 
           const SizedBox(height: 5),
 
-          Text(
-            'Прораб · ИП Сейткали Н.Б.',
-            style: TextStyle(
-              color: secondaryText,
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
-          // PRO badge
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF2563EB), Color(0xFF3B82F6)],
+          GestureDetector(
+            onTap: _showEditProfileDialog,
+            child: Text(
+              hasRoleLine ? _profile.roleLine : 'Укажите должность и ИП',
+              style: TextStyle(
+                color: secondaryText,
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                fontStyle: hasRoleLine ? FontStyle.normal : FontStyle.italic,
               ),
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: primary.withValues(alpha: 0.16),
-                  blurRadius: 8,
-                  offset: const Offset(0, 3),
-                ),
-              ],
             ),
-            child: const Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.workspace_premium_outlined,
-                  color: Colors.white,
-                  size: 15,
-                ),
-                SizedBox(width: 5),
-                Text(
-                  'PRO',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.6,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 7),
-
-          Text(
-            'Подписка активна до 19 сентября 2026',
-            style: TextStyle(color: secondaryText, fontSize: 11.5),
           ),
         ],
       ),
@@ -274,10 +316,141 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
   }
 
   // ------------------------------------------------------------
+  // EDIT PROFILE DIALOG
+  // ------------------------------------------------------------
+
+  Future<void> _showEditProfileDialog() async {
+    final firstNameController = TextEditingController(text: _profile.firstName);
+    final lastNameController = TextEditingController(text: _profile.lastName);
+    final roleController = TextEditingController(text: _profile.role);
+    final companyController = TextEditingController(text: _profile.companyInfo);
+
+    bool isSaving = false;
+
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text('Данные профиля'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: firstNameController,
+                      enabled: !isSaving,
+                      decoration: const InputDecoration(labelText: 'Имя'),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: lastNameController,
+                      enabled: !isSaving,
+                      decoration: const InputDecoration(labelText: 'Фамилия'),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: roleController,
+                      enabled: !isSaving,
+                      decoration: const InputDecoration(
+                        labelText: 'Должность',
+                        hintText: 'Например: Прораб',
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: companyController,
+                      enabled: !isSaving,
+                      decoration: const InputDecoration(
+                        labelText: 'ИП / Компания',
+                        hintText: 'Например: ИП Иванов И.И.',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: isSaving
+                      ? null
+                      : () => Navigator.pop(dialogContext),
+                  child: const Text('Отмена'),
+                ),
+                FilledButton(
+                  onPressed: isSaving
+                      ? null
+                      : () async {
+                          setDialogState(() {
+                            isSaving = true;
+                          });
+
+                          final updatedProfile = _profile.copyWith(
+                            firstName: firstNameController.text.trim(),
+                            lastName: lastNameController.text.trim(),
+                            role: roleController.text.trim(),
+                            companyInfo: companyController.text.trim(),
+                          );
+
+                          try {
+                            await _profileRepository.saveUserProfile(
+                              updatedProfile,
+                            );
+
+                            if (!mounted) return;
+
+                            setState(() {
+                              _profile = updatedProfile;
+                            });
+
+                            if (!dialogContext.mounted) return;
+                            Navigator.pop(dialogContext);
+                          } catch (e) {
+                            setDialogState(() {
+                              isSaving = false;
+                            });
+
+                            if (!dialogContext.mounted) return;
+
+                            ScaffoldMessenger.of(dialogContext).showSnackBar(
+                              SnackBar(
+                                content: Text('Не удалось сохранить: $e'),
+                              ),
+                            );
+                          }
+                        },
+                  child: isSaving
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text('Сохранить'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    firstNameController.dispose();
+    lastNameController.dispose();
+    roleController.dispose();
+    companyController.dispose();
+  }
+
+  // ------------------------------------------------------------
   // STATISTICS
   // ------------------------------------------------------------
 
   Widget _buildStatistics() {
+    final projectsProvider = context.watch<ProjectsProvider>();
+
+    final projectsCount = projectsProvider.projects.length;
+    final activeCount =
+        projectsProvider.getProjectCountByStatus()[ProjectStatus.active] ?? 0;
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 18),
       decoration: BoxDecoration(
@@ -289,20 +462,20 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
         children: [
           _buildStatistic(
             icon: Icons.folder_outlined,
-            value: '12',
+            value: '$projectsCount',
             label: 'Проектов',
           ),
           _buildStatisticDivider(),
           _buildStatistic(
             icon: Icons.photo_library_outlined,
-            value: '293',
+            value: _photoCount != null ? '$_photoCount' : '…',
             label: 'Фотографии',
           ),
           _buildStatisticDivider(),
           _buildStatistic(
-            icon: Icons.groups_outlined,
-            value: '4',
-            label: 'Бригады',
+            icon: Icons.play_circle_outline,
+            value: '$activeCount',
+            label: 'Активные',
           ),
         ],
       ),
@@ -395,7 +568,7 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
           _buildMenuItem(
             icon: Icons.workspace_premium_outlined,
             title: 'Подписка Pro',
-            subtitle: 'Управление подпиской',
+            subtitle: 'Скоро будет доступна',
             iconColor: primary,
             onTap: () {
               _showComingSoon('Подписка Pro');
@@ -605,13 +778,7 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
               child: Text('Отмена', style: TextStyle(color: secondaryText)),
             ),
             TextButton(
-              onPressed: () {
-                Navigator.pop(dialogContext);
-
-                // Подключи сюда существующий logout:
-                //
-                // FirebaseAuth.instance.signOut();
-              },
+              onPressed: () => _logout(dialogContext),
               child: const Text(
                 'Выйти',
                 style: TextStyle(
@@ -624,6 +791,23 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
         );
       },
     );
+  }
+
+  Future<void> _logout(BuildContext dialogContext) async {
+    Navigator.pop(dialogContext);
+
+    try {
+      await FirebaseAuth.instance.signOut();
+
+      if (!mounted) return;
+      Navigator.of(context).pushReplacementNamed('/login');
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Ошибка при выходе: $e')));
+    }
   }
 
   void _showComingSoon(String title) {

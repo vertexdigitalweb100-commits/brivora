@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../../../home/presentation/screens/home_tab_screen.dart';
 import '../../../projects/presentation/screens/projects_tab_screen.dart';
 import '../../../projects/presentation/providers/projects_provider.dart';
@@ -17,12 +16,10 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedIndex = 0;
 
-  late final List<Widget> _screens = [
-    const HomeTabScreen(),
-    const ProjectsTabScreen(),
-    AITabScreen(),
-    const ProfileTabScreen(),
-  ];
+  // Когда true — вкладка "Проекты" сразу открывает диалог создания
+  // проекта при монтировании. Сбрасывается через _handleAutoOpenHandled,
+  // чтобы обычное переключение на вкладку вручную не открывало диалог.
+  bool _autoOpenCreateProject = false;
 
   void _onNavItemTapped(int index) {
     setState(() {
@@ -30,8 +27,45 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
   }
 
+  /// Кнопка "+ Новый проект" на Главной: переключает на вкладку
+  /// "Проекты" и просит её сразу открыть диалог создания.
+  void _openCreateProjectFromHome() {
+    setState(() {
+      _selectedIndex = 1;
+      _autoOpenCreateProject = true;
+    });
+  }
+
+  /// Кнопка "Все" у "Недавних проектов": просто переключает вкладку,
+  /// без автооткрытия диалога создания.
+  void _goToProjectsTab() {
+    setState(() {
+      _selectedIndex = 1;
+    });
+  }
+
+  void _handleAutoOpenHandled() {
+    // Не через setState — вкладка "Проекты" уже открыла диалог сама,
+    // лишний rebuild здесь не нужен, важно только сбросить флаг
+    // до следующего монтирования этой вкладки.
+    _autoOpenCreateProject = false;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final screens = <Widget>[
+      HomeTabScreen(
+        onCreateProject: _openCreateProjectFromHome,
+        onViewAllProjects: _goToProjectsTab,
+      ),
+      ProjectsTabScreen(
+        autoOpenCreateDialog: _autoOpenCreateProject,
+        onAutoOpenHandled: _handleAutoOpenHandled,
+      ),
+      const AITabScreen(),
+      const ProfileTabScreen(),
+    ];
+
     return ChangeNotifierProvider(
       create: (context) => ProjectsProvider(),
       child: Scaffold(
@@ -40,7 +74,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           elevation: 0,
           centerTitle: false,
         ),
-        body: _screens[_selectedIndex],
+        body: screens[_selectedIndex],
         bottomNavigationBar: NavigationBar(
           selectedIndex: _selectedIndex,
           onDestinationSelected: _onNavItemTapped,

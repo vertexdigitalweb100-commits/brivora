@@ -73,9 +73,7 @@ class PhotoRepository {
   }
 
   Future<void> updatePhotoCaption(String photoId, String caption) async {
-    await _photosCollection.doc(photoId).update({
-      'caption': caption,
-    });
+    await _photosCollection.doc(photoId).update({'caption': caption});
   }
 
   Stream<List<Photo>> getProjectPhotos(String projectId) {
@@ -94,6 +92,21 @@ class PhotoRepository {
           (snapshot) =>
               snapshot.docs.map((e) => Photo.fromFirestore(e)).toList(),
         );
+  }
+
+  /// Общее количество фото пользователя по всем проектам —
+  /// для статистики в профиле.
+  Future<int> getUserPhotoCount() async {
+    final user = _auth.currentUser;
+
+    if (user == null) return 0;
+
+    final snapshot = await _photosCollection
+        .where('ownerId', isEqualTo: user.uid)
+        .count()
+        .get();
+
+    return snapshot.count ?? 0;
   }
 
   Future<void> deletePhoto(Photo photo) async {
