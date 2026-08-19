@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../../../home/presentation/screens/home_tab_screen.dart';
 import '../../../projects/presentation/screens/projects_tab_screen.dart';
 import '../../../projects/presentation/providers/projects_provider.dart';
@@ -19,7 +20,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   late final List<Widget> _screens = [
     const HomeTabScreen(),
     const ProjectsTabScreen(),
-    const AITabScreen(),
+    AITabScreen(),
     const ProfileTabScreen(),
   ];
 
