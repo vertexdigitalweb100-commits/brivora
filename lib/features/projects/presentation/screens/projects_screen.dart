@@ -8,7 +8,19 @@ import '../../domain/models/project.dart';
 import '../../../../core/routes/app_routes.dart';
 
 class ProjectsScreen extends StatefulWidget {
-  const ProjectsScreen({super.key});
+  /// Если true — после открытия экрана автоматически
+  /// показывается окно создания проекта.
+  final bool autoOpenCreateDialog;
+
+  /// Вызывается после того, как автоматическое открытие
+  /// было обработано.
+  final VoidCallback? onAutoOpenHandled;
+
+  const ProjectsScreen({
+    super.key,
+    this.autoOpenCreateDialog = false,
+    this.onAutoOpenHandled,
+  });
 
   @override
   State<ProjectsScreen> createState() => _ProjectsScreenState();
@@ -18,7 +30,9 @@ enum _ProjectSort { newest, oldest, progress, nameAsc, nameDesc }
 
 class _ProjectsScreenState extends State<ProjectsScreen> {
   ProjectStatus? _selectedFilter;
+
   _ProjectSort _sort = _ProjectSort.newest;
+
   String _searchQuery = '';
 
   @override
@@ -27,7 +41,16 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      context.read<ProjectsProvider>().listenToProjects();
+
+      final provider = context.read<ProjectsProvider>();
+
+      provider.listenToProjects();
+
+      if (widget.autoOpenCreateDialog) {
+        _openCreateProjectDialog();
+
+        widget.onAutoOpenHandled?.call();
+      }
     });
   }
 
@@ -37,25 +60,35 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     super.dispose();
   }
 
+  // ============================================================
+  // СОЗДАНИЕ ПРОЕКТА
+  // ============================================================
+
   void _openCreateProjectDialog() {
     showDialog(
       context: context,
-      builder: (_) => CreateProjectDialog(
-        onCreateProject: (title, description) async {
-          await context.read<ProjectsProvider>().createProject(
-            title,
-            description: description,
-          );
+      builder: (_) {
+        return CreateProjectDialog(
+          onCreateProject: (title, description) async {
+            await context.read<ProjectsProvider>().createProject(
+              title,
+              description: description,
+            );
 
-          if (!mounted) return;
+            if (!mounted) return;
 
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Проект "$title" создан')));
-        },
-      ),
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text('Проект «$title» создан')));
+          },
+        );
+      },
     );
   }
+
+  // ============================================================
+  // ФИЛЬТРАЦИЯ + ПОИСК + СОРТИРОВКА
+  // ============================================================
 
   List<Project> _visibleProjects(List<Project> source) {
     final query = _searchQuery.trim().toLowerCase();
@@ -76,12 +109,16 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       switch (_sort) {
         case _ProjectSort.newest:
           return b.createdAt.compareTo(a.createdAt);
+
         case _ProjectSort.oldest:
           return a.createdAt.compareTo(b.createdAt);
+
         case _ProjectSort.progress:
           return b.progress.compareTo(a.progress);
+
         case _ProjectSort.nameAsc:
           return a.title.toLowerCase().compareTo(b.title.toLowerCase());
+
         case _ProjectSort.nameDesc:
           return b.title.toLowerCase().compareTo(a.title.toLowerCase());
       }
@@ -94,16 +131,24 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     switch (sort) {
       case _ProjectSort.newest:
         return 'Новые';
+
       case _ProjectSort.oldest:
         return 'Старые';
+
       case _ProjectSort.progress:
         return 'Прогресс';
+
       case _ProjectSort.nameAsc:
         return 'Название А–Я';
+
       case _ProjectSort.nameDesc:
         return 'Название Я–А';
     }
   }
+
+  // ============================================================
+  // BUILD
+  // ============================================================
 
   @override
   Widget build(BuildContext context) {
@@ -117,11 +162,19 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       body: SafeArea(
         child: Consumer<ProjectsProvider>(
           builder: (context, provider, _) {
+            // --------------------------------------------------
+            // ЗАГРУЗКА
+            // --------------------------------------------------
+
             if (provider.isLoading && provider.projects.isEmpty) {
               return const Center(
                 child: CircularProgressIndicator(color: primary),
               );
             }
+
+            // --------------------------------------------------
+            // ОШИБКА
+            // --------------------------------------------------
 
             if (provider.error != null && provider.projects.isEmpty) {
               return Center(
@@ -135,13 +188,17 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                         size: 48,
                         color: Color(0xFFEF4444),
                       ),
+
                       const SizedBox(height: 16),
+
                       Text(
                         provider.error!,
                         style: const TextStyle(color: Color(0xFFEF4444)),
                         textAlign: TextAlign.center,
                       ),
+
                       const SizedBox(height: 16),
+
                       FilledButton(
                         onPressed: provider.listenToProjects,
                         child: const Text('Повторить'),
@@ -152,16 +209,25 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
               );
             }
 
+            // --------------------------------------------------
+            // ДАННЫЕ
+            // --------------------------------------------------
+
             final counts = provider.getProjectCountByStatus();
+
             final projects = _visibleProjects(provider.projects);
 
             return LayoutBuilder(
               builder: (context, constraints) {
                 final isMobile = constraints.maxWidth < 700;
+
                 final horizontalPadding = isMobile ? 16.0 : 28.0;
 
                 return CustomScrollView(
                   slivers: [
+                    // ==================================================
+                    // ЗАГОЛОВОК
+                    // ==================================================
                     SliverPadding(
                       padding: EdgeInsets.fromLTRB(
                         horizontalPadding,
@@ -178,7 +244,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Projects',
+                                    'Проекты',
                                     style: TextStyle(
                                       fontSize: isMobile ? 28 : 32,
                                       fontWeight: FontWeight.w700,
@@ -186,9 +252,11 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                                       letterSpacing: -0.7,
                                     ),
                                   ),
+
                                   const SizedBox(height: 4),
+
                                   const Text(
-                                    'Manage your construction projects',
+                                    'Управляйте строительными проектами',
                                     style: TextStyle(
                                       fontSize: 14,
                                       color: textSecondary,
@@ -197,11 +265,13 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                                 ],
                               ),
                             ),
+
                             const SizedBox(width: 12),
+
                             FilledButton.icon(
                               onPressed: _openCreateProjectDialog,
                               icon: const Icon(Icons.add_rounded, size: 20),
-                              label: Text(isMobile ? 'New' : 'New Project'),
+                              label: Text(isMobile ? 'Новый' : 'Новый проект'),
                               style: FilledButton.styleFrom(
                                 backgroundColor: primary,
                                 foregroundColor: Colors.white,
@@ -218,6 +288,10 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                         ),
                       ),
                     ),
+
+                    // ==================================================
+                    // ПОИСК + ФИЛЬТРЫ
+                    // ==================================================
                     SliverPadding(
                       padding: EdgeInsets.fromLTRB(
                         horizontalPadding,
@@ -230,11 +304,15 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                             ? Column(
                                 children: [
                                   _buildSearchField(),
+
                                   const SizedBox(height: 10),
+
                                   Row(
                                     children: [
                                       Expanded(child: _buildFilterBar(counts)),
+
                                       const SizedBox(width: 8),
+
                                       _buildSortButton(),
                                     ],
                                   ),
@@ -243,14 +321,22 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                             : Row(
                                 children: [
                                   Expanded(child: _buildSearchField()),
+
                                   const SizedBox(width: 16),
+
                                   _buildFilterBar(counts),
+
                                   const SizedBox(width: 10),
+
                                   _buildSortButton(),
                                 ],
                               ),
                       ),
                     ),
+
+                    // ==================================================
+                    // КОЛИЧЕСТВО ПРОЕКТОВ
+                    // ==================================================
                     SliverPadding(
                       padding: EdgeInsets.fromLTRB(
                         horizontalPadding,
@@ -262,14 +348,16 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                         child: Row(
                           children: [
                             Text(
-                              'Showing ${projects.length} projects',
+                              'Показано проектов: ${projects.length}',
                               style: const TextStyle(
                                 color: textSecondary,
                                 fontSize: 13,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
+
                             const Spacer(),
+
                             if (_searchQuery.isNotEmpty ||
                                 _selectedFilter != null)
                               TextButton(
@@ -285,6 +373,10 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                         ),
                       ),
                     ),
+
+                    // ==================================================
+                    // ПУСТОЕ СОСТОЯНИЕ
+                    // ==================================================
                     if (projects.isEmpty)
                       SliverFillRemaining(
                         hasScrollBody: false,
@@ -306,35 +398,52 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                                     size: 32,
                                   ),
                                 ),
+
                                 const SizedBox(height: 14),
-                                const Text(
-                                  'No projects yet',
-                                  style: TextStyle(
+
+                                Text(
+                                  _searchQuery.isNotEmpty ||
+                                          _selectedFilter != null
+                                      ? 'Ничего не найдено'
+                                      : 'Пока нет проектов',
+                                  style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w700,
                                     color: textPrimary,
                                   ),
                                 ),
+
                                 const SizedBox(height: 6),
-                                const Text(
-                                  'Create your first project and keep everything organized in one place.',
+
+                                Text(
+                                  _searchQuery.isNotEmpty ||
+                                          _selectedFilter != null
+                                      ? 'Попробуйте изменить параметры поиска или фильтра.'
+                                      : 'Создайте первый проект, чтобы начать работу.',
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(color: textSecondary),
+                                  style: const TextStyle(color: textSecondary),
                                 ),
+
                                 const SizedBox(height: 16),
-                                FilledButton.icon(
-                                  onPressed: _openCreateProjectDialog,
-                                  icon: const Icon(Icons.add_rounded),
-                                  label: const Text('Create Project'),
-                                  style: FilledButton.styleFrom(
-                                    backgroundColor: primary,
+
+                                if (_searchQuery.isEmpty &&
+                                    _selectedFilter == null)
+                                  FilledButton.icon(
+                                    onPressed: _openCreateProjectDialog,
+                                    icon: const Icon(Icons.add_rounded),
+                                    label: const Text('Создать проект'),
+                                    style: FilledButton.styleFrom(
+                                      backgroundColor: primary,
+                                    ),
                                   ),
-                                ),
                               ],
                             ),
                           ),
                         ),
                       )
+                    // ==================================================
+                    // СПИСОК ПРОЕКТОВ
+                    // ==================================================
                     else
                       SliverPadding(
                         padding: EdgeInsets.fromLTRB(
@@ -352,6 +461,8 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
 
                             return ProjectCard(
                               project: project,
+
+                              // Открытие деталей
                               onTap: () {
                                 Navigator.pushNamed(
                                   context,
@@ -359,11 +470,15 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                                   arguments: project,
                                 );
                               },
+
+                              // Удаление
                               onDelete: () async {
                                 await context
                                     .read<ProjectsProvider>()
                                     .deleteProject(project.id);
                               },
+
+                              // Изменение статуса
                               onStatusChange: (status) async {
                                 await context
                                     .read<ProjectsProvider>()
@@ -390,11 +505,19 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     );
   }
 
+  // ============================================================
+  // ПОИСК
+  // ============================================================
+
   Widget _buildSearchField() {
     return TextField(
-      onChanged: (value) => setState(() => _searchQuery = value),
+      onChanged: (value) {
+        setState(() {
+          _searchQuery = value;
+        });
+      },
       decoration: InputDecoration(
-        hintText: 'Search projects...',
+        hintText: 'Поиск проектов...',
         prefixIcon: const Icon(Icons.search_rounded),
         filled: true,
         fillColor: Colors.white,
@@ -415,25 +538,29 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     );
   }
 
+  // ============================================================
+  // ФИЛЬТРЫ
+  // ============================================================
+
   Widget _buildFilterBar(Map<ProjectStatus, int> counts) {
     final items = <({String label, int count, ProjectStatus? status})>[
       (
-        label: 'All',
+        label: 'Все',
         count: counts.values.fold(0, (a, b) => a + b),
         status: null,
       ),
       (
-        label: 'Active',
+        label: 'Активные',
         count: counts[ProjectStatus.active] ?? 0,
         status: ProjectStatus.active,
       ),
       (
-        label: 'Planning',
+        label: 'Планирование',
         count: counts[ProjectStatus.planning] ?? 0,
         status: ProjectStatus.planning,
       ),
       (
-        label: 'Completed',
+        label: 'Завершённые',
         count: counts[ProjectStatus.completed] ?? 0,
         status: ProjectStatus.completed,
       ),
@@ -457,7 +584,9 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
               child: InkWell(
                 borderRadius: BorderRadius.circular(8),
                 onTap: () {
-                  setState(() => _selectedFilter = item.status);
+                  setState(() {
+                    _selectedFilter = item.status;
+                  });
                 },
                 child: Container(
                   padding: const EdgeInsets.symmetric(
@@ -487,27 +616,38 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     );
   }
 
+  // ============================================================
+  // СОРТИРОВКА
+  // ============================================================
+
   Widget _buildSortButton() {
     return PopupMenuButton<_ProjectSort>(
       initialValue: _sort,
-      onSelected: (value) => setState(() => _sort = value),
-      itemBuilder: (context) => _ProjectSort.values
-          .map(
-            (value) => PopupMenuItem(
-              value: value,
-              child: Row(
-                children: [
-                  if (value == _sort)
-                    const Padding(
-                      padding: EdgeInsets.only(right: 8),
-                      child: Icon(Icons.check_rounded, size: 18),
-                    ),
-                  Text(_sortLabel(value)),
-                ],
-              ),
+
+      onSelected: (value) {
+        setState(() {
+          _sort = value;
+        });
+      },
+
+      itemBuilder: (context) {
+        return _ProjectSort.values.map((value) {
+          return PopupMenuItem(
+            value: value,
+            child: Row(
+              children: [
+                if (value == _sort)
+                  const Padding(
+                    padding: EdgeInsets.only(right: 8),
+                    child: Icon(Icons.check_rounded, size: 18),
+                  ),
+                Text(_sortLabel(value)),
+              ],
             ),
-          )
-          .toList(),
+          );
+        }).toList();
+      },
+
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
         decoration: BoxDecoration(
@@ -519,16 +659,20 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(Icons.tune_rounded, size: 17, color: Color(0xFF64748B)),
+
             const SizedBox(width: 7),
+
             Text(
-              'Sort: ${_sortLabel(_sort)}',
+              'Сортировка: ${_sortLabel(_sort)}',
               style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
                 color: Color(0xFF334155),
               ),
             ),
+
             const SizedBox(width: 4),
+
             const Icon(Icons.keyboard_arrow_down_rounded, size: 18),
           ],
         ),
