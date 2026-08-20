@@ -20,31 +20,25 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
   final ProfileRepository _profileRepository = ProfileRepository();
   final PhotoRepository _photoRepository = PhotoRepository();
 
-  bool _darkMode = false;
   UserProfile _profile = const UserProfile();
+
   bool _isProfileLoading = true;
-  int? _photoCount;
   bool _isAvatarLoading = false;
 
-  static const Color primary = Color(0xFF2563EB);
-  static const Color background = Color(0xFFF8FAFC);
-  static const Color textPrimary = Color(0xFF0F172A);
-  static const Color textSecondary = Color(0xFF64748B);
-  static const Color border = Color(0xFFE2E8F0);
+  int? _photoCount;
 
-  Color get pageBackground => _darkMode ? const Color(0xFF0F172A) : background;
-  Color get cardColor => _darkMode ? const Color(0xFF1E293B) : Colors.white;
-  Color get primaryText => _darkMode ? Colors.white : textPrimary;
-  Color get secondaryText =>
-      _darkMode ? const Color(0xFF94A3B8) : textSecondary;
-  Color get dividerColor => _darkMode ? const Color(0xFF334155) : border;
+  static const Color primary = Color(0xFF2563EB);
 
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) context.read<ProjectsProvider>().listenToProjects();
+      if (!mounted) return;
+
+      context.read<ProjectsProvider>().listenToProjects();
     });
+
     _loadProfile();
     _loadPhotoCount();
   }
@@ -52,49 +46,73 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
   Future<void> _loadProfile() async {
     try {
       final profile = await _profileRepository.getUserProfile();
+
       if (!mounted) return;
+
       setState(() {
         _profile = profile;
         _isProfileLoading = false;
       });
     } catch (_) {
       if (!mounted) return;
-      setState(() => _isProfileLoading = false);
+
+      setState(() {
+        _isProfileLoading = false;
+      });
     }
   }
 
   Future<void> _loadPhotoCount() async {
     try {
       final count = await _photoRepository.getUserPhotoCount();
+
       if (!mounted) return;
-      setState(() => _photoCount = count);
+
+      setState(() {
+        _photoCount = count;
+      });
     } catch (_) {
       if (!mounted) return;
-      setState(() => _photoCount = 0);
+
+      setState(() {
+        _photoCount = 0;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
     return Scaffold(
-      backgroundColor: pageBackground,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
             SliverToBoxAdapter(child: _buildProfileHeader()),
+
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 28),
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
                   _buildStatistics(),
+
                   const SizedBox(height: 20),
+
                   _buildAppearanceCard(),
+
                   const SizedBox(height: 20),
+
                   _buildSettingsCard(),
+
                   const SizedBox(height: 20),
+
                   _buildLogoutButton(),
+
                   const SizedBox(height: 14),
+
                   _buildVersion(),
                 ]),
               ),
@@ -106,12 +124,15 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
   }
 
   Widget _buildProfileHeader() {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
     final hasName = _profile.fullName.isNotEmpty;
     final hasRoleLine = _profile.roleLine.isNotEmpty;
 
     return Container(
       width: double.infinity,
-      color: _darkMode ? const Color(0xFF0F172A) : Colors.white,
+      color: theme.scaffoldBackgroundColor,
       padding: const EdgeInsets.fromLTRB(20, 18, 20, 25),
       child: Column(
         children: [
@@ -119,25 +140,31 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
             children: [
               Text(
                 'Профиль',
-                style: TextStyle(
-                  color: primaryText,
-                  fontSize: 25,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  color: colors.onSurface,
                   fontWeight: FontWeight.w800,
                   letterSpacing: -0.4,
                 ),
               ),
+
               const Spacer(),
+
               _buildHeaderButton(
                 icon: Icons.settings_outlined,
-                onTap: () => _showComingSoon('Настройки'),
+                onTap: () {
+                  Navigator.of(context).pushNamed('/settings');
+                },
               ),
             ],
           ),
+
           const SizedBox(height: 25),
+
           Stack(
             clipBehavior: Clip.none,
             children: [
               _buildAvatar(),
+
               Positioned(
                 right: 2,
                 bottom: 2,
@@ -147,10 +174,14 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                   decoration: BoxDecoration(
                     color: const Color(0xFF22C55E),
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 3),
+                    border: Border.all(
+                      color: theme.scaffoldBackgroundColor,
+                      width: 3,
+                    ),
                   ),
                 ),
               ),
+
               Positioned(
                 right: -3,
                 top: -3,
@@ -160,9 +191,11 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                     width: 33,
                     height: 33,
                     decoration: BoxDecoration(
-                      color: cardColor,
+                      color: colors.surface,
                       shape: BoxShape.circle,
-                      border: Border.all(color: dividerColor),
+                      border: Border.all(
+                        color: colors.outline.withValues(alpha: 0.5),
+                      ),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withValues(alpha: 0.08),
@@ -179,14 +212,16 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                         : Icon(
                             Icons.camera_alt_outlined,
                             size: 16,
-                            color: secondaryText,
+                            color: colors.onSurfaceVariant,
                           ),
                   ),
                 ),
               ),
             ],
           ),
+
           const SizedBox(height: 14),
+
           GestureDetector(
             onTap: _showEditProfileDialog,
             child: Row(
@@ -196,27 +231,33 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                   hasName
                       ? _profile.fullName
                       : (_isProfileLoading ? 'Загрузка...' : 'Добавьте имя'),
-                  style: TextStyle(
-                    color: hasName ? primaryText : secondaryText,
-                    fontSize: 21,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    color: hasName ? colors.onSurface : colors.onSurfaceVariant,
                     fontWeight: FontWeight.w800,
                     letterSpacing: -0.2,
                     fontStyle: hasName ? FontStyle.normal : FontStyle.italic,
                   ),
                 ),
+
                 const SizedBox(width: 6),
-                Icon(Icons.edit_outlined, size: 16, color: secondaryText),
+
+                Icon(
+                  Icons.edit_outlined,
+                  size: 16,
+                  color: colors.onSurfaceVariant,
+                ),
               ],
             ),
           ),
+
           const SizedBox(height: 5),
+
           GestureDetector(
             onTap: _showEditProfileDialog,
             child: Text(
               hasRoleLine ? _profile.roleLine : 'Укажите должность и ИП',
-              style: TextStyle(
-                color: secondaryText,
-                fontSize: 13,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colors.onSurfaceVariant,
                 fontWeight: FontWeight.w500,
                 fontStyle: hasRoleLine ? FontStyle.normal : FontStyle.italic,
               ),
@@ -228,6 +269,7 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
   }
 
   Widget _buildAvatar() {
+    final theme = Theme.of(context);
     final url = _profile.avatarUrl;
 
     return Container(
@@ -253,7 +295,9 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
             ? Image.network(
                 url,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => _buildInitials(),
+                errorBuilder: (_, __, ___) {
+                  return _buildInitials();
+                },
               )
             : _buildInitials(),
       ),
@@ -277,6 +321,9 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
     required IconData icon,
     required VoidCallback onTap,
   }) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -286,21 +333,21 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
           width: 42,
           height: 42,
           decoration: BoxDecoration(
-            color: _darkMode
-                ? const Color(0xFF1E293B)
-                : const Color(0xFFF1F5F9),
+            color: colors.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(13),
           ),
-          child: Icon(icon, size: 21, color: secondaryText),
+          child: Icon(icon, size: 21, color: colors.onSurfaceVariant),
         ),
       ),
     );
   }
 
   Future<void> _showAvatarOptions() async {
+    final theme = Theme.of(context);
+
     final action = await showModalBottomSheet<String>(
       context: context,
-      backgroundColor: cardColor,
+      backgroundColor: theme.colorScheme.surface,
       showDragHandle: true,
       builder: (sheetContext) {
         return SafeArea(
@@ -310,18 +357,26 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
               ListTile(
                 leading: const Icon(Icons.photo_library_outlined),
                 title: const Text('Выбрать из галереи'),
-                onTap: () => Navigator.pop(sheetContext, 'gallery'),
+                onTap: () {
+                  Navigator.pop(sheetContext, 'gallery');
+                },
               ),
+
               ListTile(
                 leading: const Icon(Icons.camera_alt_outlined),
                 title: const Text('Сделать фото'),
-                onTap: () => Navigator.pop(sheetContext, 'camera'),
+                onTap: () {
+                  Navigator.pop(sheetContext, 'camera');
+                },
               ),
+
               if (_profile.avatarUrl != null && _profile.avatarUrl!.isNotEmpty)
                 ListTile(
                   leading: const Icon(Icons.delete_outline, color: Colors.red),
                   title: const Text('Удалить фотографию'),
-                  onTap: () => Navigator.pop(sheetContext, 'delete'),
+                  onTap: () {
+                    Navigator.pop(sheetContext, 'delete');
+                  },
                 ),
             ],
           ),
@@ -339,10 +394,15 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
   }
 
   Future<void> _uploadAvatar(ImageSource source) async {
-    setState(() => _isAvatarLoading = true);
+    if (!mounted) return;
+
+    setState(() {
+      _isAvatarLoading = true;
+    });
 
     try {
       final url = await _profileRepository.pickAndUploadAvatar(source);
+
       if (url == null || !mounted) return;
 
       setState(() {
@@ -354,38 +414,62 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
       ).showSnackBar(const SnackBar(content: Text('Аватар успешно обновлён')));
     } catch (e) {
       if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Не удалось загрузить аватар: $e')),
       );
     } finally {
-      if (mounted) setState(() => _isAvatarLoading = false);
+      if (mounted) {
+        setState(() {
+          _isAvatarLoading = false;
+        });
+      }
     }
   }
 
   Future<void> _deleteAvatar() async {
-    setState(() => _isAvatarLoading = true);
+    if (!mounted) return;
+
+    setState(() {
+      _isAvatarLoading = true;
+    });
+
     try {
       await _profileRepository.deleteAvatar();
+
       if (!mounted) return;
-      setState(() => _profile = _profile.copyWith(avatarUrl: ''));
+
+      setState(() {
+        _profile = _profile.copyWith(avatarUrl: '');
+      });
+
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Аватар удалён')));
     } catch (e) {
       if (!mounted) return;
+
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Не удалось удалить аватар: $e')));
     } finally {
-      if (mounted) setState(() => _isAvatarLoading = false);
+      if (mounted) {
+        setState(() {
+          _isAvatarLoading = false;
+        });
+      }
     }
   }
 
   Future<void> _showEditProfileDialog() async {
     final firstNameController = TextEditingController(text: _profile.firstName);
+
     final lastNameController = TextEditingController(text: _profile.lastName);
+
     final roleController = TextEditingController(text: _profile.role);
+
     final companyController = TextEditingController(text: _profile.companyInfo);
+
     bool isSaving = false;
 
     await showDialog<void>(
@@ -395,6 +479,7 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
           builder: (context, setDialogState) {
             return AlertDialog(
               title: const Text('Данные профиля'),
+
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -404,13 +489,17 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                       enabled: !isSaving,
                       decoration: const InputDecoration(labelText: 'Имя'),
                     ),
+
                     const SizedBox(height: 12),
+
                     TextField(
                       controller: lastNameController,
                       enabled: !isSaving,
                       decoration: const InputDecoration(labelText: 'Фамилия'),
                     ),
+
                     const SizedBox(height: 12),
+
                     TextField(
                       controller: roleController,
                       enabled: !isSaving,
@@ -419,7 +508,9 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                         hintText: 'Например: Прораб',
                       ),
                     ),
+
                     const SizedBox(height: 12),
+
                     TextField(
                       controller: companyController,
                       enabled: !isSaving,
@@ -431,18 +522,25 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                   ],
                 ),
               ),
+
               actions: [
                 TextButton(
                   onPressed: isSaving
                       ? null
-                      : () => Navigator.pop(dialogContext),
+                      : () {
+                          Navigator.pop(dialogContext);
+                        },
                   child: const Text('Отмена'),
                 ),
+
                 FilledButton(
                   onPressed: isSaving
                       ? null
                       : () async {
-                          setDialogState(() => isSaving = true);
+                          setDialogState(() {
+                            isSaving = true;
+                          });
+
                           final updatedProfile = _profile.copyWith(
                             firstName: firstNameController.text.trim(),
                             lastName: lastNameController.text.trim(),
@@ -454,14 +552,27 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                             await _profileRepository.saveUserProfile(
                               updatedProfile,
                             );
-                            if (!mounted) return;
-                            setState(() => _profile = updatedProfile);
+
+                            if (!mounted) {
+                              return;
+                            }
+
+                            setState(() {
+                              _profile = updatedProfile;
+                            });
+
                             if (dialogContext.mounted) {
                               Navigator.pop(dialogContext);
                             }
                           } catch (e) {
-                            setDialogState(() => isSaving = false);
-                            if (!dialogContext.mounted) return;
+                            setDialogState(() {
+                              isSaving = false;
+                            });
+
+                            if (!dialogContext.mounted) {
+                              return;
+                            }
+
                             ScaffoldMessenger.of(dialogContext).showSnackBar(
                               SnackBar(
                                 content: Text('Не удалось сохранить: $e'),
@@ -491,17 +602,22 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
   }
 
   Widget _buildStatistics() {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
     final projectsProvider = context.watch<ProjectsProvider>();
+
     final projectsCount = projectsProvider.projects.length;
+
     final activeCount =
         projectsProvider.getProjectCountByStatus()[ProjectStatus.active] ?? 0;
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 18),
       decoration: BoxDecoration(
-        color: cardColor,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: dividerColor),
+        border: Border.all(color: colors.outline.withValues(alpha: 0.45)),
       ),
       child: Row(
         children: [
@@ -510,13 +626,17 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
             value: '$projectsCount',
             label: 'Проектов',
           ),
+
           _buildStatisticDivider(),
+
           _buildStatistic(
             icon: Icons.photo_library_outlined,
             value: _photoCount != null ? '$_photoCount' : '…',
             label: 'Фотографии',
           ),
+
           _buildStatisticDivider(),
+
           _buildStatistic(
             icon: Icons.play_circle_outline,
             value: '$activeCount',
@@ -532,25 +652,30 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
     required String value,
     required String label,
   }) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
     return Expanded(
       child: Column(
         children: [
           Icon(icon, color: primary, size: 19),
+
           const SizedBox(height: 7),
+
           Text(
             value,
-            style: TextStyle(
-              color: primaryText,
-              fontSize: 19,
+            style: theme.textTheme.titleLarge?.copyWith(
+              color: colors.onSurface,
               fontWeight: FontWeight.w800,
             ),
           ),
+
           const SizedBox(height: 2),
+
           Text(
             label,
-            style: TextStyle(
-              color: secondaryText,
-              fontSize: 11,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: colors.onSurfaceVariant,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -560,22 +685,28 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
   }
 
   Widget _buildStatisticDivider() {
-    return Container(width: 1, height: 45, color: dividerColor);
+    final colors = Theme.of(context).colorScheme;
+
+    return Container(
+      width: 1,
+      height: 45,
+      color: colors.outline.withValues(alpha: 0.45),
+    );
   }
 
   Widget _buildAppearanceCard() {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
     return _buildCard(
       child: _buildMenuItem(
-        icon: Icons.dark_mode_outlined,
-        title: 'Тёмная тема',
-        subtitle: _darkMode ? 'Включена' : 'Выключена',
-        trailing: Switch(
-          value: _darkMode,
-          activeTrackColor: primary,
-          activeThumbColor: Colors.white,
-          onChanged: (value) => setState(() => _darkMode = value),
-        ),
-        onTap: () => setState(() => _darkMode = !_darkMode),
+        icon: Icons.palette_outlined,
+        title: 'Оформление',
+        subtitle: 'Тема, язык и валюта',
+        iconColor: primary,
+        onTap: () {
+          Navigator.of(context).pushNamed('/settings');
+        },
       ),
     );
   }
@@ -587,29 +718,44 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
           _buildMenuItem(
             icon: Icons.settings_outlined,
             title: 'Настройки',
-            onTap: () => _showComingSoon('Настройки'),
+            subtitle: 'Язык, тема, валюта и уведомления',
+            onTap: () {
+              Navigator.of(context).pushNamed('/settings');
+            },
           ),
+
           _buildDivider(),
+
           _buildMenuItem(
             icon: Icons.workspace_premium_outlined,
             title: 'Подписка Pro',
             subtitle: 'Скоро будет доступна',
             iconColor: primary,
-            onTap: () => _showComingSoon('Подписка Pro'),
+            onTap: () {
+              _showComingSoon('Подписка Pro');
+            },
           ),
+
           _buildDivider(),
+
           _buildMenuItem(
             icon: Icons.security_outlined,
             title: 'Безопасность',
             subtitle: 'Пароль и вход',
-            onTap: () => _showComingSoon('Безопасность'),
+            onTap: () {
+              _showComingSoon('Безопасность');
+            },
           ),
+
           _buildDivider(),
+
           _buildMenuItem(
             icon: Icons.chat_bubble_outline,
             title: 'Обратная связь',
             subtitle: 'Сообщить о проблеме',
-            onTap: () => _showComingSoon('Обратная связь'),
+            onTap: () {
+              _showComingSoon('Обратная связь');
+            },
           ),
         ],
       ),
@@ -617,11 +763,14 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
   }
 
   Widget _buildCard({required Widget child}) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
     return Container(
       decoration: BoxDecoration(
-        color: cardColor,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: dividerColor),
+        border: Border.all(color: colors.outline.withValues(alpha: 0.45)),
       ),
       child: child,
     );
@@ -635,7 +784,10 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
     Color? iconColor,
     VoidCallback? onTap,
   }) {
-    final actualIconColor = iconColor ?? secondaryText;
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    final actualIconColor = iconColor ?? colors.onSurfaceVariant;
 
     return Material(
       color: Colors.transparent,
@@ -655,37 +807,40 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                 ),
                 child: Icon(icon, color: actualIconColor, size: 20),
               ),
+
               const SizedBox(width: 13),
+
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       title,
-                      style: TextStyle(
-                        color: primaryText,
-                        fontSize: 14,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        color: colors.onSurface,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
+
                     if (subtitle != null) ...[
                       const SizedBox(height: 3),
                       Text(
                         subtitle,
-                        style: TextStyle(color: secondaryText, fontSize: 11.5),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colors.onSurfaceVariant,
+                        ),
                       ),
                     ],
                   ],
                 ),
               ),
+
               if (trailing != null)
                 trailing
               else
                 Icon(
                   Icons.chevron_right_rounded,
-                  color: _darkMode
-                      ? const Color(0xFF64748B)
-                      : const Color(0xFF94A3B8),
+                  color: colors.onSurfaceVariant.withValues(alpha: 0.65),
                   size: 21,
                 ),
             ],
@@ -696,9 +851,14 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
   }
 
   Widget _buildDivider() {
+    final colors = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.only(left: 69),
-      child: Container(height: 1, color: dividerColor),
+      child: Container(
+        height: 1,
+        color: colors.outline.withValues(alpha: 0.35),
+      ),
     );
   }
 
@@ -712,7 +872,7 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(vertical: 15),
           decoration: BoxDecoration(
-            color: cardColor,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: const Color(0xFFFECACA)),
           ),
@@ -737,11 +897,13 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
   }
 
   Widget _buildVersion() {
+    final colors = Theme.of(context).colorScheme;
+
     return Center(
       child: Text(
         'Brivora · Версия 1.0.0',
         style: TextStyle(
-          color: _darkMode ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+          color: colors.onSurfaceVariant.withValues(alpha: 0.65),
           fontSize: 11,
         ),
       ),
@@ -749,33 +911,36 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
   }
 
   void _showLogoutDialog() {
-    showDialog(
+    final theme = Theme.of(context);
+
+    showDialog<void>(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          backgroundColor: cardColor,
+          backgroundColor: theme.colorScheme.surface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          title: Text(
-            'Выйти из аккаунта?',
-            style: TextStyle(
-              color: primaryText,
-              fontSize: 19,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
+          title: const Text('Выйти из аккаунта?'),
           content: Text(
             'Вы действительно хотите выйти из аккаунта Brivora?',
-            style: TextStyle(color: secondaryText, fontSize: 14, height: 1.4),
+            style: TextStyle(
+              color: theme.colorScheme.onSurfaceVariant,
+              fontSize: 14,
+              height: 1.4,
+            ),
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: Text('Отмена', style: TextStyle(color: secondaryText)),
+              onPressed: () {
+                Navigator.pop(dialogContext);
+              },
+              child: const Text('Отмена'),
             ),
             TextButton(
-              onPressed: () => _logout(dialogContext),
+              onPressed: () {
+                _logout(dialogContext);
+              },
               child: const Text(
                 'Выйти',
                 style: TextStyle(
@@ -792,12 +957,16 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
 
   Future<void> _logout(BuildContext dialogContext) async {
     Navigator.pop(dialogContext);
+
     try {
       await FirebaseAuth.instance.signOut();
+
       if (!mounted) return;
+
       Navigator.of(context).pushReplacementNamed('/login');
     } catch (e) {
       if (!mounted) return;
+
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Ошибка при выходе: $e')));

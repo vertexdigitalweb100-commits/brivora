@@ -152,13 +152,11 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const primary = Color(0xFF2563EB);
-    const background = Color(0xFFF8FAFC);
-    const textPrimary = Color(0xFF0F172A);
-    const textSecondary = Color(0xFF64748B);
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
 
     return Scaffold(
-      backgroundColor: background,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: Consumer<ProjectsProvider>(
           builder: (context, provider, _) {
@@ -167,8 +165,8 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
             // --------------------------------------------------
 
             if (provider.isLoading && provider.projects.isEmpty) {
-              return const Center(
-                child: CircularProgressIndicator(color: primary),
+              return Center(
+                child: CircularProgressIndicator(color: colors.primary),
               );
             }
 
@@ -177,36 +175,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
             // --------------------------------------------------
 
             if (provider.error != null && provider.projects.isEmpty) {
-              return Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        Icons.error_outline_rounded,
-                        size: 48,
-                        color: Color(0xFFEF4444),
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      Text(
-                        provider.error!,
-                        style: const TextStyle(color: Color(0xFFEF4444)),
-                        textAlign: TextAlign.center,
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      FilledButton(
-                        onPressed: provider.listenToProjects,
-                        child: const Text('Повторить'),
-                      ),
-                    ],
-                  ),
-                ),
-              );
+              return _buildErrorState(provider.error!);
             }
 
             // --------------------------------------------------
@@ -224,6 +193,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                 final horizontalPadding = isMobile ? 16.0 : 28.0;
 
                 return CustomScrollView(
+                  physics: const BouncingScrollPhysics(),
                   slivers: [
                     // ==================================================
                     // ЗАГОЛОВОК
@@ -245,21 +215,20 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                                 children: [
                                   Text(
                                     'Проекты',
-                                    style: TextStyle(
-                                      fontSize: isMobile ? 28 : 32,
-                                      fontWeight: FontWeight.w700,
-                                      color: textPrimary,
-                                      letterSpacing: -0.7,
-                                    ),
+                                    style: theme.textTheme.headlineMedium
+                                        ?.copyWith(
+                                          fontSize: isMobile ? 28 : 32,
+                                          fontWeight: FontWeight.w700,
+                                          letterSpacing: -0.7,
+                                        ),
                                   ),
 
                                   const SizedBox(height: 4),
 
-                                  const Text(
+                                  Text(
                                     'Управляйте строительными проектами',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: textSecondary,
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      color: colors.onSurfaceVariant,
                                     ),
                                   ),
                                 ],
@@ -273,8 +242,8 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                               icon: const Icon(Icons.add_rounded, size: 20),
                               label: Text(isMobile ? 'Новый' : 'Новый проект'),
                               style: FilledButton.styleFrom(
-                                backgroundColor: primary,
-                                foregroundColor: Colors.white,
+                                backgroundColor: colors.primary,
+                                foregroundColor: colors.onPrimary,
                                 padding: EdgeInsets.symmetric(
                                   horizontal: isMobile ? 14 : 18,
                                   vertical: 14,
@@ -349,9 +318,8 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                           children: [
                             Text(
                               'Показано проектов: ${projects.length}',
-                              style: const TextStyle(
-                                color: textSecondary,
-                                fontSize: 13,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: colors.onSurfaceVariant,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -380,66 +348,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                     if (projects.isEmpty)
                       SliverFillRemaining(
                         hasScrollBody: false,
-                        child: Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(32),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                    color: primary.withOpacity(0.08),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(
-                                    Icons.folder_open_rounded,
-                                    color: primary,
-                                    size: 32,
-                                  ),
-                                ),
-
-                                const SizedBox(height: 14),
-
-                                Text(
-                                  _searchQuery.isNotEmpty ||
-                                          _selectedFilter != null
-                                      ? 'Ничего не найдено'
-                                      : 'Пока нет проектов',
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w700,
-                                    color: textPrimary,
-                                  ),
-                                ),
-
-                                const SizedBox(height: 6),
-
-                                Text(
-                                  _searchQuery.isNotEmpty ||
-                                          _selectedFilter != null
-                                      ? 'Попробуйте изменить параметры поиска или фильтра.'
-                                      : 'Создайте первый проект, чтобы начать работу.',
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(color: textSecondary),
-                                ),
-
-                                const SizedBox(height: 16),
-
-                                if (_searchQuery.isEmpty &&
-                                    _selectedFilter == null)
-                                  FilledButton.icon(
-                                    onPressed: _openCreateProjectDialog,
-                                    icon: const Icon(Icons.add_rounded),
-                                    label: const Text('Создать проект'),
-                                    style: FilledButton.styleFrom(
-                                      backgroundColor: primary,
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
-                        ),
+                        child: _buildEmptyState(),
                       )
                     // ==================================================
                     // СПИСОК ПРОЕКТОВ
@@ -462,7 +371,6 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                             return ProjectCard(
                               project: project,
 
-                              // Открытие деталей
                               onTap: () {
                                 Navigator.pushNamed(
                                   context,
@@ -471,14 +379,12 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                                 );
                               },
 
-                              // Удаление
                               onDelete: () async {
                                 await context
                                     .read<ProjectsProvider>()
                                     .deleteProject(project.id);
                               },
 
-                              // Изменение статуса
                               onStatusChange: (status) async {
                                 await context
                                     .read<ProjectsProvider>()
@@ -506,33 +412,149 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   }
 
   // ============================================================
+  // СОСТОЯНИЕ ОШИБКИ
+  // ============================================================
+
+  Widget _buildErrorState(String error) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.error_outline_rounded, size: 48, color: colors.error),
+
+            const SizedBox(height: 16),
+
+            Text(
+              error,
+              style: theme.textTheme.bodyMedium?.copyWith(color: colors.error),
+              textAlign: TextAlign.center,
+            ),
+
+            const SizedBox(height: 16),
+
+            FilledButton(
+              onPressed: () {
+                context.read<ProjectsProvider>().listenToProjects();
+              },
+              child: const Text('Повторить'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ============================================================
+  // ПУСТОЕ СОСТОЯНИЕ
+  // ============================================================
+
+  Widget _buildEmptyState() {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    final hasFilters = _searchQuery.isNotEmpty || _selectedFilter != null;
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: colors.primary.withValues(alpha: 0.08),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.folder_open_rounded,
+                color: colors.primary,
+                size: 32,
+              ),
+            ),
+
+            const SizedBox(height: 14),
+
+            Text(
+              hasFilters ? 'Ничего не найдено' : 'Пока нет проектов',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+
+            const SizedBox(height: 6),
+
+            Text(
+              hasFilters
+                  ? 'Попробуйте изменить параметры поиска или фильтра.'
+                  : 'Создайте первый проект, чтобы начать работу.',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colors.onSurfaceVariant,
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            if (!hasFilters)
+              FilledButton.icon(
+                onPressed: _openCreateProjectDialog,
+                icon: const Icon(Icons.add_rounded),
+                label: const Text('Создать проект'),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ============================================================
   // ПОИСК
   // ============================================================
 
   Widget _buildSearchField() {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
     return TextField(
       onChanged: (value) {
         setState(() {
           _searchQuery = value;
         });
       },
+      style: TextStyle(color: colors.onSurface),
+      cursorColor: colors.primary,
       decoration: InputDecoration(
         hintText: 'Поиск проектов...',
-        prefixIcon: const Icon(Icons.search_rounded),
+
+        hintStyle: TextStyle(color: colors.onSurfaceVariant),
+
+        prefixIcon: Icon(Icons.search_rounded, color: colors.onSurfaceVariant),
+
         filled: true,
-        fillColor: Colors.white,
+
+        fillColor: colors.surface,
+
         contentPadding: const EdgeInsets.symmetric(vertical: 15),
+
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+          borderSide: BorderSide(color: colors.outline.withValues(alpha: 0.5)),
         ),
+
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+          borderSide: BorderSide(color: colors.outline.withValues(alpha: 0.5)),
         ),
+
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFF2563EB), width: 1.4),
+          borderSide: BorderSide(color: colors.primary, width: 1.4),
         ),
       ),
     );
@@ -543,6 +565,9 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   // ============================================================
 
   Widget _buildFilterBar(Map<ProjectStatus, int> counts) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
     final items = <({String label, int count, ProjectStatus? status})>[
       (
         label: 'Все',
@@ -569,9 +594,9 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     return Container(
       padding: const EdgeInsets.all(3),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: colors.outline.withValues(alpha: 0.5)),
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -594,9 +619,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                     vertical: 9,
                   ),
                   decoration: BoxDecoration(
-                    color: selected
-                        ? const Color(0xFF2563EB)
-                        : Colors.transparent,
+                    color: selected ? colors.primary : Colors.transparent,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -604,7 +627,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: selected ? Colors.white : const Color(0xFF334155),
+                      color: selected ? colors.onPrimary : colors.onSurface,
                     ),
                   ),
                 ),
@@ -621,6 +644,9 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   // ============================================================
 
   Widget _buildSortButton() {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
     return PopupMenuButton<_ProjectSort>(
       initialValue: _sort,
 
@@ -632,14 +658,18 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
 
       itemBuilder: (context) {
         return _ProjectSort.values.map((value) {
-          return PopupMenuItem(
+          return PopupMenuItem<_ProjectSort>(
             value: value,
             child: Row(
               children: [
                 if (value == _sort)
-                  const Padding(
-                    padding: EdgeInsets.only(right: 8),
-                    child: Icon(Icons.check_rounded, size: 18),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: Icon(
+                      Icons.check_rounded,
+                      size: 18,
+                      color: colors.primary,
+                    ),
                   ),
                 Text(_sortLabel(value)),
               ],
@@ -651,29 +681,33 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: colors.surface,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: const Color(0xFFE2E8F0)),
+          border: Border.all(color: colors.outline.withValues(alpha: 0.5)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.tune_rounded, size: 17, color: Color(0xFF64748B)),
+            Icon(Icons.tune_rounded, size: 17, color: colors.onSurfaceVariant),
 
             const SizedBox(width: 7),
 
             Text(
               'Сортировка: ${_sortLabel(_sort)}',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF334155),
+                color: colors.onSurface,
               ),
             ),
 
             const SizedBox(width: 4),
 
-            const Icon(Icons.keyboard_arrow_down_rounded, size: 18),
+            Icon(
+              Icons.keyboard_arrow_down_rounded,
+              size: 18,
+              color: colors.onSurfaceVariant,
+            ),
           ],
         ),
       ),
