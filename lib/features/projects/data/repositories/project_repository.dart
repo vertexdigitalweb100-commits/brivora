@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../domain/models/project.dart';
 
@@ -29,14 +30,15 @@ class ProjectRepository {
     }
 
     final doc = _projectsCollectionRef.doc();
+    final now = DateTime.now();
 
     final project = Project(
       id: doc.id,
       title: title.trim(),
       description: description.trim(),
       ownerId: userId,
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
+      createdAt: now,
+      updatedAt: now,
       progress: 0.0,
       status: ProjectStatus.active,
       coverImageUrl: null,
@@ -44,6 +46,12 @@ class ProjectRepository {
     );
 
     await doc.set(project.toFirestore());
+
+    debugPrint('========== PROJECT CREATED ==========');
+    debugPrint('Project ID: ${project.id}');
+    debugPrint('Owner ID: ${project.ownerId}');
+    debugPrint('Title: ${project.title}');
+    debugPrint('=====================================');
 
     return project;
   }
@@ -55,31 +63,63 @@ class ProjectRepository {
   Future<List<Project>> getUserProjects() async {
     final userId = currentUserId;
 
+    debugPrint('========== GET USER PROJECTS ==========');
+    debugPrint('Current Firebase UID: $userId');
+
     if (userId == null) {
+      debugPrint('GET PROJECTS: user is not authenticated');
+      debugPrint('======================================');
       return [];
     }
 
-    final snapshot = await _projectsCollectionRef
-        .where('ownerId', isEqualTo: userId)
-        .get();
+    try {
+      final snapshot = await _projectsCollectionRef
+          .where('ownerId', isEqualTo: userId)
+          .get();
 
-    final projects = <Project>[];
+      debugPrint('Documents received: ${snapshot.docs.length}');
 
-    for (final doc in snapshot.docs) {
-      try {
-        final project = Project.fromFirestore(doc.data(), documentId: doc.id);
+      final projects = <Project>[];
 
-        projects.add(project);
-      } catch (e) {
-        // Один повреждённый документ не должен
-        // ломать загрузку всех проектов.
-        continue;
+      for (final doc in snapshot.docs) {
+        try {
+          final data = doc.data();
+
+          debugPrint('--------------------------------------');
+          debugPrint('Document ID: ${doc.id}');
+          debugPrint('ownerId: ${data['ownerId']}');
+          debugPrint('title: ${data['title']}');
+          debugPrint('fields: ${data.keys.toList()}');
+
+          final project = Project.fromFirestore(data, documentId: doc.id);
+
+          debugPrint('Parsed project ID: ${project.id}');
+          debugPrint('Parsed project title: ${project.title}');
+          debugPrint('Parsed project ownerId: ${project.ownerId}');
+
+          projects.add(project);
+        } catch (e, stackTrace) {
+          debugPrint('PROJECT PARSE ERROR');
+          debugPrint('Document ID: ${doc.id}');
+          debugPrint('Error: $e');
+          debugPrint(stackTrace.toString());
+        }
       }
+
+      projects.sort(_compareByRecent);
+
+      debugPrint('FINAL PROJECTS COUNT: ${projects.length}');
+      debugPrint('======================================');
+
+      return projects;
+    } catch (e, stackTrace) {
+      debugPrint('========== GET PROJECTS ERROR ==========');
+      debugPrint('Error: $e');
+      debugPrint(stackTrace.toString());
+      debugPrint('========================================');
+
+      rethrow;
     }
-
-    projects.sort(_compareByRecent);
-
-    return projects;
   }
 
   // ============================================================
@@ -89,7 +129,13 @@ class ProjectRepository {
   Stream<List<Project>> getUserProjectsStream() {
     final userId = currentUserId;
 
+    debugPrint('========== BRIVORA PROJECTS DEBUG ==========');
+    debugPrint('Current Firebase UID: $userId');
+
     if (userId == null) {
+      debugPrint('PROJECTS ERROR: currentUserId == null');
+      debugPrint('============================================');
+
       return Stream.value(const []);
     }
 
@@ -97,26 +143,55 @@ class ProjectRepository {
         .where('ownerId', isEqualTo: userId)
         .snapshots()
         .map((snapshot) {
+          debugPrint('========== FIRESTORE PROJECTS ==========');
+          debugPrint('Current UID: $userId');
+          debugPrint('Documents received: ${snapshot.docs.length}');
+
           final projects = <Project>[];
 
           for (final doc in snapshot.docs) {
             try {
-              final project = Project.fromFirestore(
-                doc.data(),
-                documentId: doc.id,
-              );
+              final data = doc.data();
+
+              debugPrint('----------------------------------------');
+              debugPrint('Document ID: ${doc.id}');
+              debugPrint('Document ownerId: ${data['ownerId']}');
+              debugPrint('Document title: ${data['title']}');
+              debugPrint('Document fields: ${data.keys.toList()}');
+
+              final project = Project.fromFirestore(data, documentId: doc.id);
+
+              debugPrint('Parsed project ID: ${project.id}');
+
+              debugPrint('Parsed project title: ${project.title}');
+
+              debugPrint('Parsed project ownerId: ${project.ownerId}');
 
               projects.add(project);
-            } catch (_) {
-              // Пропускаем только повреждённый документ.
-              // Остальные проекты продолжают отображаться.
-              continue;
+            } catch (e, stackTrace) {
+              debugPrint('PROJECT PARSE ERROR');
+              debugPrint('Document ID: ${doc.id}');
+              debugPrint('Error: $e');
+              debugPrint(stackTrace.toString());
             }
           }
 
           projects.sort(_compareByRecent);
 
+          debugPrint('----------------------------------------');
+          debugPrint('FINAL PROJECTS COUNT: ${projects.length}');
+          debugPrint('==========================================');
+
           return projects;
+        })
+        .handleError((Object error, StackTrace stackTrace) {
+          debugPrint('========== FIRESTORE STREAM ERROR ==========');
+
+          debugPrint('Current UID: $userId');
+          debugPrint('Error: $error');
+          debugPrint(stackTrace.toString());
+
+          debugPrint('=============================================');
         });
   }
 
@@ -146,25 +221,48 @@ class ProjectRepository {
       return null;
     }
 
-    final doc = await _projectsCollectionRef.doc(projectId).get();
+    try {
+      final doc = await _projectsCollectionRef.doc(projectId).get();
 
-    if (!doc.exists) {
-      return null;
+      if (!doc.exists) {
+        debugPrint('GET PROJECT: document does not exist: $projectId');
+
+        return null;
+      }
+
+      final data = doc.data();
+
+      if (data == null) {
+        debugPrint('GET PROJECT: document data is null: $projectId');
+
+        return null;
+      }
+
+      debugPrint('========== GET PROJECT ==========');
+      debugPrint('Document ID: ${doc.id}');
+      debugPrint('Current UID: $userId');
+      debugPrint('ownerId: ${data['ownerId']}');
+      debugPrint('title: ${data['title']}');
+      debugPrint('=================================');
+
+      final project = Project.fromFirestore(data, documentId: doc.id);
+
+      if (project.ownerId != userId) {
+        debugPrint('GET PROJECT: access denied for project ${project.id}');
+
+        return null;
+      }
+
+      return project;
+    } catch (e, stackTrace) {
+      debugPrint('========== GET PROJECT ERROR ==========');
+      debugPrint('Project ID: $projectId');
+      debugPrint('Error: $e');
+      debugPrint(stackTrace.toString());
+      debugPrint('=======================================');
+
+      rethrow;
     }
-
-    final data = doc.data();
-
-    if (data == null) {
-      return null;
-    }
-
-    final project = Project.fromFirestore(data, documentId: doc.id);
-
-    if (project.ownerId != userId) {
-      return null;
-    }
-
-    return project;
   }
 
   // ============================================================
@@ -188,9 +286,21 @@ class ProjectRepository {
 
     final updatedProject = project.copyWith(updatedAt: DateTime.now());
 
-    await _projectsCollectionRef
-        .doc(project.id)
-        .set(updatedProject.toFirestore());
+    try {
+      await _projectsCollectionRef
+          .doc(project.id)
+          .set(updatedProject.toFirestore());
+
+      debugPrint('PROJECT UPDATED: ${project.id}');
+    } catch (e, stackTrace) {
+      debugPrint('========== UPDATE PROJECT ERROR ==========');
+      debugPrint('Project ID: ${project.id}');
+      debugPrint('Error: $e');
+      debugPrint(stackTrace.toString());
+      debugPrint('==========================================');
+
+      rethrow;
+    }
   }
 
   // ============================================================
@@ -204,10 +314,22 @@ class ProjectRepository {
       throw Exception('Проект не найден');
     }
 
-    await _projectsCollectionRef.doc(projectId).update({
-      'coverImageUrl': imageUrl,
-      'updatedAt': Timestamp.now(),
-    });
+    try {
+      await _projectsCollectionRef.doc(projectId).update({
+        'coverImageUrl': imageUrl,
+        'updatedAt': Timestamp.now(),
+      });
+
+      debugPrint('PROJECT COVER UPDATED: $projectId');
+    } catch (e, stackTrace) {
+      debugPrint('========== COVER UPDATE ERROR ==========');
+      debugPrint('Project ID: $projectId');
+      debugPrint('Error: $e');
+      debugPrint(stackTrace.toString());
+      debugPrint('========================================');
+
+      rethrow;
+    }
   }
 
   // ============================================================
@@ -221,7 +343,19 @@ class ProjectRepository {
       throw Exception('Проект не найден');
     }
 
-    await _projectsCollectionRef.doc(projectId).delete();
+    try {
+      await _projectsCollectionRef.doc(projectId).delete();
+
+      debugPrint('PROJECT DELETED: $projectId');
+    } catch (e, stackTrace) {
+      debugPrint('========== DELETE PROJECT ERROR ==========');
+      debugPrint('Project ID: $projectId');
+      debugPrint('Error: $e');
+      debugPrint(stackTrace.toString());
+      debugPrint('==========================================');
+
+      rethrow;
+    }
   }
 
   // ============================================================
@@ -266,11 +400,25 @@ class ProjectRepository {
       return 0;
     }
 
-    final snapshot = await _projectsCollectionRef
-        .where('ownerId', isEqualTo: userId)
-        .count()
-        .get();
+    try {
+      final snapshot = await _projectsCollectionRef
+          .where('ownerId', isEqualTo: userId)
+          .count()
+          .get();
 
-    return snapshot.count ?? 0;
+      final count = snapshot.count ?? 0;
+
+      debugPrint('PROJECT COUNT: $count');
+
+      return count;
+    } catch (e, stackTrace) {
+      debugPrint('========== PROJECT COUNT ERROR ==========');
+      debugPrint('Current UID: $userId');
+      debugPrint('Error: $e');
+      debugPrint(stackTrace.toString());
+      debugPrint('=========================================');
+
+      rethrow;
+    }
   }
 }
