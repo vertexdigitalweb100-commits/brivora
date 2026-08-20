@@ -19,28 +19,33 @@ class PhotoRepository {
 
   Future<void> pickAndUploadPhoto(String projectId) async {
     final user = _auth.currentUser;
-
     if (user == null) return;
 
-    final List<XFile> pickedFiles = await _picker.pickMultiImage(
-      imageQuality: 90,
+    final pickedFiles = await _picker.pickMultiImage(
+      imageQuality: 80,
+      maxWidth: 1920,
+      maxHeight: 1920,
     );
 
     if (pickedFiles.isEmpty) return;
 
-    for (final picked in pickedFiles) {
-      await _uploadFile(File(picked.path), projectId, user.uid);
-    }
+    // Все выбранные фотографии загружаются параллельно.
+    await Future.wait(
+      pickedFiles.map(
+        (picked) => _uploadFile(File(picked.path), projectId, user.uid),
+      ),
+    );
   }
 
   Future<void> takeAndUploadPhoto(String projectId) async {
     final user = _auth.currentUser;
-
     if (user == null) return;
 
-    final XFile? picked = await _picker.pickImage(
+    final picked = await _picker.pickImage(
       source: ImageSource.camera,
-      imageQuality: 90,
+      imageQuality: 80,
+      maxWidth: 1920,
+      maxHeight: 1920,
     );
 
     if (picked == null) return;
@@ -52,10 +57,17 @@ class PhotoRepository {
     const uuid = Uuid();
 
     final fileId = uuid.v4();
+    final fileName = '$fileId.jpg';
 
-    final ref = _storage.ref().child('projects/$projectId/photos/$fileId.jpg');
+    final ref = _storage.ref().child('projects/$projectId/photos/$fileName');
 
-    await ref.putFile(file);
+    await ref.putFile(
+      file,
+      SettableMetadata(
+        contentType: 'image/jpeg',
+        cacheControl: 'public,max-age=31536000',
+      ),
+    );
 
     final url = await ref.getDownloadURL();
 
@@ -64,7 +76,7 @@ class PhotoRepository {
       projectId: projectId,
       ownerId: ownerId,
       imageUrl: url,
-      fileName: '$fileId.jpg',
+      fileName: fileName,
       createdAt: DateTime.now(),
       caption: '',
     );
@@ -78,10 +90,7 @@ class PhotoRepository {
 
   Stream<List<Photo>> getProjectPhotos(String projectId) {
     final user = _auth.currentUser;
-
-    if (user == null) {
-      return Stream.value([]);
-    }
+    if (user == null) return Stream.value([]);
 
     return _photosCollection
         .where('projectId', isEqualTo: projectId)
@@ -90,15 +99,12 @@ class PhotoRepository {
         .snapshots()
         .map(
           (snapshot) =>
-              snapshot.docs.map((e) => Photo.fromFirestore(e)).toList(),
+              snapshot.docs.map((doc) => Photo.fromFirestore(doc)).toList(),
         );
   }
 
-  /// Общее количество фото пользователя по всем проектам —
-  /// для статистики в профиле.
   Future<int> getUserPhotoCount() async {
     final user = _auth.currentUser;
-
     if (user == null) return 0;
 
     final snapshot = await _photosCollection

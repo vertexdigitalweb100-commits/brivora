@@ -2,6 +2,20 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../domain/models/task.dart';
 
+class TaskStats {
+  final int total;
+  final int completed;
+  final int inProgress;
+
+  const TaskStats({
+    required this.total,
+    required this.completed,
+    required this.inProgress,
+  });
+
+  static const empty = TaskStats(total: 0, completed: 0, inProgress: 0);
+}
+
 class TaskRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -10,10 +24,7 @@ class TaskRepository {
 
   Future<Task> createTask(Task task) async {
     final doc = _tasksCollection.doc();
-    final newTask = task.copyWith(
-      id: doc.id,
-      createdAt: DateTime.now(),
-    );
+    final newTask = task.copyWith(id: doc.id, createdAt: DateTime.now());
 
     await doc.set(newTask.toFirestore());
     return newTask;
@@ -30,11 +41,45 @@ class TaskRepository {
   Stream<List<Task>> getProjectTasks(String projectId) {
     return _tasksCollection
         .where('projectId', isEqualTo: projectId)
-        .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => Task.fromFirestore(doc))
-            .toList());
+        .map((snapshot) {
+          final tasks = snapshot.docs
+              .map((doc) => Task.fromFirestore(doc))
+              .toList();
+          tasks.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+          return tasks;
+        });
+  }
+
+  Future<TaskStats> getTaskStatsForProjects(Iterable<String> projectIds) async {
+    final ids = projectIds.where((id) => id.isNotEmpty).toSet().toList();
+    if (ids.isEmpty) return TaskStats.empty;
+
+    final snapshots = await Future.wait(
+      ids.map(
+        (projectId) =>
+            _tasksCollection.where('projectId', isEqualTo: projectId).get(),
+      ),
+    );
+
+    int total = 0;
+    int completed = 0;
+
+    for (final snapshot in snapshots) {
+      for (final doc in snapshot.docs) {
+        total++;
+        final status = doc.data()['status'];
+        if (status == TaskStatus.completed.name) {
+          completed++;
+        }
+      }
+    }
+
+    return TaskStats(
+      total: total,
+      completed: completed,
+      inProgress: total - completed,
+    );
   }
 
   Future<void> updateTaskStatus(
@@ -44,7 +89,9 @@ class TaskRepository {
   ) async {
     await _tasksCollection.doc(taskId).update({
       'status': status.name,
-      'completedAt': completedAt != null ? Timestamp.fromDate(completedAt) : null,
+      'completedAt': completedAt != null
+          ? Timestamp.fromDate(completedAt)
+          : null,
       'updatedAt': Timestamp.now(),
     });
   }

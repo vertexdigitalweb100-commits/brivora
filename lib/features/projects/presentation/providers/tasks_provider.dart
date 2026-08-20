@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../data/repositories/project_repository.dart';
 import '../../data/repositories/task_repository.dart';
-import '../../domain/models/project.dart'; // Added import for Project model
+import '../../domain/models/project.dart';
 import '../../domain/models/task.dart';
 
 class TasksProvider extends ChangeNotifier {
@@ -12,26 +12,28 @@ class TasksProvider extends ChangeNotifier {
   final ProjectRepository projectRepository = ProjectRepository();
 
   StreamSubscription<List<Task>>? _subscription;
+
   List<Task> _tasks = [];
   bool _isLoading = false;
   String? _error;
   String _filter = 'all';
 
   List<Task> get tasks {
-    if (_filter == 'all') return List.unmodifiable(_tasks);
-    if (_filter == 'active') {
-      return List.unmodifiable(
-          _tasks.where((task) => task.status == TaskStatus.active));
+    Iterable<Task> result = _tasks;
+
+    switch (_filter) {
+      case 'active':
+        result = result.where((task) => task.status == TaskStatus.active);
+        break;
+      case 'inProgress':
+        result = result.where((task) => task.status == TaskStatus.inProgress);
+        break;
+      case 'completed':
+        result = result.where((task) => task.status == TaskStatus.completed);
+        break;
     }
-    if (_filter == 'inProgress') {
-      return List.unmodifiable(
-          _tasks.where((task) => task.status == TaskStatus.inProgress));
-    }
-    if (_filter == 'completed') {
-      return List.unmodifiable(
-          _tasks.where((task) => task.status == TaskStatus.completed));
-    }
-    return List.unmodifiable(_tasks);
+
+    return List.unmodifiable(result);
   }
 
   bool get isLoading => _isLoading;
@@ -45,65 +47,100 @@ class TasksProvider extends ChangeNotifier {
 
   void listenToProjectTasks(String projectId) {
     _subscription?.cancel();
-    _subscription = repository.getProjectTasks(projectId).listen(
-      (tasks) {
-        _tasks = tasks;
-        notifyListeners();
-        _syncProjectProgress(projectId);
-      },
-      onError: (error) {
-        _error = error.toString();
-        notifyListeners();
-      },
-    );
+
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    _subscription = repository
+        .getProjectTasks(projectId)
+        .listen(
+          (tasks) {
+            _tasks = _removeDuplicateTasks(tasks);
+            _isLoading = false;
+            _error = null;
+            notifyListeners();
+            _syncProjectProgress(projectId);
+          },
+          onError: (error) {
+            _isLoading = false;
+            _error = error.toString();
+            notifyListeners();
+          },
+        );
   }
 
   void updateTasks(List<Task> tasks, String projectId) {
-    _tasks = tasks;
+    _tasks = _removeDuplicateTasks(tasks);
     notifyListeners();
     _syncProjectProgress(projectId);
   }
 
   Future<Task> createTask(Task task) async {
-    final createdTask = await repository.createTask(task);
-    _tasks.insert(0, createdTask);
-    notifyListeners();
-    _syncProjectProgress(task.projectId);
-    return createdTask;
+    _error = null;
+    try {
+      // Firestore stream is the single source of truth.
+      // Do not insert the task into _tasks manually.
+      final createdTask = await repository.createTask(task);
+      await _syncProjectProgress(task.projectId);
+      return createdTask;
+    } catch (error) {
+      _error = error.toString();
+      notifyListeners();
+      rethrow;
+    }
   }
 
   Future<void> updateTask(Task task) async {
-    await repository.updateTask(task);
-    final index = _tasks.indexWhere((item) => item.id == task.id);
-    if (index != -1) {
-      _tasks[index] = task;
+    _error = null;
+    try {
+      await repository.updateTask(task);
+      // The Firestore stream updates _tasks.
+      await _syncProjectProgress(task.projectId);
+    } catch (error) {
+      _error = error.toString();
       notifyListeners();
-      _syncProjectProgress(task.projectId);
+      rethrow;
     }
   }
 
   Future<void> deleteTask(String taskId, String projectId) async {
-    await repository.deleteTask(taskId);
-    _tasks.removeWhere((task) => task.id == taskId);
-    notifyListeners();
-    _syncProjectProgress(projectId);
+    _error = null;
+    try {
+      await repository.deleteTask(taskId);
+      // The Firestore stream removes the task from _tasks.
+      await _syncProjectProgress(projectId);
+    } catch (error) {
+      _error = error.toString();
+      notifyListeners();
+      rethrow;
+    }
   }
 
-  Future<void> updateTaskStatus(
-    Task task,
-    TaskStatus status,
-  ) async {
-    final completedAt = status == TaskStatus.completed ? DateTime.now() : null;
-    await repository.updateTaskStatus(task.id, status, completedAt);
-    final index = _tasks.indexWhere((item) => item.id == task.id);
-    if (index != -1) {
-      _tasks[index] = _tasks[index].copyWith(
-        status: status,
-        completedAt: completedAt,
-      );
+  Future<void> updateTaskStatus(Task task, TaskStatus status) async {
+    _error = null;
+    try {
+      final completedAt = status == TaskStatus.completed
+          ? DateTime.now()
+          : null;
+
+      await repository.updateTaskStatus(task.id, status, completedAt);
+
+      // The Firestore stream provides the updated task.
+      await _syncProjectProgress(task.projectId);
+    } catch (error) {
+      _error = error.toString();
       notifyListeners();
-      _syncProjectProgress(task.projectId);
+      rethrow;
     }
+  }
+
+  List<Task> _removeDuplicateTasks(List<Task> tasks) {
+    final unique = <String, Task>{};
+    for (final task in tasks) {
+      unique[task.id] = task;
+    }
+    return unique.values.toList();
   }
 
   @override
@@ -113,18 +150,27 @@ class TasksProvider extends ChangeNotifier {
   }
 
   Future<void> _syncProjectProgress(String projectId) async {
-    if (_tasks.isEmpty) {
-      await projectRepository.updateProjectProgress(projectId, 0.0);
-      return;
-    }
+    try {
+      if (_tasks.isEmpty) {
+        await projectRepository.updateProjectProgress(projectId, 0.0);
+        return;
+      }
 
-    final completedCount = _tasks.where((task) => task.status == TaskStatus.completed).length;
-    final progress = completedCount / _tasks.length;
+      final completedCount = _tasks
+          .where((task) => task.status == TaskStatus.completed)
+          .length;
+      final progress = completedCount / _tasks.length;
 
-    await projectRepository.updateProjectProgress(projectId, progress);
+      await projectRepository.updateProjectProgress(projectId, progress);
 
-    if (completedCount == _tasks.length && _tasks.isNotEmpty) {
-      await projectRepository.updateProjectStatus(projectId, ProjectStatus.completed);
+      if (completedCount == _tasks.length) {
+        await projectRepository.updateProjectStatus(
+          projectId,
+          ProjectStatus.completed,
+        );
+      }
+    } catch (error) {
+      debugPrint('Ошибка синхронизации прогресса проекта: $error');
     }
   }
 }

@@ -1,10 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
+import '../../../photos/data/repositories/photo_repository.dart';
 import '../../../projects/domain/models/project.dart';
 import '../../../projects/presentation/providers/projects_provider.dart';
-import '../../../photos/data/repositories/photo_repository.dart';
 import '../../data/repositories/profile_repository.dart';
 import '../../domain/models/user_profile.dart';
 
@@ -20,12 +21,10 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
   final PhotoRepository _photoRepository = PhotoRepository();
 
   bool _darkMode = false;
-
   UserProfile _profile = const UserProfile();
   bool _isProfileLoading = true;
-
-  // null = ещё грузится, показываем "…" вместо цифры.
   int? _photoCount;
+  bool _isAvatarLoading = false;
 
   static const Color primary = Color(0xFF2563EB);
   static const Color background = Color(0xFFF8FAFC);
@@ -34,29 +33,18 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
   static const Color border = Color(0xFFE2E8F0);
 
   Color get pageBackground => _darkMode ? const Color(0xFF0F172A) : background;
-
   Color get cardColor => _darkMode ? const Color(0xFF1E293B) : Colors.white;
-
   Color get primaryText => _darkMode ? Colors.white : textPrimary;
-
   Color get secondaryText =>
       _darkMode ? const Color(0xFF94A3B8) : textSecondary;
-
   Color get dividerColor => _darkMode ? const Color(0xFF334155) : border;
 
   @override
   void initState() {
     super.initState();
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-
-      // Провайдер проектов уже может слушать (если юзер заходил
-      // на вкладку "Проекты"), повторный вызов безопасен —
-      // listenToProjects() сам себя гасит, если уже запущен.
-      context.read<ProjectsProvider>().listenToProjects();
+      if (mounted) context.read<ProjectsProvider>().listenToProjects();
     });
-
     _loadProfile();
     _loadPhotoCount();
   }
@@ -64,37 +52,25 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
   Future<void> _loadProfile() async {
     try {
       final profile = await _profileRepository.getUserProfile();
-
       if (!mounted) return;
-
       setState(() {
         _profile = profile;
         _isProfileLoading = false;
       });
-    } catch (e) {
+    } catch (_) {
       if (!mounted) return;
-
-      setState(() {
-        _isProfileLoading = false;
-      });
+      setState(() => _isProfileLoading = false);
     }
   }
 
   Future<void> _loadPhotoCount() async {
     try {
       final count = await _photoRepository.getUserPhotoCount();
-
       if (!mounted) return;
-
-      setState(() {
-        _photoCount = count;
-      });
-    } catch (e) {
+      setState(() => _photoCount = count);
+    } catch (_) {
       if (!mounted) return;
-
-      setState(() {
-        _photoCount = 0;
-      });
+      setState(() => _photoCount = 0);
     }
   }
 
@@ -129,10 +105,6 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
     );
   }
 
-  // ------------------------------------------------------------
-  // PROFILE HEADER
-  // ------------------------------------------------------------
-
   Widget _buildProfileHeader() {
     final hasName = _profile.fullName.isNotEmpty;
     final hasRoleLine = _profile.roleLine.isNotEmpty;
@@ -157,50 +129,15 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
               const Spacer(),
               _buildHeaderButton(
                 icon: Icons.settings_outlined,
-                onTap: () {
-                  _showComingSoon('Настройки');
-                },
+                onTap: () => _showComingSoon('Настройки'),
               ),
             ],
           ),
-
           const SizedBox(height: 25),
-
-          // Аватар
           Stack(
             clipBehavior: Clip.none,
             children: [
-              Container(
-                width: 92,
-                height: 92,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF2563EB), Color(0xFF60A5FA)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: primary.withValues(alpha: 0.22),
-                      blurRadius: 18,
-                      offset: const Offset(0, 7),
-                    ),
-                  ],
-                ),
-                child: Center(
-                  child: Text(
-                    _profile.initials.isNotEmpty ? _profile.initials : '?',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 28,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-              ),
-
-              // Онлайн
+              _buildAvatar(),
               Positioned(
                 right: 2,
                 bottom: 2,
@@ -214,22 +151,18 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                   ),
                 ),
               ),
-
-              // Камера
               Positioned(
                 right: -3,
                 top: -3,
                 child: GestureDetector(
-                  onTap: () {
-                    _showComingSoon('Изменение фотографии');
-                  },
+                  onTap: _showAvatarOptions,
                   child: Container(
                     width: 33,
                     height: 33,
                     decoration: BoxDecoration(
                       color: cardColor,
                       shape: BoxShape.circle,
-                      border: Border.all(color: dividerColor, width: 1),
+                      border: Border.all(color: dividerColor),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withValues(alpha: 0.08),
@@ -238,26 +171,31 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                         ),
                       ],
                     ),
-                    child: Icon(
-                      Icons.camera_alt_outlined,
-                      size: 16,
-                      color: secondaryText,
-                    ),
+                    child: _isAvatarLoading
+                        ? const Padding(
+                            padding: EdgeInsets.all(8),
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : Icon(
+                            Icons.camera_alt_outlined,
+                            size: 16,
+                            color: secondaryText,
+                          ),
                   ),
                 ),
               ),
             ],
           ),
-
           const SizedBox(height: 14),
-
           GestureDetector(
             onTap: _showEditProfileDialog,
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  hasName ? _profile.fullName : 'Добавьте имя',
+                  hasName
+                      ? _profile.fullName
+                      : (_isProfileLoading ? 'Загрузка...' : 'Добавьте имя'),
                   style: TextStyle(
                     color: hasName ? primaryText : secondaryText,
                     fontSize: 21,
@@ -271,9 +209,7 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
               ],
             ),
           ),
-
           const SizedBox(height: 5),
-
           GestureDetector(
             onTap: _showEditProfileDialog,
             child: Text(
@@ -287,6 +223,52 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildAvatar() {
+    final url = _profile.avatarUrl;
+
+    return Container(
+      width: 92,
+      height: 92,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: const LinearGradient(
+          colors: [Color(0xFF2563EB), Color(0xFF60A5FA)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: primary.withValues(alpha: 0.22),
+            blurRadius: 18,
+            offset: const Offset(0, 7),
+          ),
+        ],
+      ),
+      child: ClipOval(
+        child: url != null && url.isNotEmpty
+            ? Image.network(
+                url,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => _buildInitials(),
+              )
+            : _buildInitials(),
+      ),
+    );
+  }
+
+  Widget _buildInitials() {
+    return Center(
+      child: Text(
+        _profile.initials.isNotEmpty ? _profile.initials : '?',
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 28,
+          fontWeight: FontWeight.w800,
+        ),
       ),
     );
   }
@@ -315,16 +297,95 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
     );
   }
 
-  // ------------------------------------------------------------
-  // EDIT PROFILE DIALOG
-  // ------------------------------------------------------------
+  Future<void> _showAvatarOptions() async {
+    final action = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: cardColor,
+      showDragHandle: true,
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.photo_library_outlined),
+                title: const Text('Выбрать из галереи'),
+                onTap: () => Navigator.pop(sheetContext, 'gallery'),
+              ),
+              ListTile(
+                leading: const Icon(Icons.camera_alt_outlined),
+                title: const Text('Сделать фото'),
+                onTap: () => Navigator.pop(sheetContext, 'camera'),
+              ),
+              if (_profile.avatarUrl != null && _profile.avatarUrl!.isNotEmpty)
+                ListTile(
+                  leading: const Icon(Icons.delete_outline, color: Colors.red),
+                  title: const Text('Удалить фотографию'),
+                  onTap: () => Navigator.pop(sheetContext, 'delete'),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (action == 'gallery') {
+      await _uploadAvatar(ImageSource.gallery);
+    } else if (action == 'camera') {
+      await _uploadAvatar(ImageSource.camera);
+    } else if (action == 'delete') {
+      await _deleteAvatar();
+    }
+  }
+
+  Future<void> _uploadAvatar(ImageSource source) async {
+    setState(() => _isAvatarLoading = true);
+
+    try {
+      final url = await _profileRepository.pickAndUploadAvatar(source);
+      if (url == null || !mounted) return;
+
+      setState(() {
+        _profile = _profile.copyWith(avatarUrl: url);
+      });
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Аватар успешно обновлён')));
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Не удалось загрузить аватар: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _isAvatarLoading = false);
+    }
+  }
+
+  Future<void> _deleteAvatar() async {
+    setState(() => _isAvatarLoading = true);
+    try {
+      await _profileRepository.deleteAvatar();
+      if (!mounted) return;
+      setState(() => _profile = _profile.copyWith(avatarUrl: ''));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Аватар удалён')));
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Не удалось удалить аватар: $e')));
+    } finally {
+      if (mounted) setState(() => _isAvatarLoading = false);
+    }
+  }
 
   Future<void> _showEditProfileDialog() async {
     final firstNameController = TextEditingController(text: _profile.firstName);
     final lastNameController = TextEditingController(text: _profile.lastName);
     final roleController = TextEditingController(text: _profile.role);
     final companyController = TextEditingController(text: _profile.companyInfo);
-
     bool isSaving = false;
 
     await showDialog<void>(
@@ -381,10 +442,7 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                   onPressed: isSaving
                       ? null
                       : () async {
-                          setDialogState(() {
-                            isSaving = true;
-                          });
-
+                          setDialogState(() => isSaving = true);
                           final updatedProfile = _profile.copyWith(
                             firstName: firstNameController.text.trim(),
                             lastName: lastNameController.text.trim(),
@@ -396,22 +454,14 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                             await _profileRepository.saveUserProfile(
                               updatedProfile,
                             );
-
                             if (!mounted) return;
-
-                            setState(() {
-                              _profile = updatedProfile;
-                            });
-
-                            if (!dialogContext.mounted) return;
-                            Navigator.pop(dialogContext);
+                            setState(() => _profile = updatedProfile);
+                            if (dialogContext.mounted) {
+                              Navigator.pop(dialogContext);
+                            }
                           } catch (e) {
-                            setDialogState(() {
-                              isSaving = false;
-                            });
-
+                            setDialogState(() => isSaving = false);
                             if (!dialogContext.mounted) return;
-
                             ScaffoldMessenger.of(dialogContext).showSnackBar(
                               SnackBar(
                                 content: Text('Не удалось сохранить: $e'),
@@ -440,13 +490,8 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
     companyController.dispose();
   }
 
-  // ------------------------------------------------------------
-  // STATISTICS
-  // ------------------------------------------------------------
-
   Widget _buildStatistics() {
     final projectsProvider = context.watch<ProjectsProvider>();
-
     final projectsCount = projectsProvider.projects.length;
     final activeCount =
         projectsProvider.getProjectCountByStatus()[ProjectStatus.active] ?? 0;
@@ -518,10 +563,6 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
     return Container(width: 1, height: 45, color: dividerColor);
   }
 
-  // ------------------------------------------------------------
-  // APPEARANCE
-  // ------------------------------------------------------------
-
   Widget _buildAppearanceCard() {
     return _buildCard(
       child: _buildMenuItem(
@@ -532,24 +573,12 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
           value: _darkMode,
           activeTrackColor: primary,
           activeThumbColor: Colors.white,
-          onChanged: (value) {
-            setState(() {
-              _darkMode = value;
-            });
-          },
+          onChanged: (value) => setState(() => _darkMode = value),
         ),
-        onTap: () {
-          setState(() {
-            _darkMode = !_darkMode;
-          });
-        },
+        onTap: () => setState(() => _darkMode = !_darkMode),
       ),
     );
   }
-
-  // ------------------------------------------------------------
-  // SETTINGS
-  // ------------------------------------------------------------
 
   Widget _buildSettingsCard() {
     return _buildCard(
@@ -558,43 +587,29 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
           _buildMenuItem(
             icon: Icons.settings_outlined,
             title: 'Настройки',
-            onTap: () {
-              _showComingSoon('Настройки');
-            },
+            onTap: () => _showComingSoon('Настройки'),
           ),
-
           _buildDivider(),
-
           _buildMenuItem(
             icon: Icons.workspace_premium_outlined,
             title: 'Подписка Pro',
             subtitle: 'Скоро будет доступна',
             iconColor: primary,
-            onTap: () {
-              _showComingSoon('Подписка Pro');
-            },
+            onTap: () => _showComingSoon('Подписка Pro'),
           ),
-
           _buildDivider(),
-
           _buildMenuItem(
             icon: Icons.security_outlined,
             title: 'Безопасность',
             subtitle: 'Пароль и вход',
-            onTap: () {
-              _showComingSoon('Безопасность');
-            },
+            onTap: () => _showComingSoon('Безопасность'),
           ),
-
           _buildDivider(),
-
           _buildMenuItem(
             icon: Icons.chat_bubble_outline,
             title: 'Обратная связь',
             subtitle: 'Сообщить о проблеме',
-            onTap: () {
-              _showComingSoon('Обратная связь');
-            },
+            onTap: () => _showComingSoon('Обратная связь'),
           ),
         ],
       ),
@@ -640,9 +655,7 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                 ),
                 child: Icon(icon, color: actualIconColor, size: 20),
               ),
-
               const SizedBox(width: 13),
-
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -655,7 +668,6 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-
                     if (subtitle != null) ...[
                       const SizedBox(height: 3),
                       Text(
@@ -666,7 +678,6 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                   ],
                 ),
               ),
-
               if (trailing != null)
                 trailing
               else
@@ -690,10 +701,6 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
       child: Container(height: 1, color: dividerColor),
     );
   }
-
-  // ------------------------------------------------------------
-  // LOGOUT
-  // ------------------------------------------------------------
 
   Widget _buildLogoutButton() {
     return Material(
@@ -729,10 +736,6 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
     );
   }
 
-  // ------------------------------------------------------------
-  // VERSION
-  // ------------------------------------------------------------
-
   Widget _buildVersion() {
     return Center(
       child: Text(
@@ -744,10 +747,6 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
       ),
     );
   }
-
-  // ------------------------------------------------------------
-  // DIALOGS
-  // ------------------------------------------------------------
 
   void _showLogoutDialog() {
     showDialog(
@@ -772,9 +771,7 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.pop(dialogContext);
-              },
+              onPressed: () => Navigator.pop(dialogContext),
               child: Text('Отмена', style: TextStyle(color: secondaryText)),
             ),
             TextButton(
@@ -795,15 +792,12 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
 
   Future<void> _logout(BuildContext dialogContext) async {
     Navigator.pop(dialogContext);
-
     try {
       await FirebaseAuth.instance.signOut();
-
       if (!mounted) return;
       Navigator.of(context).pushReplacementNamed('/login');
     } catch (e) {
       if (!mounted) return;
-
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Ошибка при выходе: $e')));
