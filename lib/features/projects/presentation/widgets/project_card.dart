@@ -23,34 +23,35 @@ class ProjectCard extends StatelessWidget {
     required this.onStatusChange,
   });
 
-  static const primary = Color(0xFF2563EB);
-  static const textPrimary = Color(0xFF0F172A);
-  static const textSecondary = Color(0xFF64748B);
-  static const border = Color(0xFFE2E8F0);
-
-  Color _statusColor() {
+  Color _statusColor(ColorScheme colors) {
     switch (project.status) {
       case ProjectStatus.active:
         return const Color(0xFF22C55E);
+
       case ProjectStatus.planning:
         return const Color(0xFFF59E0B);
+
       case ProjectStatus.completed:
-        return const Color(0xFF64748B);
+        return colors.onSurfaceVariant;
+
       case ProjectStatus.archived:
-        return const Color(0xFF94A3B8);
+        return colors.outline;
     }
   }
 
   String _statusLabel() {
     switch (project.status) {
       case ProjectStatus.active:
-        return 'Active';
+        return 'Активный';
+
       case ProjectStatus.planning:
-        return 'Planning';
+        return 'Планирование';
+
       case ProjectStatus.completed:
-        return 'Completed';
+        return 'Завершён';
+
       case ProjectStatus.archived:
-        return 'Archived';
+        return 'Архив';
     }
   }
 
@@ -58,36 +59,37 @@ class ProjectCard extends StatelessWidget {
     if (value >= 1000000) {
       return '₸${(value / 1000000).toStringAsFixed(1)}M';
     }
+
     if (value >= 1000) {
       return '₸${(value / 1000).toStringAsFixed(0)}K';
     }
+
     return '₸${value.round()}';
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
     final progress = project.progress.clamp(0.0, 1.0);
-    final statusColor = _statusColor();
+    final statusColor = _statusColor(colors);
+
+    final surface = colors.surface;
+    final outline = colors.outlineVariant;
 
     return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(14),
+      color: surface,
+      borderRadius: BorderRadius.circular(16),
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(16),
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: border),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x0D0F172A),
-                blurRadius: 12,
-                offset: Offset(0, 4),
-              ),
-            ],
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: outline),
           ),
-          clipBehavior: Clip.antiAlias,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -96,156 +98,23 @@ class ProjectCard extends StatelessWidget {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    if (project.coverImageUrl != null &&
-                        project.coverImageUrl!.isNotEmpty)
-                      CachedNetworkImage(
-                        imageUrl: project.coverImageUrl!,
-                        fit: BoxFit.cover,
-                        placeholder: (_, __) => const ColoredBox(
-                          color: Color(0xFFE2E8F0),
-                          child: Center(
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          ),
-                        ),
-                        errorWidget: (_, __, ___) => const ColoredBox(
-                          color: Color(0xFFE2E8F0),
-                          child: Center(
-                            child: Icon(
-                              Icons.image_not_supported_outlined,
-                              color: textSecondary,
-                              size: 34,
-                            ),
-                          ),
-                        ),
-                      )
-                    else
-                      const ColoredBox(
-                        color: Color(0xFFEFF6FF),
-                        child: Center(
-                          child: Icon(
-                            Icons.business_rounded,
-                            color: primary,
-                            size: 42,
-                          ),
-                        ),
-                      ),
+                    _buildCover(context, colors),
+
                     Positioned(
                       top: 12,
                       left: 12,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(7),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Color(0x260F172A),
-                              blurRadius: 8,
-                              offset: Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              width: 7,
-                              height: 7,
-                              decoration: BoxDecoration(
-                                color: statusColor,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              _statusLabel(),
-                              style: TextStyle(
-                                color: statusColor == const Color(0xFF64748B)
-                                    ? const Color(0xFF334155)
-                                    : statusColor,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      child: _buildStatusBadge(context, colors, statusColor),
                     ),
+
                     Positioned(
                       top: 10,
                       right: 10,
-                      child: PopupMenuButton<String>(
-                        tooltip: 'Project actions',
-                        onSelected: (value) {
-                          switch (value) {
-                            case 'active':
-                              onStatusChange(ProjectStatus.active);
-                              break;
-                            case 'planning':
-                              onStatusChange(ProjectStatus.planning);
-                              break;
-                            case 'completed':
-                              onStatusChange(ProjectStatus.completed);
-                              break;
-                            case 'archived':
-                              onStatusChange(ProjectStatus.archived);
-                              break;
-                            case 'delete':
-                              onDelete();
-                              break;
-                          }
-                        },
-                        itemBuilder: (_) => const [
-                          PopupMenuItem(value: 'active', child: Text('Active')),
-                          PopupMenuItem(
-                            value: 'planning',
-                            child: Text('Planning'),
-                          ),
-                          PopupMenuItem(
-                            value: 'completed',
-                            child: Text('Completed'),
-                          ),
-                          PopupMenuItem(
-                            value: 'archived',
-                            child: Text('Archive'),
-                          ),
-                          PopupMenuDivider(),
-                          PopupMenuItem(
-                            value: 'delete',
-                            child: Text(
-                              'Delete',
-                              style: TextStyle(color: Color(0xFFEF4444)),
-                            ),
-                          ),
-                        ],
-                        child: Container(
-                          width: 34,
-                          height: 34,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(8),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Color(0x260F172A),
-                                blurRadius: 8,
-                                offset: Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: const Icon(
-                            Icons.more_vert_rounded,
-                            size: 20,
-                            color: textPrimary,
-                          ),
-                        ),
-                      ),
+                      child: _buildMenu(context, colors),
                     ),
                   ],
                 ),
               ),
+
               Expanded(
                 flex: 6,
                 child: Padding(
@@ -254,133 +123,65 @@ class ProjectCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        project.title,
+                        project.title.isEmpty ? 'Без названия' : project.title,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: textPrimary,
-                          fontSize: 16,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: colors.onSurface,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
+
                       if (project.description.isNotEmpty) ...[
                         const SizedBox(height: 5),
                         Text(
                           project.description,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: textSecondary,
-                            fontSize: 12,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: colors.onSurfaceVariant,
                           ),
                         ),
                       ],
+
                       const SizedBox(height: 14),
+
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
-                            'Progress',
-                            style: TextStyle(
-                              color: textSecondary,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
+                          Text(
+                            'Прогресс',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: colors.onSurfaceVariant,
                             ),
                           ),
                           Text(
                             '${(progress * 100).round()}%',
-                            style: const TextStyle(
-                              color: textPrimary,
-                              fontSize: 12,
+                            style: theme.textTheme.labelLarge?.copyWith(
+                              color: colors.onSurface,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
                         ],
                       ),
+
                       const SizedBox(height: 7),
+
                       ClipRRect(
                         borderRadius: BorderRadius.circular(10),
                         child: LinearProgressIndicator(
                           value: progress,
                           minHeight: 6,
-                          backgroundColor: const Color(0xFFEFF3F8),
-                          valueColor: const AlwaysStoppedAnimation<Color>(
-                            primary,
+                          backgroundColor: colors.surfaceContainerHighest,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            colors.primary,
                           ),
                         ),
                       ),
+
                       const SizedBox(height: 13),
-                      Expanded(
-                        child: StreamBuilder<List<Task>>(
-                          stream: TaskRepository().getProjectTasks(project.id),
-                          builder: (context, taskSnapshot) {
-                            final tasks = taskSnapshot.data ?? const <Task>[];
 
-                            return StreamBuilder<List<Photo>>(
-                              stream: PhotoRepository().getProjectPhotos(
-                                project.id,
-                              ),
-                              builder: (context, photoSnapshot) {
-                                final photos =
-                                    photoSnapshot.data ?? const <Photo>[];
-
-                                return StreamBuilder<List<EstimateItem>>(
-                                  stream: EstimateRepository()
-                                      .getProjectEstimatesStream(project.id),
-                                  builder: (context, estimateSnapshot) {
-                                    final estimateItems =
-                                        estimateSnapshot.data ??
-                                        const <EstimateItem>[];
-
-                                    final completedTasks = tasks
-                                        .where(
-                                          (task) =>
-                                              task.status ==
-                                              TaskStatus.completed,
-                                        )
-                                        .length;
-
-                                    final totalEstimate = estimateItems
-                                        .fold<double>(
-                                          0,
-                                          (sum, item) => sum + item.totalPrice,
-                                        );
-
-                                    return Row(
-                                      children: [
-                                        Expanded(
-                                          child: _Stat(
-                                            icon: Icons.check_box_outlined,
-                                            value:
-                                                '$completedTasks/${tasks.length}',
-                                            label: 'Tasks',
-                                          ),
-                                        ),
-                                        const _Divider(),
-                                        Expanded(
-                                          child: _Stat(
-                                            icon: Icons.image_outlined,
-                                            value: '${photos.length}',
-                                            label: 'Photos',
-                                          ),
-                                        ),
-                                        const _Divider(),
-                                        Expanded(
-                                          child: _Stat(
-                                            icon: Icons.payments_outlined,
-                                            value: _formatMoney(totalEstimate),
-                                            label: 'Estimate',
-                                          ),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
-                              },
-                            );
-                          },
-                        ),
-                      ),
+                      Expanded(child: _buildProjectStats(context, colors)),
                     ],
                   ),
                 ),
@@ -389,6 +190,223 @@ class ProjectCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildCover(BuildContext context, ColorScheme colors) {
+    final url = project.coverImageUrl;
+
+    if (url == null || url.isEmpty) {
+      return Container(
+        color: colors.primaryContainer,
+        alignment: Alignment.center,
+        child: Icon(
+          Icons.business_rounded,
+          color: colors.onPrimaryContainer,
+          size: 42,
+        ),
+      );
+    }
+
+    return CachedNetworkImage(
+      imageUrl: url,
+      fit: BoxFit.cover,
+
+      placeholder: (_, __) {
+        return Container(
+          color: colors.surfaceContainerHighest,
+          alignment: Alignment.center,
+          child: SizedBox(
+            width: 24,
+            height: 24,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: colors.primary,
+            ),
+          ),
+        );
+      },
+
+      errorWidget: (_, __, ___) {
+        return Container(
+          color: colors.surfaceContainerHighest,
+          alignment: Alignment.center,
+          child: Icon(
+            Icons.image_not_supported_outlined,
+            color: colors.onSurfaceVariant,
+            size: 34,
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildStatusBadge(
+    BuildContext context,
+    ColorScheme colors,
+    Color statusColor,
+  ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final background = isDark
+        ? colors.surface.withValues(alpha: 0.94)
+        : Colors.white.withValues(alpha: 0.96);
+
+    final textColor = statusColor == colors.onSurfaceVariant
+        ? colors.onSurface
+        : statusColor;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.6)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 7,
+            height: 7,
+            decoration: BoxDecoration(
+              color: statusColor,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 6),
+          Text(
+            _statusLabel(),
+            style: TextStyle(
+              color: textColor,
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMenu(BuildContext context, ColorScheme colors) {
+    return PopupMenuButton<String>(
+      tooltip: 'Действия проекта',
+
+      onSelected: (value) {
+        switch (value) {
+          case 'active':
+            onStatusChange(ProjectStatus.active);
+            break;
+
+          case 'planning':
+            onStatusChange(ProjectStatus.planning);
+            break;
+
+          case 'completed':
+            onStatusChange(ProjectStatus.completed);
+            break;
+
+          case 'archived':
+            onStatusChange(ProjectStatus.archived);
+            break;
+
+          case 'delete':
+            onDelete();
+            break;
+        }
+      },
+
+      itemBuilder: (_) => [
+        const PopupMenuItem(value: 'active', child: Text('Активный')),
+        const PopupMenuItem(value: 'planning', child: Text('Планирование')),
+        const PopupMenuItem(value: 'completed', child: Text('Завершён')),
+        const PopupMenuItem(value: 'archived', child: Text('Архив')),
+        const PopupMenuDivider(),
+        PopupMenuItem(
+          value: 'delete',
+          child: Text('Удалить', style: TextStyle(color: colors.error)),
+        ),
+      ],
+
+      child: Container(
+        width: 34,
+        height: 34,
+        decoration: BoxDecoration(
+          color: colors.surface.withValues(alpha: 0.94),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: colors.outlineVariant.withValues(alpha: 0.7),
+          ),
+        ),
+        child: Icon(Icons.more_vert_rounded, size: 20, color: colors.onSurface),
+      ),
+    );
+  }
+
+  Widget _buildProjectStats(BuildContext context, ColorScheme colors) {
+    return StreamBuilder<List<Task>>(
+      stream: TaskRepository().getProjectTasks(project.id),
+      builder: (context, taskSnapshot) {
+        final tasks = taskSnapshot.data ?? const <Task>[];
+
+        return StreamBuilder<List<Photo>>(
+          stream: PhotoRepository().getProjectPhotos(project.id),
+          builder: (context, photoSnapshot) {
+            final photos = photoSnapshot.data ?? const <Photo>[];
+
+            return StreamBuilder<List<EstimateItem>>(
+              stream: EstimateRepository().getProjectEstimatesStream(
+                project.id,
+              ),
+              builder: (context, estimateSnapshot) {
+                final estimateItems =
+                    estimateSnapshot.data ?? const <EstimateItem>[];
+
+                final completedTasks = tasks
+                    .where((task) => task.status == TaskStatus.completed)
+                    .length;
+
+                final totalEstimate = estimateItems.fold<double>(
+                  0,
+                  (sum, item) => sum + item.totalPrice,
+                );
+
+                return Row(
+                  children: [
+                    Expanded(
+                      child: _Stat(
+                        icon: Icons.check_box_outlined,
+                        value: '$completedTasks/${tasks.length}',
+                        label: 'Задачи',
+                      ),
+                    ),
+
+                    _Divider(color: colors.outlineVariant),
+
+                    Expanded(
+                      child: _Stat(
+                        icon: Icons.image_outlined,
+                        value: '${photos.length}',
+                        label: 'Фото',
+                      ),
+                    ),
+
+                    _Divider(color: colors.outlineVariant),
+
+                    Expanded(
+                      child: _Stat(
+                        icon: Icons.payments_outlined,
+                        value: _formatMoney(totalEstimate),
+                        label: 'Смета',
+                      ),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+        );
+      },
     );
   }
 }
@@ -402,21 +420,23 @@ class _Stat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 15, color: const Color(0xFF64748B)),
+            Icon(icon, size: 15, color: colors.onSurfaceVariant),
             const SizedBox(width: 5),
             Flexible(
               child: Text(
                 value,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: Color(0xFF0F172A),
+                style: TextStyle(
+                  color: colors.onSurface,
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
                 ),
@@ -427,7 +447,7 @@ class _Stat extends StatelessWidget {
         const SizedBox(height: 3),
         Text(
           label,
-          style: const TextStyle(color: Color(0xFF64748B), fontSize: 10),
+          style: TextStyle(color: colors.onSurfaceVariant, fontSize: 10),
         ),
       ],
     );
@@ -435,10 +455,12 @@ class _Stat extends StatelessWidget {
 }
 
 class _Divider extends StatelessWidget {
-  const _Divider();
+  final Color color;
+
+  const _Divider({required this.color});
 
   @override
   Widget build(BuildContext context) {
-    return Container(width: 1, height: 30, color: const Color(0xFFE2E8F0));
+    return Container(width: 1, height: 30, color: color);
   }
 }

@@ -10,11 +10,9 @@ class Project {
   final DateTime createdAt;
   final DateTime? updatedAt;
   final List<String> members;
-
-  // Обложка проекта
   final String? coverImageUrl;
 
-  Project({
+  const Project({
     required this.id,
     required this.title,
     required this.ownerId,
@@ -52,7 +50,8 @@ class Project {
       coverImageUrl: coverImageUrl ?? this.coverImageUrl,
     );
   }
-    Map<String, dynamic> toFirestore() {
+
+  Map<String, dynamic> toFirestore() {
     return {
       'id': id,
       'title': title,
@@ -67,39 +66,111 @@ class Project {
     };
   }
 
-  factory Project.fromFirestore(Map<String, dynamic> data) {
-    return Project(
-      id: data['id'] ?? '',
-      title: data['title'] ?? '',
-      description: data['description'] ?? '',
-      progress: (data['progress'] ?? 0).toDouble(),
-      status: ProjectStatus.values.firstWhere(
-        (e) => e.name == data['status'],
+  factory Project.fromFirestore(
+    Map<String, dynamic> data, {
+    String? documentId,
+  }) {
+    final rawId = data['id'];
+
+    final String projectId = documentId != null && documentId.trim().isNotEmpty
+        ? documentId
+        : rawId is String && rawId.trim().isNotEmpty
+        ? rawId
+        : '';
+
+    final rawTitle = data['title'];
+    final rawDescription = data['description'];
+    final rawOwnerId = data['ownerId'];
+    final rawProgress = data['progress'];
+    final rawStatus = data['status'];
+    final rawMembers = data['members'];
+    final rawCover = data['coverImageUrl'];
+
+    double parsedProgress = 0.0;
+
+    if (rawProgress is num) {
+      parsedProgress = rawProgress.toDouble();
+    } else if (rawProgress is String) {
+      parsedProgress = double.tryParse(rawProgress) ?? 0.0;
+    }
+
+    parsedProgress = parsedProgress.clamp(0.0, 1.0);
+
+    ProjectStatus parsedStatus = ProjectStatus.active;
+
+    if (rawStatus is String) {
+      parsedStatus = ProjectStatus.values.firstWhere(
+        (status) => status.name == rawStatus,
         orElse: () => ProjectStatus.active,
-      ),
-      ownerId: data['ownerId'] ?? '',
-      createdAt: data['createdAt'] is Timestamp
-          ? (data['createdAt'] as Timestamp).toDate()
-          : DateTime.now(),
-      updatedAt: data['updatedAt'] is Timestamp
-          ? (data['updatedAt'] as Timestamp).toDate()
-          : null,
-      members: List<String>.from(data['members'] ?? []),
-      coverImageUrl: data['coverImageUrl'] as String?,
+      );
+    }
+
+    DateTime parsedCreatedAt = DateTime.now();
+
+    final createdValue = data['createdAt'];
+
+    if (createdValue is Timestamp) {
+      parsedCreatedAt = createdValue.toDate();
+    } else if (createdValue is DateTime) {
+      parsedCreatedAt = createdValue;
+    } else if (createdValue is String) {
+      parsedCreatedAt = DateTime.tryParse(createdValue) ?? DateTime.now();
+    }
+
+    DateTime? parsedUpdatedAt;
+
+    final updatedValue = data['updatedAt'];
+
+    if (updatedValue is Timestamp) {
+      parsedUpdatedAt = updatedValue.toDate();
+    } else if (updatedValue is DateTime) {
+      parsedUpdatedAt = updatedValue;
+    } else if (updatedValue is String) {
+      parsedUpdatedAt = DateTime.tryParse(updatedValue);
+    }
+
+    List<String> parsedMembers = const [];
+
+    if (rawMembers is List) {
+      parsedMembers = rawMembers
+          .whereType<String>()
+          .where((value) => value.trim().isNotEmpty)
+          .toList();
+    }
+
+    String? parsedCoverImageUrl;
+
+    if (rawCover is String && rawCover.trim().isNotEmpty) {
+      parsedCoverImageUrl = rawCover.trim();
+    }
+
+    return Project(
+      id: projectId,
+      title: rawTitle is String ? rawTitle : '',
+      description: rawDescription is String ? rawDescription : '',
+      progress: parsedProgress,
+      status: parsedStatus,
+      ownerId: rawOwnerId is String ? rawOwnerId : '',
+      createdAt: parsedCreatedAt,
+      updatedAt: parsedUpdatedAt,
+      members: parsedMembers,
+      coverImageUrl: parsedCoverImageUrl,
     );
   }
 
   @override
   String toString() {
-    return 'Project(id: $id, title: $title, ownerId: $ownerId)';
+    return 'Project('
+        'id: $id, '
+        'title: $title, '
+        'ownerId: $ownerId, '
+        'status: ${status.name}, '
+        'progress: $progress'
+        ')';
   }
 }
-enum ProjectStatus {
-  active,
-  planning,
-  completed,
-  archived,
-}
+
+enum ProjectStatus { active, planning, completed, archived }
 
 extension ProjectStatusExtension on ProjectStatus {
   String get displayName {
@@ -111,7 +182,7 @@ extension ProjectStatusExtension on ProjectStatus {
         return 'Планирование';
 
       case ProjectStatus.completed:
-        return 'Завершен';
+        return 'Завершён';
 
       case ProjectStatus.archived:
         return 'Архив';
@@ -127,7 +198,7 @@ extension ProjectStatusExtension on ProjectStatus {
         return 'В процессе';
 
       case ProjectStatus.completed:
-        return 'Завершен';
+        return 'Завершён';
 
       case ProjectStatus.archived:
         return 'Архив';

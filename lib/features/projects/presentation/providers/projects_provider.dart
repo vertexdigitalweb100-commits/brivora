@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../data/repositories/project_repository.dart';
 import '../../domain/models/project.dart';
@@ -16,18 +16,30 @@ class ProjectsProvider extends ChangeNotifier {
 
   bool _isListening = false;
 
-  /// Все проекты пользователя.
   List<Project> get projects => List.unmodifiable(_projects);
 
-  /// Состояние загрузки.
   bool get isLoading => _isLoading;
 
-  /// Ошибка.
   String? get error => _error;
 
-  /// Запускает realtime-синхронизацию проектов с Firestore.
+  bool get isListening => _isListening;
+
+  // ============================================================
+  // REALTIME LISTENER
+  // ============================================================
+
   void listenToProjects() {
-    if (_isListening) return;
+    if (_isListening) {
+      return;
+    }
+
+    _startListening();
+  }
+
+  Future<void> _startListening() async {
+    // На всякий случай отменяем старую подписку.
+    await _projectsSubscription?.cancel();
+    _projectsSubscription = null;
 
     _isListening = true;
     _isLoading = true;
@@ -35,36 +47,78 @@ class ProjectsProvider extends ChangeNotifier {
 
     notifyListeners();
 
-    _projectsSubscription = repository.getUserProjectsStream().listen(
-      (projects) {
-        _projects = projects;
-        _isLoading = false;
-        _error = null;
+    try {
+      _projectsSubscription = repository.getUserProjectsStream().listen(
+        (projects) {
+          if (_isDisposed) return;
 
-        notifyListeners();
-      },
-      onError: (error) {
-        _isLoading = false;
-        _error = 'Ошибка при загрузке проектов: $error';
+          _projects = projects;
+          _isLoading = false;
+          _error = null;
 
-        notifyListeners();
-      },
-    );
+          notifyListeners();
+        },
+        onError: (error) {
+          if (_isDisposed) return;
+
+          _isLoading = false;
+          _error = 'Ошибка при загрузке проектов: $error';
+
+          notifyListeners();
+        },
+        cancelOnError: false,
+      );
+    } catch (e) {
+      if (_isDisposed) return;
+
+      _isListening = false;
+      _isLoading = false;
+      _error = 'Ошибка при подключении к проектам: $e';
+
+      notifyListeners();
+    }
   }
 
-  /// Останавливает realtime-синхронизацию.
+  // ============================================================
+  // RESTART LISTENER
+  // ============================================================
+
+  Future<void> restartListening() async {
+    await stopListening();
+
+    if (_isDisposed) return;
+
+    _projects = [];
+    _error = null;
+    _isLoading = true;
+
+    notifyListeners();
+
+    await _startListening();
+  }
+
+  // ============================================================
+  // STOP LISTENER
+  // ============================================================
+
   Future<void> stopListening() async {
-    await _projectsSubscription?.cancel();
+    final subscription = _projectsSubscription;
 
     _projectsSubscription = null;
     _isListening = false;
+
+    if (subscription != null) {
+      await subscription.cancel();
+    }
   }
 
-  /// Однократная загрузка проектов.
-  ///
-  /// Оставляем метод, чтобы старые места приложения,
-  /// которые его вызывают, не ломались.
+  // ============================================================
+  // ОДНОРАЗОВАЯ ЗАГРУЗКА
+  // ============================================================
+
   Future<void> loadProjects() async {
+    if (_isDisposed) return;
+
     _isLoading = true;
     _error = null;
 
@@ -73,37 +127,51 @@ class ProjectsProvider extends ChangeNotifier {
     try {
       final projects = await repository.getUserProjects();
 
+      if (_isDisposed) return;
+
       _projects = projects;
       _error = null;
     } catch (e) {
+      if (_isDisposed) return;
+
       _error = 'Ошибка при загрузке проектов: $e';
     } finally {
+      if (_isDisposed) return;
+
       _isLoading = false;
 
       notifyListeners();
     }
   }
 
-  /// Создание проекта.
+  // ============================================================
+  // СОЗДАНИЕ ПРОЕКТА
+  // ============================================================
+
   Future<void> createProject(String title, {String description = ''}) async {
+    if (_isDisposed) return;
+
     try {
       _error = null;
+
+      notifyListeners();
 
       final project = await repository.createProject(
         title: title,
         description: description,
       );
 
-      // Если realtime listener уже работает,
-      // Firestore сам пришлёт новый проект.
-      //
-      // Поэтому здесь вручную список не меняем,
-      // чтобы не получить дубликат.
+      if (_isDisposed) return;
+
+      // Если realtime listener работает,
+      // Firestore сам пришлёт новый список.
       if (!_isListening) {
         _projects.insert(0, project);
         notifyListeners();
       }
     } catch (e) {
+      if (_isDisposed) return;
+
       _error = 'Ошибка при создании проекта: $e';
 
       notifyListeners();
@@ -112,12 +180,19 @@ class ProjectsProvider extends ChangeNotifier {
     }
   }
 
-  /// Удаление проекта.
+  // ============================================================
+  // УДАЛЕНИЕ ПРОЕКТА
+  // ============================================================
+
   Future<void> deleteProject(String projectId) async {
+    if (_isDisposed) return;
+
     try {
       _error = null;
 
       await repository.deleteProject(projectId);
+
+      if (_isDisposed) return;
 
       // При активном listener Firestore сам обновит список.
       if (!_isListening) {
@@ -126,6 +201,8 @@ class ProjectsProvider extends ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
+      if (_isDisposed) return;
+
       _error = 'Ошибка при удалении проекта: $e';
 
       notifyListeners();
@@ -134,29 +211,44 @@ class ProjectsProvider extends ChangeNotifier {
     }
   }
 
-  /// Получить проекты по статусу.
+  // ============================================================
+  // ПОЛУЧИТЬ ПРОЕКТЫ ПО СТАТУСУ
+  // ============================================================
+
   List<Project> getProjectsByStatus(ProjectStatus status) {
     return _projects.where((project) => project.status == status).toList();
   }
 
-  /// Получить проект по ID.
+  // ============================================================
+  // ПОЛУЧИТЬ ПРОЕКТ ПО ID
+  // ============================================================
+
   Project? getProjectById(String id) {
-    try {
-      return _projects.firstWhere((project) => project.id == id);
-    } catch (_) {
-      return null;
+    for (final project in _projects) {
+      if (project.id == id) {
+        return project;
+      }
     }
+
+    return null;
   }
 
-  /// Изменить статус проекта.
+  // ============================================================
+  // ИЗМЕНЕНИЕ СТАТУСА
+  // ============================================================
+
   Future<void> updateProjectStatus(
     String projectId,
     ProjectStatus status,
   ) async {
+    if (_isDisposed) return;
+
     try {
       _error = null;
 
       await repository.updateProjectStatus(projectId, status);
+
+      if (_isDisposed) return;
 
       // При realtime listener Firestore сам отправит
       // обновлённый проект.
@@ -172,6 +264,8 @@ class ProjectsProvider extends ChangeNotifier {
         }
       }
     } catch (e) {
+      if (_isDisposed) return;
+
       _error = 'Ошибка при изменении статуса: $e';
 
       notifyListeners();
@@ -180,8 +274,13 @@ class ProjectsProvider extends ChangeNotifier {
     }
   }
 
-  /// Изменить прогресс проекта.
+  // ============================================================
+  // ИЗМЕНЕНИЕ ПРОГРЕССА
+  // ============================================================
+
   Future<void> updateProjectProgress(String projectId, double progress) async {
+    if (_isDisposed) return;
+
     final normalizedProgress = progress.clamp(0.0, 1.0);
 
     try {
@@ -189,8 +288,8 @@ class ProjectsProvider extends ChangeNotifier {
 
       await repository.updateProjectProgress(projectId, normalizedProgress);
 
-      // При realtime listener Firestore сам обновит
-      // проект в списке.
+      if (_isDisposed) return;
+
       if (!_isListening) {
         final index = _projects.indexWhere(
           (project) => project.id == projectId,
@@ -205,6 +304,8 @@ class ProjectsProvider extends ChangeNotifier {
         }
       }
     } catch (e) {
+      if (_isDisposed) return;
+
       _error = 'Ошибка при обновлении прогресса: $e';
 
       notifyListeners();
@@ -213,27 +314,43 @@ class ProjectsProvider extends ChangeNotifier {
     }
   }
 
-  /// Количество проектов по статусам.
+  // ============================================================
+  // СТАТИСТИКА ПО СТАТУСАМ
+  // ============================================================
+
   Map<ProjectStatus, int> getProjectCountByStatus() {
     return {
       ProjectStatus.active: _projects
           .where((project) => project.status == ProjectStatus.active)
           .length,
+
       ProjectStatus.planning: _projects
           .where((project) => project.status == ProjectStatus.planning)
           .length,
+
       ProjectStatus.completed: _projects
           .where((project) => project.status == ProjectStatus.completed)
           .length,
+
       ProjectStatus.archived: _projects
           .where((project) => project.status == ProjectStatus.archived)
           .length,
     };
   }
 
+  // ============================================================
+  // DISPOSE
+  // ============================================================
+
+  bool _isDisposed = false;
+
   @override
   void dispose() {
+    _isDisposed = true;
+
     _projectsSubscription?.cancel();
+    _projectsSubscription = null;
+
     super.dispose();
   }
 }

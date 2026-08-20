@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../app/theme.dart';
 import '../../../../core/routes/app_routes.dart';
 import '../../../projects/data/repositories/task_repository.dart';
 import '../../../projects/domain/models/project.dart';
@@ -28,46 +27,69 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        context.read<ProjectsProvider>().listenToProjects();
-      }
+      if (!mounted) return;
+
+      final provider = context.read<ProjectsProvider>();
+      provider.listenToProjects();
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
     final user = FirebaseAuth.instance.currentUser;
+
     final displayName = user?.displayName?.trim();
+
     final firstName = displayName != null && displayName.isNotEmpty
         ? displayName.split(' ').first
         : 'пользователь';
 
-    final projects = context.watch<ProjectsProvider>().projects;
-    final projectIds = projects.map((project) => project.id).toList();
+    final projectsProvider = context.watch<ProjectsProvider>();
+    final projects = projectsProvider.projects;
+
+    final projectIds = projects
+        .map((project) => project.id)
+        .where((id) => id.isNotEmpty)
+        .toList();
 
     return Scaffold(
+      backgroundColor: colors.surface,
       body: SafeArea(
         child: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
           slivers: [
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
                   _buildHeader(context, firstName),
+
                   const SizedBox(height: 28),
+
                   FutureBuilder<TaskStats>(
                     future: _taskRepository.getTaskStatsForProjects(projectIds),
                     builder: (context, snapshot) {
                       final stats = snapshot.data ?? TaskStats.empty;
+
                       return _buildOverview(context, projects, stats);
                     },
                   ),
+
                   const SizedBox(height: 28),
+
                   _buildSectionHeader(context, title: 'Быстрые действия'),
+
                   const SizedBox(height: 12),
+
                   _buildQuickActions(context),
+
                   const SizedBox(height: 28),
+
                   _buildRecentProjectsSection(context, projects),
                 ]),
               ),
@@ -79,6 +101,9 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
   }
 
   Widget _buildHeader(BuildContext context, String firstName) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -88,32 +113,46 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
             children: [
               Text(
                 'Добро пожаловать 👋',
-                style: Theme.of(context).textTheme.bodyMedium,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colors.onSurfaceVariant,
+                ),
               ),
+
               const SizedBox(height: 4),
+
               Text(
                 'Привет, $firstName',
-                style: Theme.of(context).textTheme.headlineMedium,
+                style: theme.textTheme.headlineMedium?.copyWith(
+                  color: colors.onSurface,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.5,
+                ),
               ),
+
               const SizedBox(height: 6),
+
               Text(
                 'Вот что происходит с вашими проектами.',
-                style: Theme.of(context).textTheme.bodyMedium,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colors.onSurfaceVariant,
+                ),
               ),
             ],
           ),
         ),
+
         const SizedBox(width: 12),
+
         Container(
-          height: 46,
           width: 46,
+          height: 46,
           decoration: BoxDecoration(
-            color: AppColors.primaryLight,
+            color: colors.primaryContainer,
             borderRadius: BorderRadius.circular(14),
           ),
-          child: const Icon(
+          child: Icon(
             Icons.notifications_none_rounded,
-            color: AppColors.primary,
+            color: colors.onPrimaryContainer,
             size: 24,
           ),
         ),
@@ -126,6 +165,8 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
     List<Project> projects,
     TaskStats stats,
   ) {
+    final theme = Theme.of(context);
+
     if (projects.isEmpty) {
       return _buildEmptyCard(
         context,
@@ -138,54 +179,46 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
     final cards = <Widget>[
       _StatCard(
         title: 'Проекты',
-        value: '${projects.length}',
+        value: projects.length.toString(),
         icon: Icons.folder_outlined,
-        iconBackground: AppColors.primaryLight,
-        iconColor: AppColors.primary,
+        iconType: _StatCardColor.primary,
+      ),
+
+      _StatCard(
+        title: 'Задачи',
+        value: stats.total.toString(),
+        icon: Icons.checklist_rounded,
+        iconType: _StatCardColor.warning,
+      ),
+
+      _StatCard(
+        title: 'Выполнено',
+        value: stats.completed.toString(),
+        icon: Icons.check_circle_outline_rounded,
+        iconType: _StatCardColor.success,
+      ),
+
+      _StatCard(
+        title: 'В процессе',
+        value: stats.inProgress.toString(),
+        icon: Icons.schedule_rounded,
+        iconType: _StatCardColor.primary,
       ),
     ];
-
-    if (stats.total > 0) {
-      cards.add(
-        _StatCard(
-          title: 'Задачи',
-          value: '${stats.total}',
-          icon: Icons.checklist_rounded,
-          iconBackground: AppColors.warningLight,
-          iconColor: AppColors.warning,
-        ),
-      );
-    }
-
-    if (stats.completed > 0) {
-      cards.add(
-        _StatCard(
-          title: 'Выполнено',
-          value: '${stats.completed}',
-          icon: Icons.check_circle_outline_rounded,
-          iconBackground: AppColors.successLight,
-          iconColor: AppColors.success,
-        ),
-      );
-    }
-
-    if (stats.inProgress > 0) {
-      cards.add(
-        _StatCard(
-          title: 'В процессе',
-          value: '${stats.inProgress}',
-          icon: Icons.schedule_rounded,
-          iconBackground: AppColors.primaryLight,
-          iconColor: AppColors.primary,
-        ),
-      );
-    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Обзор', style: Theme.of(context).textTheme.titleLarge),
+        Text(
+          'Обзор',
+          style: theme.textTheme.titleLarge?.copyWith(
+            color: theme.colorScheme.onSurface,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+
         const SizedBox(height: 12),
+
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -196,7 +229,9 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
             mainAxisSpacing: 12,
             childAspectRatio: 1.12,
           ),
-          itemBuilder: (_, index) => cards[index],
+          itemBuilder: (context, index) {
+            return cards[index];
+          },
         ),
       ],
     );
@@ -226,7 +261,9 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
           actionText: 'Все',
           onActionTap: widget.onViewAllProjects,
         ),
+
         const SizedBox(height: 12),
+
         ...recentProjects.map(
           (project) => Padding(
             padding: const EdgeInsets.only(bottom: 12),
@@ -243,36 +280,48 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
     required String title,
     required String subtitle,
   }) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        color: AppColors.card,
+        color: colors.surfaceContainerLow,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: colors.outlineVariant),
       ),
       child: Column(
         children: [
           Container(
-            height: 44,
             width: 44,
+            height: 44,
             decoration: BoxDecoration(
-              color: AppColors.primaryLight,
+              color: colors.primaryContainer,
               borderRadius: BorderRadius.circular(13),
             ),
-            child: Icon(icon, color: AppColors.primary),
+            child: Icon(icon, color: colors.onPrimaryContainer),
           ),
+
           const SizedBox(height: 12),
+
           Text(
             title,
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.titleMedium,
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: colors.onSurface,
+              fontWeight: FontWeight.w700,
+            ),
           ),
+
           const SizedBox(height: 4),
+
           Text(
             subtitle,
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodySmall,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colors.onSurfaceVariant,
+            ),
           ),
         ],
       ),
@@ -280,6 +329,8 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
   }
 
   Widget _buildQuickActions(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
     return Row(
       children: [
         Expanded(
@@ -287,17 +338,19 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
             icon: Icons.add_rounded,
             title: 'Новый проект',
             subtitle: 'Создать',
-            color: AppColors.primary,
+            color: colors.primary,
             onTap: widget.onCreateProject,
           ),
         ),
+
         const SizedBox(width: 12),
+
         Expanded(
           child: _QuickActionCard(
             icon: Icons.calculate_outlined,
             title: 'Калькуляторы',
             subtitle: 'Материалы',
-            color: AppColors.primary,
+            color: colors.primary,
             onTap: () {
               Navigator.pushNamed(context, AppRoutes.calculators);
             },
@@ -313,10 +366,20 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
     String? actionText,
     VoidCallback? onActionTap,
   }) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(title, style: Theme.of(context).textTheme.titleLarge),
+        Text(
+          title,
+          style: theme.textTheme.titleLarge?.copyWith(
+            color: colors.onSurface,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+
         if (actionText != null)
           TextButton(
             onPressed: onActionTap,
@@ -324,6 +387,7 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
               padding: EdgeInsets.zero,
               minimumSize: const Size(0, 0),
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              foregroundColor: colors.primary,
             ),
             child: Text(actionText),
           ),
@@ -332,46 +396,88 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
   }
 }
 
+enum _StatCardColor { primary, warning, success }
+
 class _StatCard extends StatelessWidget {
   final String title;
   final String value;
   final IconData icon;
-  final Color iconBackground;
-  final Color iconColor;
+  final _StatCardColor iconType;
 
   const _StatCard({
     required this.title,
     required this.value,
     required this.icon,
-    required this.iconBackground,
-    required this.iconColor,
+    required this.iconType,
   });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    late Color iconColor;
+
+    switch (iconType) {
+      case _StatCardColor.primary:
+        iconColor = colors.primary;
+        break;
+
+      case _StatCardColor.warning:
+        iconColor = const Color(0xFFF59E0B);
+        break;
+
+      case _StatCardColor.success:
+        iconColor = const Color(0xFF22C55E);
+        break;
+    }
+
+    final iconBackground = iconColor.withValues(
+      alpha: theme.brightness == Brightness.dark ? 0.18 : 0.10,
+    );
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.card,
+        color: colors.surfaceContainerLow,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: colors.outlineVariant),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            height: 40,
             width: 40,
+            height: 40,
             decoration: BoxDecoration(
               color: iconBackground,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icon, color: iconColor, size: 21),
           ),
+
           const SizedBox(height: 16),
-          Text(value, style: Theme.of(context).textTheme.headlineMedium),
+
+          Text(
+            value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.headlineMedium?.copyWith(
+              color: colors.onSurface,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+
           const SizedBox(height: 3),
-          Text(title, style: Theme.of(context).textTheme.bodySmall),
+
+          Text(
+            title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colors.onSurfaceVariant,
+            ),
+          ),
         ],
       ),
     );
@@ -395,8 +501,11 @@ class _QuickActionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
     return Material(
-      color: AppColors.card,
+      color: colors.surfaceContainerLow,
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         onTap: onTap,
@@ -405,20 +514,24 @@ class _QuickActionCard extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: colors.outlineVariant),
           ),
           child: Row(
             children: [
               Container(
-                height: 42,
                 width: 42,
+                height: 42,
                 decoration: BoxDecoration(
-                  color: AppColors.primaryLight,
+                  color: color.withValues(
+                    alpha: theme.brightness == Brightness.dark ? 0.18 : 0.10,
+                  ),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(icon, color: color, size: 22),
               ),
+
               const SizedBox(width: 10),
+
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -427,12 +540,21 @@ class _QuickActionCard extends StatelessWidget {
                       title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.labelLarge,
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        color: colors.onSurface,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
+
                     const SizedBox(height: 2),
+
                     Text(
                       subtitle,
-                      style: Theme.of(context).textTheme.bodySmall,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colors.onSurfaceVariant,
+                      ),
                     ),
                   ],
                 ),
@@ -452,16 +574,24 @@ class _ProjectCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final progress = project.progress.clamp(0.0, 1.0);
-    final percentage = (progress * 100).round();
-    final statusColor = _statusColor(project.status);
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    // ВАЖНО:
+    // clamp() возвращает num,
+    // поэтому явно преобразуем обратно в double.
+    final double progress = project.progress.clamp(0.0, 1.0).toDouble();
+
+    final int percentage = (progress * 100).round();
+
+    final statusColor = _statusColor(project.status, colors);
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.card,
+        color: colors.surfaceContainerLow,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: colors.outlineVariant),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -477,24 +607,35 @@ class _ProjectCard extends StatelessWidget {
                       project.title.isEmpty ? 'Без названия' : project.title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.titleMedium,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: colors.onSurface,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
+
                     const SizedBox(height: 5),
+
                     Text(
                       _formatUpdatedAt(project.updatedAt ?? project.createdAt),
-                      style: Theme.of(context).textTheme.bodySmall,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colors.onSurfaceVariant,
+                      ),
                     ),
                   ],
                 ),
               ),
+
               const SizedBox(width: 12),
+
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10,
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.10),
+                  color: statusColor.withValues(
+                    alpha: theme.brightness == Brightness.dark ? 0.18 : 0.10,
+                  ),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -508,29 +649,38 @@ class _ProjectCard extends StatelessWidget {
               ),
             ],
           ),
+
           const SizedBox(height: 18),
+
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Прогресс', style: Theme.of(context).textTheme.bodySmall),
+              Text(
+                'Прогресс',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colors.onSurfaceVariant,
+                ),
+              ),
+
               Text(
                 '$percentage%',
-                style: Theme.of(
-                  context,
-                ).textTheme.labelLarge?.copyWith(color: AppColors.textPrimary),
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: colors.onSurface,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ],
           ),
+
           const SizedBox(height: 8),
+
           ClipRRect(
             borderRadius: BorderRadius.circular(100),
             child: LinearProgressIndicator(
               value: progress,
               minHeight: 7,
-              backgroundColor: AppColors.mutedBackground,
-              valueColor: const AlwaysStoppedAnimation<Color>(
-                AppColors.primary,
-              ),
+              backgroundColor: colors.surfaceContainerHighest,
+              valueColor: AlwaysStoppedAnimation<Color>(colors.primary),
             ),
           ),
         ],
@@ -538,35 +688,54 @@ class _ProjectCard extends StatelessWidget {
     );
   }
 
-  static Color _statusColor(ProjectStatus status) {
+  static Color _statusColor(ProjectStatus status, ColorScheme colors) {
     switch (status) {
       case ProjectStatus.completed:
-        return AppColors.success;
+        return const Color(0xFF22C55E);
+
       case ProjectStatus.planning:
-        return AppColors.warning;
+        return const Color(0xFFF59E0B);
+
       case ProjectStatus.archived:
-        return AppColors.textSecondary;
+        return colors.onSurfaceVariant;
+
       case ProjectStatus.active:
-        return AppColors.primary;
+        return colors.primary;
     }
   }
 
   static String _formatUpdatedAt(DateTime date) {
     final now = DateTime.now();
+
     final difference = now.difference(date);
 
-    if (difference.inMinutes < 1) return 'Обновлено только что';
+    if (difference.isNegative) {
+      return 'Обновлено недавно';
+    }
+
+    if (difference.inMinutes < 1) {
+      return 'Обновлено только что';
+    }
+
     if (difference.inMinutes < 60) {
       return 'Обновлено ${difference.inMinutes} мин. назад';
     }
+
     if (difference.inHours < 24) {
       return 'Обновлено ${difference.inHours} ч. назад';
     }
-    if (difference.inDays == 1) return 'Обновлено вчера';
+
+    if (difference.inDays == 1) {
+      return 'Обновлено вчера';
+    }
+
     if (difference.inDays < 7) {
       return 'Обновлено ${difference.inDays} дн. назад';
     }
 
-    return 'Обновлено ${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
+    return 'Обновлено '
+        '${date.day.toString().padLeft(2, '0')}.'
+        '${date.month.toString().padLeft(2, '0')}.'
+        '${date.year}';
   }
 }
