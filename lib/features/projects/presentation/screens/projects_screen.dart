@@ -35,24 +35,12 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
 
-      final provider = context.read<ProjectsProvider>();
-
-      provider.listenToProjects();
-
       if (widget.autoOpenCreateDialog) {
         _openCreateProjectDialog();
         widget.onAutoOpenHandled?.call();
       }
     });
   }
-
-  // ВАЖНО:
-  // Здесь НЕТ dispose() с stopListening().
-  //
-  // ProjectsProvider является владельцем Firestore listener.
-  // Экран не должен останавливать общий listener при уничтожении.
-  //
-  // Поэтому dispose здесь вообще не нужен.
 
   void _openCreateProjectDialog() {
     showDialog(
@@ -160,7 +148,10 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
 
             return LayoutBuilder(
               builder: (context, constraints) {
-                final isMobile = constraints.maxWidth < 700;
+                final width = constraints.maxWidth;
+
+                final isMobile = width < 700;
+
                 final horizontalPadding = isMobile ? 16.0 : 28.0;
 
                 return CustomScrollView(
@@ -204,14 +195,17 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                       sliver: SliverToBoxAdapter(
                         child: Row(
                           children: [
-                            Text(
-                              'Показано проектов: ${projects.length}',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: colors.onSurfaceVariant,
-                                fontWeight: FontWeight.w500,
+                            Expanded(
+                              child: Text(
+                                'Показано проектов: ${projects.length}',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: colors.onSurfaceVariant,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
-                            const Spacer(),
                             if (_searchQuery.isNotEmpty ||
                                 _selectedFilter != null)
                               TextButton(
@@ -292,6 +286,8 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
 
+    final buttonWidth = isMobile ? 96.0 : 150.0;
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -302,6 +298,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
               Text(
                 'Проекты',
                 style: theme.textTheme.headlineMedium?.copyWith(
+                  color: colors.onSurface,
                   fontSize: isMobile ? 28 : 32,
                   fontWeight: FontWeight.w700,
                   letterSpacing: -0.7,
@@ -310,6 +307,8 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
               const SizedBox(height: 5),
               Text(
                 'Управляйте строительными проектами',
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: colors.onSurfaceVariant,
                 ),
@@ -317,20 +316,29 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
             ],
           ),
         ),
+
         const SizedBox(width: 12),
-        FilledButton.icon(
-          onPressed: _openCreateProjectDialog,
-          icon: const Icon(Icons.add_rounded),
-          label: Text(isMobile ? 'Новый' : 'Новый проект'),
-          style: FilledButton.styleFrom(
-            backgroundColor: colors.primary,
-            foregroundColor: colors.onPrimary,
-            padding: EdgeInsets.symmetric(
-              horizontal: isMobile ? 13 : 17,
-              vertical: 13,
+
+        // ВАЖНО:
+        // FilledButton больше НЕ получает бесконечную ширину.
+        SizedBox(
+          width: buttonWidth,
+          height: 48,
+          child: FilledButton.icon(
+            onPressed: _openCreateProjectDialog,
+            icon: const Icon(Icons.add_rounded),
+            label: Text(
+              isMobile ? 'Новый' : 'Новый проект',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(11),
+            style: FilledButton.styleFrom(
+              backgroundColor: colors.primary,
+              foregroundColor: colors.onPrimary,
+              padding: EdgeInsets.symmetric(horizontal: isMobile ? 8 : 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(11),
+              ),
             ),
           ),
         ),
@@ -347,13 +355,18 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
 
     if (isMobile) {
       return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _buildSearchField(context),
+
           const SizedBox(height: 10),
+
           Row(
             children: [
               Expanded(child: _buildFilterBar(context, counts)),
+
               const SizedBox(width: 8),
+
               _buildSortButton(context),
             ],
           ),
@@ -364,9 +377,13 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     return Row(
       children: [
         Expanded(child: _buildSearchField(context)),
+
         const SizedBox(width: 14),
-        _buildFilterBar(context, counts),
+
+        Flexible(child: _buildFilterBar(context, counts)),
+
         const SizedBox(width: 10),
+
         _buildSortButton(context),
       ],
     );
@@ -439,37 +456,44 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         borderRadius: BorderRadius.circular(11),
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize: MainAxisSize.max,
         children: items.map((item) {
           final selected = _selectedFilter == item.status;
 
-          return GestureDetector(
-            onTap: () {
-              setState(() {
-                _selectedFilter = item.status;
-              });
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 11),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: selected ? colors.surface : Colors.transparent,
-                borderRadius: BorderRadius.circular(9),
-                boxShadow: selected
-                    ? [
-                        BoxShadow(
-                          color: colors.shadow.withValues(alpha: 0.08),
-                          blurRadius: 5,
-                        ),
-                      ]
-                    : null,
-              ),
-              child: Text(
-                '${item.label} ${item.count}',
-                style: TextStyle(
-                  color: selected ? colors.onSurface : colors.onSurfaceVariant,
-                  fontSize: 12,
-                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+          return Expanded(
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  _selectedFilter = item.status;
+                });
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 5),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: selected ? colors.surface : Colors.transparent,
+                  borderRadius: BorderRadius.circular(9),
+                  boxShadow: selected
+                      ? [
+                          BoxShadow(
+                            color: colors.shadow.withValues(alpha: 0.08),
+                            blurRadius: 5,
+                          ),
+                        ]
+                      : null,
+                ),
+                child: Text(
+                  '${item.label} ${item.count}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: selected
+                        ? colors.onSurface
+                        : colors.onSurfaceVariant,
+                    fontSize: 11,
+                    fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                  ),
                 ),
               ),
             ),
@@ -482,30 +506,35 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   Widget _buildSortButton(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
 
-    return PopupMenuButton<_ProjectSort>(
-      initialValue: _sort,
-      onSelected: (value) {
-        setState(() {
-          _sort = value;
-        });
-      },
-      itemBuilder: (context) {
-        return _ProjectSort.values.map((sort) {
-          return PopupMenuItem<_ProjectSort>(
-            value: sort,
-            child: Text(_sortLabel(sort)),
-          );
-        }).toList();
-      },
-      child: Container(
-        height: 44,
-        width: 44,
-        decoration: BoxDecoration(
-          color: colors.surfaceContainerHighest.withValues(alpha: 0.45),
-          borderRadius: BorderRadius.circular(11),
-          border: Border.all(color: colors.outlineVariant),
+    return SizedBox(
+      width: 44,
+      height: 44,
+      child: PopupMenuButton<_ProjectSort>(
+        initialValue: _sort,
+        onSelected: (value) {
+          setState(() {
+            _sort = value;
+          });
+        },
+        itemBuilder: (context) {
+          return _ProjectSort.values.map((sort) {
+            return PopupMenuItem<_ProjectSort>(
+              value: sort,
+              child: Text(_sortLabel(sort)),
+            );
+          }).toList();
+        },
+        padding: EdgeInsets.zero,
+        child: Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            color: colors.surfaceContainerHighest.withValues(alpha: 0.45),
+            borderRadius: BorderRadius.circular(11),
+            border: Border.all(color: colors.outlineVariant),
+          ),
+          child: Icon(Icons.sort_rounded, color: colors.onSurfaceVariant),
         ),
-        child: Icon(Icons.sort_rounded, color: colors.onSurfaceVariant),
       ),
     );
   }
@@ -515,13 +544,15 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     final colors = theme.colorScheme;
 
     return Center(
-      child: Padding(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.all(28),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.error_outline_rounded, size: 52, color: colors.error),
+
             const SizedBox(height: 16),
+
             Text(
               'Не удалось загрузить проекты',
               style: theme.textTheme.titleMedium?.copyWith(
@@ -529,7 +560,9 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
               ),
               textAlign: TextAlign.center,
             ),
+
             const SizedBox(height: 8),
+
             Text(
               error,
               style: theme.textTheme.bodySmall?.copyWith(
@@ -537,13 +570,18 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
               ),
               textAlign: TextAlign.center,
             ),
+
             const SizedBox(height: 18),
-            FilledButton.icon(
-              onPressed: () {
-                context.read<ProjectsProvider>().restartListening();
-              },
-              icon: const Icon(Icons.refresh_rounded),
-              label: const Text('Повторить'),
+
+            SizedBox(
+              height: 48,
+              child: FilledButton.icon(
+                onPressed: () {
+                  context.read<ProjectsProvider>().restartListening();
+                },
+                icon: const Icon(Icons.refresh_rounded),
+                label: const Text('Повторить'),
+              ),
             ),
           ],
         ),
@@ -578,14 +616,18 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                 size: 32,
               ),
             ),
+
             const SizedBox(height: 16),
+
             Text(
               hasFilters ? 'Ничего не найдено' : 'Пока нет проектов',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
               ),
             ),
+
             const SizedBox(height: 7),
+
             Text(
               hasFilters
                   ? 'Попробуйте изменить поиск или фильтр.'
@@ -595,12 +637,17 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                 color: colors.onSurfaceVariant,
               ),
             ),
+
             if (!hasFilters) ...[
               const SizedBox(height: 18),
-              FilledButton.icon(
-                onPressed: _openCreateProjectDialog,
-                icon: const Icon(Icons.add_rounded),
-                label: const Text('Создать проект'),
+
+              SizedBox(
+                height: 48,
+                child: FilledButton.icon(
+                  onPressed: _openCreateProjectDialog,
+                  icon: const Icon(Icons.add_rounded),
+                  label: const Text('Создать проект'),
+                ),
               ),
             ],
           ],

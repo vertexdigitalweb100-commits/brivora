@@ -32,7 +32,6 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
       if (!mounted) return;
 
       final provider = context.read<ProjectsProvider>();
-      provider.listenToProjects();
     });
   }
 

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../data/repositories/project_repository.dart';
@@ -7,14 +8,16 @@ import '../../domain/models/project.dart';
 
 class ProjectsProvider extends ChangeNotifier {
   final ProjectRepository repository = ProjectRepository();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   final List<Project> _projects = [];
 
-  StreamSubscription<List<Project>>? _subscription;
+  StreamSubscription<List<Project>>? _projectsSubscription;
+  StreamSubscription<User?>? _authSubscription;
 
   bool _isLoading = false;
-  bool _isStarted = false;
   bool _disposed = false;
+  bool _isListening = false;
 
   String? _error;
 
@@ -24,78 +27,173 @@ class ProjectsProvider extends ChangeNotifier {
 
   String? get error => _error;
 
-  bool get isListening => _subscription != null;
+  bool get isListening => _projectsSubscription != null && _isListening;
 
   // ============================================================
-  // START
+  // START LISTENING
   // ============================================================
 
   void listenToProjects() {
     if (_disposed) return;
 
-    // Уже слушаем Firebase.
-    // Ничего повторно создавать не нужно.
-    if (_subscription != null) {
+    debugPrint('PROJECTS PROVIDER: listenToProjects()');
+
+    if (_isListening && _projectsSubscription != null) {
+      debugPrint('PROJECTS PROVIDER: listener already active');
       return;
     }
 
-    _startListener();
+    _startListening();
   }
 
-  Future<void> _startListener() async {
+  void _startListening() {
     if (_disposed) return;
 
-    _isStarted = true;
     _isLoading = true;
     _error = null;
+    _isListening = false;
 
     _safeNotify();
 
-    try {
-      final stream = repository.getUserProjectsStream();
+    final user = _auth.currentUser;
 
-      _subscription = stream.listen(
-        (projects) {
-          if (_disposed) return;
+    debugPrint('PROJECTS PROVIDER: current user = ${user?.uid}');
 
-          _projects
-            ..clear()
-            ..addAll(projects);
+    if (user == null) {
+      debugPrint('PROJECTS PROVIDER: user is null, waiting for auth');
 
+      _listenForAuth();
+
+      return;
+    }
+
+    _subscribeToProjects();
+  }
+
+  // ============================================================
+  // AUTH
+  // ============================================================
+
+  void _listenForAuth() {
+    if (_disposed) return;
+
+    _authSubscription?.cancel();
+
+    _authSubscription = _auth.authStateChanges().listen(
+      (user) {
+        if (_disposed) return;
+
+        debugPrint('PROJECTS PROVIDER: auth changed -> ${user?.uid}');
+
+        if (user == null) {
+          _isListening = false;
           _isLoading = false;
+          _projects.clear();
           _error = null;
 
-          debugPrint('ProjectsProvider: received ${projects.length} projects');
-
           _safeNotify();
-        },
-        onError: (Object error, StackTrace stackTrace) {
-          if (_disposed) return;
+          return;
+        }
 
-          _isLoading = false;
-          _error = error.toString();
+        _authSubscription?.cancel();
+        _authSubscription = null;
 
-          debugPrint('ProjectsProvider FIRESTORE ERROR: $error');
+        _subscribeToProjects();
+      },
+      onError: (Object error, StackTrace stackTrace) {
+        if (_disposed) return;
 
-          debugPrint(stackTrace.toString());
+        debugPrint('PROJECTS PROVIDER AUTH ERROR: $error');
+        debugPrint(stackTrace.toString());
 
-          _safeNotify();
-        },
-        cancelOnError: false,
-      );
+        _isLoading = false;
+        _error = error.toString();
+
+        _safeNotify();
+      },
+    );
+  }
+
+  // ============================================================
+  // FIRESTORE LISTENER
+  // ============================================================
+
+  void _subscribeToProjects() {
+    if (_disposed) return;
+
+    _projectsSubscription?.cancel();
+    _projectsSubscription = null;
+
+    _isLoading = true;
+    _error = null;
+    _isListening = false;
+
+    _safeNotify();
+
+    debugPrint('PROJECTS PROVIDER: starting Firestore listener');
+
+    late final Stream<List<Project>> stream;
+
+    try {
+      stream = repository.getUserProjectsStream();
     } catch (e, stackTrace) {
-      if (_disposed) return;
-
-      _subscription = null;
-      _isLoading = false;
-      _error = e.toString();
-
-      debugPrint('ProjectsProvider START ERROR: $e');
-
+      debugPrint('PROJECTS PROVIDER: stream creation error: $e');
       debugPrint(stackTrace.toString());
 
+      _isLoading = false;
+      _isListening = false;
+      _error = e.toString();
+
       _safeNotify();
+      return;
     }
+
+    _projectsSubscription = stream.listen(
+      (projects) {
+        if (_disposed) return;
+
+        debugPrint('PROJECTS PROVIDER: received ${projects.length} projects');
+
+        _projects
+          ..clear()
+          ..addAll(projects);
+
+        _isLoading = false;
+        _isListening = true;
+        _error = null;
+
+        _safeNotify();
+      },
+      onError: (Object error, StackTrace stackTrace) {
+        if (_disposed) return;
+
+        debugPrint('PROJECTS PROVIDER FIRESTORE ERROR: $error');
+        debugPrint(stackTrace.toString());
+
+        _isLoading = false;
+        _isListening = false;
+        _error = error.toString();
+
+        _projectsSubscription?.cancel();
+        _projectsSubscription = null;
+
+        _safeNotify();
+      },
+      onDone: () {
+        if (_disposed) return;
+
+        debugPrint('PROJECTS PROVIDER: Firestore listener DONE');
+
+        _isListening = false;
+        _projectsSubscription = null;
+
+        if (_projects.isEmpty && _error == null) {
+          _isLoading = false;
+          _safeNotify();
+        }
+      },
+      cancelOnError: false,
+    );
   }
 
   // ============================================================
@@ -105,20 +203,23 @@ class ProjectsProvider extends ChangeNotifier {
   Future<void> restartListening() async {
     if (_disposed) return;
 
-    debugPrint('ProjectsProvider: restarting listener');
+    debugPrint('PROJECTS PROVIDER: restarting listener');
 
-    await _subscription?.cancel();
+    await _projectsSubscription?.cancel();
+    await _authSubscription?.cancel();
 
-    _subscription = null;
+    _projectsSubscription = null;
+    _authSubscription = null;
 
-    _projects.clear();
-
+    _isListening = false;
     _isLoading = true;
     _error = null;
 
+    _projects.clear();
+
     _safeNotify();
 
-    await _startListener();
+    _startListening();
   }
 
   // ============================================================
@@ -126,9 +227,15 @@ class ProjectsProvider extends ChangeNotifier {
   // ============================================================
 
   Future<void> stopListening() async {
-    await _subscription?.cancel();
+    debugPrint('PROJECTS PROVIDER: stopListening()');
 
-    _subscription = null;
+    await _projectsSubscription?.cancel();
+    await _authSubscription?.cancel();
+
+    _projectsSubscription = null;
+    _authSubscription = null;
+
+    _isListening = false;
   }
 
   // ============================================================
@@ -154,15 +261,14 @@ class ProjectsProvider extends ChangeNotifier {
 
       _error = null;
 
-      debugPrint('ProjectsProvider: loaded ${projects.length} projects');
+      debugPrint('PROJECTS PROVIDER: loaded ${projects.length} projects');
     } catch (e, stackTrace) {
       if (_disposed) return;
 
-      _error = e.toString();
-
-      debugPrint('ProjectsProvider LOAD ERROR: $e');
-
+      debugPrint('PROJECTS PROVIDER LOAD ERROR: $e');
       debugPrint(stackTrace.toString());
+
+      _error = e.toString();
     } finally {
       if (_disposed) return;
 
@@ -189,20 +295,21 @@ class ProjectsProvider extends ChangeNotifier {
 
       if (_disposed) return;
 
-      // Если listener не запущен,
-      // добавляем проект вручную.
-      if (_subscription == null) {
+      /*
+       * Если listener уже работает,
+       * Firestore сам вернёт новый проект.
+       */
+      if (!_isListening) {
         _projects.insert(0, project);
         _safeNotify();
       }
     } catch (e, stackTrace) {
       if (_disposed) return;
 
-      _error = e.toString();
-
-      debugPrint('ProjectsProvider CREATE ERROR: $e');
-
+      debugPrint('PROJECTS PROVIDER CREATE ERROR: $e');
       debugPrint(stackTrace.toString());
+
+      _error = e.toString();
 
       _safeNotify();
 
@@ -222,7 +329,7 @@ class ProjectsProvider extends ChangeNotifier {
 
       if (_disposed) return;
 
-      if (_subscription == null) {
+      if (!_isListening) {
         _projects.removeWhere((project) => project.id == projectId);
 
         _safeNotify();
@@ -230,11 +337,10 @@ class ProjectsProvider extends ChangeNotifier {
     } catch (e, stackTrace) {
       if (_disposed) return;
 
-      _error = e.toString();
-
-      debugPrint('ProjectsProvider DELETE ERROR: $e');
-
+      debugPrint('PROJECTS PROVIDER DELETE ERROR: $e');
       debugPrint(stackTrace.toString());
+
+      _error = e.toString();
 
       _safeNotify();
 
@@ -243,7 +349,7 @@ class ProjectsProvider extends ChangeNotifier {
   }
 
   // ============================================================
-  // UPDATE STATUS
+  // STATUS
   // ============================================================
 
   Future<void> updateProjectStatus(
@@ -257,7 +363,7 @@ class ProjectsProvider extends ChangeNotifier {
 
       if (_disposed) return;
 
-      if (_subscription == null) {
+      if (!_isListening) {
         final index = _projects.indexWhere(
           (project) => project.id == projectId,
         );
@@ -271,11 +377,10 @@ class ProjectsProvider extends ChangeNotifier {
     } catch (e, stackTrace) {
       if (_disposed) return;
 
-      _error = e.toString();
-
-      debugPrint('ProjectsProvider STATUS ERROR: $e');
-
+      debugPrint('PROJECTS PROVIDER STATUS ERROR: $e');
       debugPrint(stackTrace.toString());
+
+      _error = e.toString();
 
       _safeNotify();
 
@@ -284,7 +389,7 @@ class ProjectsProvider extends ChangeNotifier {
   }
 
   // ============================================================
-  // UPDATE PROGRESS
+  // PROGRESS
   // ============================================================
 
   Future<void> updateProjectProgress(String projectId, double progress) async {
@@ -297,7 +402,7 @@ class ProjectsProvider extends ChangeNotifier {
 
       if (_disposed) return;
 
-      if (_subscription == null) {
+      if (!_isListening) {
         final index = _projects.indexWhere(
           (project) => project.id == projectId,
         );
@@ -311,11 +416,10 @@ class ProjectsProvider extends ChangeNotifier {
     } catch (e, stackTrace) {
       if (_disposed) return;
 
-      _error = e.toString();
-
-      debugPrint('ProjectsProvider PROGRESS ERROR: $e');
-
+      debugPrint('PROJECTS PROVIDER PROGRESS ERROR: $e');
       debugPrint(stackTrace.toString());
+
+      _error = e.toString();
 
       _safeNotify();
 
@@ -354,15 +458,12 @@ class ProjectsProvider extends ChangeNotifier {
       ProjectStatus.active: _projects
           .where((project) => project.status == ProjectStatus.active)
           .length,
-
       ProjectStatus.planning: _projects
           .where((project) => project.status == ProjectStatus.planning)
           .length,
-
       ProjectStatus.completed: _projects
           .where((project) => project.status == ProjectStatus.completed)
           .length,
-
       ProjectStatus.archived: _projects
           .where((project) => project.status == ProjectStatus.archived)
           .length,
@@ -387,8 +488,11 @@ class ProjectsProvider extends ChangeNotifier {
   void dispose() {
     _disposed = true;
 
-    _subscription?.cancel();
-    _subscription = null;
+    _projectsSubscription?.cancel();
+    _authSubscription?.cancel();
+
+    _projectsSubscription = null;
+    _authSubscription = null;
 
     super.dispose();
   }
