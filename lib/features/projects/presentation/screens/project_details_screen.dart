@@ -34,10 +34,16 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
 
     _project = widget.project;
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
 
       context.read<TasksProvider>().listenToProjectTasks(_project.id);
+
+      try {
+        await ProjectRepository().markProjectAsOpened(_project.id);
+      } catch (e) {
+        debugPrint('MARK PROJECT AS OPENED ERROR: $e');
+      }
     });
   }
 
@@ -51,10 +57,13 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
     switch (status) {
       case ProjectStatus.active:
         return Colors.green;
+
       case ProjectStatus.planning:
         return Colors.blue;
+
       case ProjectStatus.completed:
         return Colors.purple;
+
       case ProjectStatus.archived:
         return Colors.grey;
     }
@@ -104,10 +113,15 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildInfoCard(context),
+
             const SizedBox(height: 20),
+
             _buildTaskSection(context),
+
             const SizedBox(height: 20),
+
             _buildProjectSections(context),
+
             const SizedBox(height: 80),
           ],
         ),
@@ -155,6 +169,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                   )
                 : _buildEmptyCover(context),
           ),
+
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
             child: Column(
@@ -171,7 +186,9 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                         ),
                       ),
                     ),
+
                     const SizedBox(width: 12),
+
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12,
@@ -191,7 +208,9 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                     ),
                   ],
                 ),
+
                 const SizedBox(height: 12),
+
                 Text(
                   project.description.trim().isNotEmpty
                       ? project.description
@@ -200,7 +219,9 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                     color: colorScheme.onSurfaceVariant,
                   ),
                 ),
+
                 const SizedBox(height: 20),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -218,7 +239,9 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                     ),
                   ],
                 ),
+
                 const SizedBox(height: 8),
+
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
                   child: LinearProgressIndicator(
@@ -228,7 +251,9 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                     backgroundColor: colorScheme.surfaceContainerHighest,
                   ),
                 ),
+
                 const SizedBox(height: 20),
+
                 Row(
                   children: [
                     Icon(
@@ -236,7 +261,9 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                       size: 18,
                       color: colorScheme.onSurfaceVariant,
                     ),
+
                     const SizedBox(width: 8),
+
                     Text(
                       _formatDate(project.createdAt),
                       style: theme.textTheme.bodyMedium?.copyWith(
@@ -270,6 +297,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
 
   Widget _buildTaskSection(BuildContext context) {
     final tasksProvider = context.watch<TasksProvider>();
+
     final tasks = tasksProvider.tasks;
 
     return Card(
@@ -282,7 +310,9 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Задачи', style: Theme.of(context).textTheme.titleMedium),
+
             const SizedBox(height: 16),
+
             Wrap(
               spacing: 8,
               runSpacing: 8,
@@ -293,7 +323,9 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                 _buildFilterChip(context, 'completed', 'Выполненные'),
               ],
             ),
+
             const SizedBox(height: 16),
+
             if (tasks.isEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16),
@@ -316,6 +348,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
 
   Widget _buildFilterChip(BuildContext context, String value, String label) {
     final tasksProvider = context.read<TasksProvider>();
+
     final selected = tasksProvider.filter == value;
 
     return FilterChip(
@@ -351,6 +384,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
             await tasksProvider.updateTaskStatus(task, nextStatus);
 
             if (!mounted) return;
+
             await _reloadProject();
           },
           borderRadius: BorderRadius.circular(24),
@@ -369,6 +403,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 8),
+
             Text(
               task.description.isNotEmpty
                   ? task.description
@@ -376,7 +411,9 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
+
             const SizedBox(height: 12),
+
             Wrap(
               spacing: 10,
               runSpacing: 8,
@@ -395,10 +432,12 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                   ),
                   child: Text(task.priority.displayName),
                 ),
+
                 Text(
                   task.status.displayName,
                   style: TextStyle(color: statusColor),
                 ),
+
                 if (task.deadline != null)
                   Text('до ${_formatDate(task.deadline!)}'),
               ],
@@ -413,9 +452,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
     );
   }
 
-  /// Спрашивает подтверждение перед удалением задачи —
-  /// раньше кнопка удаляла без подтверждения, случайный тап
-  /// по иконке безвозвратно стирал задачу.
+  /// Спрашивает подтверждение перед удалением задачи.
   Future<void> _confirmAndDeleteTask(BuildContext context, Task task) async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -423,7 +460,8 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
         return AlertDialog(
           title: const Text('Удалить задачу?'),
           content: Text(
-            'Задача «${task.title}» будет удалена без возможности восстановить.',
+            'Задача «${task.title}» будет удалена '
+            'без возможности восстановить.',
           ),
           actions: [
             TextButton(
@@ -440,12 +478,14 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
     );
 
     if (confirmed != true) return;
+
     if (!context.mounted) return;
 
     try {
       await context.read<TasksProvider>().deleteTask(task.id, project.id);
 
       if (!mounted) return;
+
       await _reloadProject();
     } catch (e) {
       if (!context.mounted) return;
@@ -458,10 +498,13 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
 
   Future<void> _showCreateTaskDialog(BuildContext context) async {
     final titleController = TextEditingController();
+
     final descriptionController = TextEditingController();
 
     TaskPriority priority = TaskPriority.normal;
+
     DateTime? deadline;
+
     bool canSave = false;
 
     await showDialog<void>(
@@ -484,13 +527,17 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                       },
                       decoration: const InputDecoration(labelText: 'Название'),
                     ),
+
                     const SizedBox(height: 12),
+
                     TextField(
                       controller: descriptionController,
                       maxLines: 3,
                       decoration: const InputDecoration(labelText: 'Описание'),
                     ),
+
                     const SizedBox(height: 12),
+
                     DropdownButtonFormField<TaskPriority>(
                       initialValue: priority,
                       items: TaskPriority.values.map((value) {
@@ -508,7 +555,9 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                         }
                       },
                     ),
+
                     const SizedBox(height: 12),
+
                     Row(
                       children: [
                         Expanded(
@@ -518,6 +567,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                                 : 'Срок не выбран',
                           ),
                         ),
+
                         TextButton(
                           onPressed: () async {
                             final picked = await showDatePicker(
@@ -549,6 +599,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                   },
                   child: const Text('Отмена'),
                 ),
+
                 ElevatedButton(
                   onPressed: canSave
                       ? () async {
@@ -575,7 +626,10 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
 
                             Navigator.pop(dialogContext);
 
-                            if (!mounted) return;
+                            if (!mounted) {
+                              return;
+                            }
+
                             await _reloadProject();
                           } catch (e) {
                             if (!context.mounted) {
@@ -610,7 +664,9 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('Разделы проекта', style: Theme.of(context).textTheme.titleMedium),
+
         const SizedBox(height: 12),
+
         Card(
           child: ListTile(
             leading: const Icon(Icons.note_alt),
@@ -627,6 +683,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
             },
           ),
         ),
+
         Card(
           child: ListTile(
             leading: const Icon(Icons.photo),
@@ -649,6 +706,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
             },
           ),
         ),
+
         Card(
           child: ListTile(
             leading: const Icon(Icons.calculate),
@@ -664,6 +722,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
             },
           ),
         ),
+
         Card(
           child: ListTile(
             leading: const Icon(Icons.receipt_long),

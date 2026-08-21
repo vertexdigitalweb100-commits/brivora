@@ -1,0 +1,41 @@
+{
+  "@@locale": "ru",
+
+  "appName": "Brivora",
+
+  "home": "Главная",
+  "projects": "Проекты",
+  "ai": "Искусственный интеллект",
+  "profile": "Профиль",
+
+  "settings": "Настройки",
+  "appearance": "Оформление",
+  "language": "Язык",
+
+  "russian": "Русский",
+  "kazakh": "Қазақша",
+
+  "recentProjects": "Недавние проекты",
+  "noRecentProjects": "Нет недавних проектов",
+
+  "tasks": "Задачи",
+  "notes": "Заметки",
+  "photos": "Фото",
+  "estimate": "Смета",
+  "calculators": "Калькуляторы",
+
+  "notifications": "Уведомления",
+
+  "save": "Сохранить",
+  "cancel": "Отмена",
+  "delete": "Удалить",
+  "edit": "Изменить",
+  "close": "Закрыть",
+  "back": "Назад",
+  "add": "Добавить",
+  "done": "Готово",
+
+  "darkTheme": "Тёмная тема",
+  "lightTheme": "Светлая тема",
+  "systemTheme": "Как в системе"
+}

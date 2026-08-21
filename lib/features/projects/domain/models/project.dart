@@ -9,6 +9,14 @@ class Project {
   final String ownerId;
   final DateTime createdAt;
   final DateTime? updatedAt;
+
+  /// Последний момент, когда пользователь реально открыл проект.
+  ///
+  /// Это отдельное поле от updatedAt:
+  /// updatedAt отвечает за изменение проекта,
+  /// lastOpenedAt — за открытие проекта.
+  final DateTime? lastOpenedAt;
+
   final List<String> members;
   final String? coverImageUrl;
 
@@ -21,6 +29,7 @@ class Project {
     this.progress = 0.0,
     this.status = ProjectStatus.active,
     this.updatedAt,
+    this.lastOpenedAt,
     this.members = const [],
     this.coverImageUrl,
   });
@@ -34,6 +43,7 @@ class Project {
     String? ownerId,
     DateTime? createdAt,
     DateTime? updatedAt,
+    DateTime? lastOpenedAt,
     List<String>? members,
     String? coverImageUrl,
   }) {
@@ -46,6 +56,7 @@ class Project {
       ownerId: ownerId ?? this.ownerId,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      lastOpenedAt: lastOpenedAt ?? this.lastOpenedAt,
       members: members ?? this.members,
       coverImageUrl: coverImageUrl ?? this.coverImageUrl,
     );
@@ -61,6 +72,9 @@ class Project {
       'ownerId': ownerId,
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': Timestamp.fromDate(updatedAt ?? createdAt),
+      'lastOpenedAt': lastOpenedAt != null
+          ? Timestamp.fromDate(lastOpenedAt!)
+          : null,
       'members': members,
       'coverImageUrl': coverImageUrl,
     };
@@ -129,6 +143,18 @@ class Project {
       parsedUpdatedAt = DateTime.tryParse(updatedValue);
     }
 
+    DateTime? parsedLastOpenedAt;
+
+    final lastOpenedValue = data['lastOpenedAt'];
+
+    if (lastOpenedValue is Timestamp) {
+      parsedLastOpenedAt = lastOpenedValue.toDate();
+    } else if (lastOpenedValue is DateTime) {
+      parsedLastOpenedAt = lastOpenedValue;
+    } else if (lastOpenedValue is String) {
+      parsedLastOpenedAt = DateTime.tryParse(lastOpenedValue);
+    }
+
     List<String> parsedMembers = const [];
 
     if (rawMembers is List) {
@@ -153,6 +179,7 @@ class Project {
       ownerId: rawOwnerId is String ? rawOwnerId : '',
       createdAt: parsedCreatedAt,
       updatedAt: parsedUpdatedAt,
+      lastOpenedAt: parsedLastOpenedAt,
       members: parsedMembers,
       coverImageUrl: parsedCoverImageUrl,
     );

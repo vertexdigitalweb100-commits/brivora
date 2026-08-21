@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import '../core/routes/app_routes.dart';
+import '../core/providers/locale_controller.dart';
 import '../features/estimates/presentation/providers/estimate_provider.dart';
 import '../features/notes/presentation/providers/notes_provider.dart';
 import '../features/photos/presentation/providers/photos_provider.dart';
 import '../features/projects/presentation/providers/projects_provider.dart';
 import '../features/projects/presentation/providers/tasks_provider.dart';
+import '../l10n/app_localizations.dart';
 import 'theme.dart';
 import 'theme_controller.dart';
 
 class BrivoraApp extends StatelessWidget {
-  const BrivoraApp({super.key});
+  final LocaleController localeController;
+
+  const BrivoraApp({super.key, required this.localeController});
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +25,8 @@ class BrivoraApp extends StatelessWidget {
         ChangeNotifierProvider<ThemeController>(
           create: (_) => ThemeController()..loadTheme(),
         ),
+
+        ChangeNotifierProvider<LocaleController>.value(value: localeController),
 
         ChangeNotifierProvider<ProjectsProvider>(
           create: (_) => ProjectsProvider(),
@@ -46,6 +53,7 @@ class _BrivoraAppContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeController = context.watch<ThemeController>();
+    final localeController = context.watch<LocaleController>();
 
     return MaterialApp(
       title: 'Brivora',
@@ -54,6 +62,17 @@ class _BrivoraAppContent extends StatelessWidget {
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       themeMode: themeController.themeMode,
+
+      locale: localeController.locale,
+
+      supportedLocales: const [Locale('ru'), Locale('kk')],
+
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
 
       initialRoute: AppRoutes.splash,
       onGenerateRoute: AppRoutes.generateRoute,

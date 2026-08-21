@@ -120,32 +120,74 @@ class _AITabScreenState extends State<AITabScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
+    final backgroundColor = theme.scaffoldBackgroundColor;
+    final surfaceColor = colors.surface;
+    final primaryColor = colors.primary;
+    final primaryContainer = colors.primaryContainer;
+    final textPrimary = colors.onSurface;
+    final textSecondary = colors.onSurfaceVariant;
+    final borderColor = colors.outline.withValues(alpha: 0.55);
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: backgroundColor,
       body: SafeArea(
         child: Column(
           children: [
-            _buildHeader(),
+            _buildHeader(
+              surfaceColor: surfaceColor,
+              textPrimary: textPrimary,
+              textSecondary: textSecondary,
+              borderColor: borderColor,
+              primaryColor: primaryColor,
+            ),
             Expanded(
               child: _messages.length == 1
-                  ? _buildInitialState()
-                  : _buildMessages(),
+                  ? _buildInitialState(
+                      surfaceColor: surfaceColor,
+                      textPrimary: textPrimary,
+                      textSecondary: textSecondary,
+                      borderColor: borderColor,
+                      primaryColor: primaryColor,
+                      primaryContainer: primaryContainer,
+                      isDark: isDark,
+                    )
+                  : _buildMessages(
+                      textPrimary: textPrimary,
+                      textSecondary: textSecondary,
+                      surfaceColor: surfaceColor,
+                      borderColor: borderColor,
+                      primaryColor: primaryColor,
+                    ),
             ),
-            _buildInputArea(),
+            _buildInputArea(
+              surfaceColor: surfaceColor,
+              textPrimary: textPrimary,
+              textSecondary: textSecondary,
+              borderColor: borderColor,
+              primaryColor: primaryColor,
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader({
+    required Color surfaceColor,
+    required Color textPrimary,
+    required Color textSecondary,
+    required Color borderColor,
+    required Color primaryColor,
+  }) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(
-          bottom: BorderSide(color: Color(0xFFE2E8F0), width: 0.8),
-        ),
+      decoration: BoxDecoration(
+        color: surfaceColor,
+        border: Border(bottom: BorderSide(color: borderColor, width: 0.8)),
       ),
       child: Row(
         children: [
@@ -153,15 +195,15 @@ class _AITabScreenState extends State<AITabScreen> {
             width: 46,
             height: 46,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF2563EB), Color(0xFF60A5FA)],
+              gradient: LinearGradient(
+                colors: [primaryColor, const Color(0xFF60A5FA)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(15),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF2563EB).withOpacity(0.20),
+                  color: primaryColor.withValues(alpha: 0.20),
                   blurRadius: 12,
                   offset: const Offset(0, 5),
                 ),
@@ -176,7 +218,7 @@ class _AITabScreenState extends State<AITabScreen> {
 
           const SizedBox(width: 13),
 
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -185,21 +227,21 @@ class _AITabScreenState extends State<AITabScreen> {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF0F172A),
+                    color: textPrimary,
                   ),
                 ),
 
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
 
                 Row(
                   children: [
-                    _OnlineDot(),
-                    SizedBox(width: 6),
+                    const _OnlineDot(),
+                    const SizedBox(width: 6),
                     Text(
                       'Онлайн',
                       style: TextStyle(
                         fontSize: 13,
-                        color: Color(0xFF64748B),
+                        color: textSecondary,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -213,63 +255,104 @@ class _AITabScreenState extends State<AITabScreen> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: const Color(0xFFF1F5F9),
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(
-              Icons.more_horiz,
-              color: Color(0xFF64748B),
-              size: 22,
-            ),
+            child: Icon(Icons.more_horiz, color: textSecondary, size: 22),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildInitialState() {
+  Widget _buildInitialState({
+    required Color surfaceColor,
+    required Color textPrimary,
+    required Color textSecondary,
+    required Color borderColor,
+    required Color primaryColor,
+    required Color primaryContainer,
+    required bool isDark,
+  }) {
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(20, 26, 20, 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildWelcomeCard(),
+          _buildWelcomeCard(
+            textPrimary: textPrimary,
+            textSecondary: textSecondary,
+            primaryColor: primaryColor,
+            borderColor: borderColor,
+            isDark: isDark,
+          ),
 
           const SizedBox(height: 24),
 
-          const Text(
+          Text(
             'Что я могу сделать?',
             style: TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF0F172A),
+              color: textPrimary,
             ),
           ),
 
           const SizedBox(height: 12),
 
-          ..._quickActions.map(_buildQuickAction),
+          ..._quickActions.map(
+            (action) => _buildQuickAction(
+              action,
+              surfaceColor: surfaceColor,
+              textPrimary: textPrimary,
+              textSecondary: textSecondary,
+              borderColor: borderColor,
+              primaryColor: primaryColor,
+              primaryContainer: primaryContainer,
+            ),
+          ),
 
           const SizedBox(height: 18),
 
-          _buildHint(),
+          _buildHint(
+            textSecondary: textSecondary,
+            backgroundColor: Theme.of(
+              context,
+            ).colorScheme.surfaceContainerHighest,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildWelcomeCard() {
+  Widget _buildWelcomeCard({
+    required Color textPrimary,
+    required Color textSecondary,
+    required Color primaryColor,
+    required Color borderColor,
+    required bool isDark,
+  }) {
+    final lightStart = isDark
+        ? const Color(0xFF172554)
+        : const Color(0xFFEFF6FF);
+
+    final lightEnd = isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC);
+
+    final cardBorder = isDark
+        ? const Color(0xFF1E40AF)
+        : const Color(0xFFDBEAFE);
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFEFF6FF), Color(0xFFF8FAFC)],
+        gradient: LinearGradient(
+          colors: [lightStart, lightEnd],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFDBEAFE)),
+        border: Border.all(color: cardBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -278,7 +361,7 @@ class _AITabScreenState extends State<AITabScreen> {
             width: 38,
             height: 38,
             decoration: BoxDecoration(
-              color: const Color(0xFF2563EB),
+              color: primaryColor,
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
@@ -290,44 +373,48 @@ class _AITabScreenState extends State<AITabScreen> {
 
           const SizedBox(height: 15),
 
-          const Text(
+          Text(
             'Чем могу помочь?',
             style: TextStyle(
               fontSize: 21,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF0F172A),
+              color: textPrimary,
             ),
           ),
 
           const SizedBox(height: 7),
 
-          const Text(
+          Text(
             'Спроси меня о ремонте, материалах, расчётах '
             'или создании сметы.',
-            style: TextStyle(
-              fontSize: 14,
-              height: 1.5,
-              color: Color(0xFF64748B),
-            ),
+            style: TextStyle(fontSize: 14, height: 1.5, color: textSecondary),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildQuickAction(_QuickAction action) {
+  Widget _buildQuickAction(
+    _QuickAction action, {
+    required Color surfaceColor,
+    required Color textPrimary,
+    required Color textSecondary,
+    required Color borderColor,
+    required Color primaryColor,
+    required Color primaryContainer,
+  }) {
     return GestureDetector(
       onTap: () => _sendMessage(action.title),
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: surfaceColor,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFE2E8F0)),
+          border: Border.all(color: borderColor),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.025),
+              color: Colors.black.withValues(alpha: 0.025),
               blurRadius: 8,
               offset: const Offset(0, 3),
             ),
@@ -339,14 +426,10 @@ class _AITabScreenState extends State<AITabScreen> {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: const Color(0xFFEFF6FF),
+                color: primaryContainer,
                 borderRadius: BorderRadius.circular(13),
               ),
-              child: Icon(
-                action.icon,
-                color: const Color(0xFF2563EB),
-                size: 21,
-              ),
+              child: Icon(action.icon, color: primaryColor, size: 21),
             ),
 
             const SizedBox(width: 13),
@@ -357,10 +440,10 @@ class _AITabScreenState extends State<AITabScreen> {
                 children: [
                   Text(
                     action.title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF0F172A),
+                      color: textPrimary,
                     ),
                   ),
 
@@ -368,19 +451,16 @@ class _AITabScreenState extends State<AITabScreen> {
 
                   Text(
                     action.subtitle,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Color(0xFF64748B),
-                    ),
+                    style: TextStyle(fontSize: 12, color: textSecondary),
                   ),
                 ],
               ),
             ),
 
-            const Icon(
+            Icon(
               Icons.arrow_forward_ios_rounded,
               size: 14,
-              color: Color(0xFF94A3B8),
+              color: textSecondary.withValues(alpha: 0.7),
             ),
           ],
         ),
@@ -388,19 +468,22 @@ class _AITabScreenState extends State<AITabScreen> {
     );
   }
 
-  Widget _buildHint() {
+  Widget _buildHint({
+    required Color textSecondary,
+    required Color backgroundColor,
+  }) {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFFF1F5F9),
+        color: backgroundColor,
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.info_outline, size: 18, color: Color(0xFF64748B)),
+          Icon(Icons.info_outline, size: 18, color: textSecondary),
 
-          SizedBox(width: 10),
+          const SizedBox(width: 10),
 
           Expanded(
             child: Text(
@@ -408,7 +491,7 @@ class _AITabScreenState extends State<AITabScreen> {
               style: TextStyle(
                 fontSize: 12.5,
                 height: 1.4,
-                color: Color(0xFF64748B),
+                color: textSecondary,
               ),
             ),
           ),
@@ -417,18 +500,38 @@ class _AITabScreenState extends State<AITabScreen> {
     );
   }
 
-  Widget _buildMessages() {
+  Widget _buildMessages({
+    required Color textPrimary,
+    required Color textSecondary,
+    required Color surfaceColor,
+    required Color borderColor,
+    required Color primaryColor,
+  }) {
     return ListView.builder(
       controller: _scrollController,
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
       itemCount: _messages.length,
       itemBuilder: (context, index) {
-        return _buildMessageBubble(_messages[index]);
+        return _buildMessageBubble(
+          _messages[index],
+          textPrimary: textPrimary,
+          textSecondary: textSecondary,
+          surfaceColor: surfaceColor,
+          borderColor: borderColor,
+          primaryColor: primaryColor,
+        );
       },
     );
   }
 
-  Widget _buildMessageBubble(_ChatMessage message) {
+  Widget _buildMessageBubble(
+    _ChatMessage message, {
+    required Color textPrimary,
+    required Color textSecondary,
+    required Color surfaceColor,
+    required Color borderColor,
+    required Color primaryColor,
+  }) {
     if (message.isUser) {
       return Align(
         alignment: Alignment.centerRight,
@@ -436,9 +539,9 @@ class _AITabScreenState extends State<AITabScreen> {
           constraints: const BoxConstraints(maxWidth: 310),
           margin: const EdgeInsets.only(bottom: 14),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: const BoxDecoration(
-            color: Color(0xFF2563EB),
-            borderRadius: BorderRadius.only(
+          decoration: BoxDecoration(
+            color: primaryColor,
+            borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(18),
               topRight: Radius.circular(18),
               bottomLeft: Radius.circular(18),
@@ -470,8 +573,8 @@ class _AITabScreenState extends State<AITabScreen> {
               height: 34,
               margin: const EdgeInsets.only(right: 9),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF2563EB), Color(0xFF60A5FA)],
+                gradient: LinearGradient(
+                  colors: [primaryColor, const Color(0xFF60A5FA)],
                 ),
                 borderRadius: BorderRadius.circular(11),
               ),
@@ -489,19 +592,19 @@ class _AITabScreenState extends State<AITabScreen> {
                   vertical: 12,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: surfaceColor,
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(5),
                     topRight: Radius.circular(18),
                     bottomLeft: Radius.circular(18),
                     bottomRight: Radius.circular(18),
                   ),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                  border: Border.all(color: borderColor),
                 ),
                 child: Text(
                   message.text,
-                  style: const TextStyle(
-                    color: Color(0xFF334155),
+                  style: TextStyle(
+                    color: textPrimary,
                     fontSize: 14,
                     height: 1.5,
                   ),
@@ -514,12 +617,20 @@ class _AITabScreenState extends State<AITabScreen> {
     );
   }
 
-  Widget _buildInputArea() {
+  Widget _buildInputArea({
+    required Color surfaceColor,
+    required Color textPrimary,
+    required Color textSecondary,
+    required Color borderColor,
+    required Color primaryColor,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 14),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Color(0xFFE2E8F0), width: 0.8)),
+      decoration: BoxDecoration(
+        color: surfaceColor,
+        border: Border(top: BorderSide(color: borderColor, width: 0.8)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -528,52 +639,59 @@ class _AITabScreenState extends State<AITabScreen> {
             child: Container(
               constraints: const BoxConstraints(minHeight: 48, maxHeight: 120),
               decoration: BoxDecoration(
-                color: const Color(0xFFF1F5F9),
+                color: colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: borderColor),
               ),
               child: TextField(
                 controller: _controller,
                 minLines: 1,
-                maxLines: 4,
+                maxLines: 5,
                 textInputAction: TextInputAction.newline,
-                style: const TextStyle(fontSize: 14, color: Color(0xFF0F172A)),
-                decoration: const InputDecoration(
-                  hintText: 'Спросите что-нибудь...',
-                  hintStyle: TextStyle(color: Color(0xFF94A3B8), fontSize: 14),
+                style: TextStyle(fontSize: 14, color: textPrimary),
+                decoration: InputDecoration(
+                  hintText: 'Напиши сообщение...',
+                  hintStyle: TextStyle(fontSize: 14, color: textSecondary),
                   border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(
+                  contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 13,
                   ),
                 ),
+                onSubmitted: (_) => _sendMessage(),
               ),
             ),
           ),
 
-          const SizedBox(width: 8),
+          const SizedBox(width: 10),
 
-          GestureDetector(
-            onTap: () => _sendMessage(),
-            child: Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: const Color(0xFF2563EB),
-                borderRadius: BorderRadius.circular(15),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF2563EB).withOpacity(0.22),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
+          ValueListenableBuilder<TextEditingValue>(
+            valueListenable: _controller,
+            builder: (context, value, child) {
+              final hasText = value.text.trim().isNotEmpty;
+
+              return GestureDetector(
+                onTap: hasText ? _sendMessage : null,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: hasText
+                        ? primaryColor
+                        : colorScheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(15),
                   ),
-                ],
-              ),
-              child: const Icon(
-                Icons.arrow_upward_rounded,
-                color: Colors.white,
-                size: 22,
-              ),
-            ),
+                  child: Icon(
+                    Icons.arrow_upward_rounded,
+                    color: hasText
+                        ? Colors.white
+                        : textSecondary.withValues(alpha: 0.55),
+                    size: 22,
+                  ),
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -581,20 +699,11 @@ class _AITabScreenState extends State<AITabScreen> {
   }
 }
 
-class _OnlineDot extends StatelessWidget {
-  const _OnlineDot();
+class _ChatMessage {
+  final String text;
+  final bool isUser;
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 7,
-      height: 7,
-      decoration: const BoxDecoration(
-        color: Color(0xFF22C55E),
-        shape: BoxShape.circle,
-      ),
-    );
-  }
+  const _ChatMessage({required this.text, required this.isUser});
 }
 
 class _QuickAction {
@@ -609,9 +718,18 @@ class _QuickAction {
   });
 }
 
-class _ChatMessage {
-  final String text;
-  final bool isUser;
+class _OnlineDot extends StatelessWidget {
+  const _OnlineDot();
 
-  const _ChatMessage({required this.text, required this.isUser});
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 8,
+      height: 8,
+      decoration: const BoxDecoration(
+        color: Color(0xFF22C55E),
+        shape: BoxShape.circle,
+      ),
+    );
+  }
 }

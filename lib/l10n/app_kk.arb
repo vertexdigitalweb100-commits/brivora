@@ -1,0 +1,41 @@
+{
+  "@@locale": "kk",
+
+  "appName": "Brivora",
+
+  "home": "Басты бет",
+  "projects": "Жобалар",
+  "ai": "Жасанды интеллект",
+  "profile": "Профиль",
+
+  "settings": "Баптаулар",
+  "appearance": "Безендіру",
+  "language": "Тіл",
+
+  "russian": "Орысша",
+  "kazakh": "Қазақша",
+
+  "recentProjects": "Соңғы жобалар",
+  "noRecentProjects": "Соңғы жобалар жоқ",
+
+  "tasks": "Тапсырмалар",
+  "notes": "Жазбалар",
+  "photos": "Фотолар",
+  "estimate": "Смета",
+  "calculators": "Калькуляторлар",
+
+  "notifications": "Хабарландырулар",
+
+  "save": "Сақтау",
+  "cancel": "Болдырмау",
+  "delete": "Жою",
+  "edit": "Өзгерту",
+  "close": "Жабу",
+  "back": "Артқа",
+  "add": "Қосу",
+  "done": "Дайын",
+
+  "darkTheme": "Қараңғы тақырып",
+  "lightTheme": "Жарық тақырып",
+  "systemTheme": "Жүйе бойынша"
+}

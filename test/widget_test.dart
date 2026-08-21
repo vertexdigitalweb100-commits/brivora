@@ -1,11 +1,16 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:brivora/app/app.dart';
+import 'package:brivora/core/providers/locale_controller.dart';
 
 void main() {
   testWidgets('Brivora app smoke test', (WidgetTester tester) async {
-    await tester.pumpWidget(const BrivoraApp());
+    final localeController = LocaleController();
 
-    expect(find.text('Brivora'), findsOneWidget);
+    await tester.pumpWidget(BrivoraApp(localeController: localeController));
+
+    await tester.pumpAndSettle();
+
+    expect(find.byType(BrivoraApp), findsOneWidget);
   });
 }

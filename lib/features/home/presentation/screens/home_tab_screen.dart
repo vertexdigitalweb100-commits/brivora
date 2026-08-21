@@ -31,7 +31,7 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
 
-      final provider = context.read<ProjectsProvider>();
+      context.read<ProjectsProvider>();
     });
   }
 
@@ -49,6 +49,7 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
         : 'пользователь';
 
     final projectsProvider = context.watch<ProjectsProvider>();
+
     final projects = projectsProvider.projects;
 
     final projectIds = projects
@@ -249,6 +250,13 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
       );
     }
 
+    /*
+     * ProjectsProvider получает проекты из
+     * ProjectRepository уже отсортированными
+     * по lastOpenedAt.
+     *
+     * Поэтому здесь берём первые три.
+     */
     final recentProjects = projects.take(3).toList();
 
     return Column(
@@ -266,7 +274,16 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
         ...recentProjects.map(
           (project) => Padding(
             padding: const EdgeInsets.only(bottom: 12),
-            child: _ProjectCard(project: project),
+            child: _ProjectCard(
+              project: project,
+              onTap: () {
+                Navigator.pushNamed(
+                  context,
+                  AppRoutes.projectDetails,
+                  arguments: project,
+                );
+              },
+            ),
           ),
         ),
       ],
@@ -413,6 +430,7 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
     final colors = theme.colorScheme;
 
     late Color iconColor;
@@ -501,6 +519,7 @@ class _QuickActionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
     final colors = theme.colorScheme;
 
     return Material(
@@ -568,121 +587,132 @@ class _QuickActionCard extends StatelessWidget {
 
 class _ProjectCard extends StatelessWidget {
   final Project project;
+  final VoidCallback? onTap;
 
-  const _ProjectCard({required this.project});
+  const _ProjectCard({required this.project, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
     final colors = theme.colorScheme;
 
-    // ВАЖНО:
-    // clamp() возвращает num,
-    // поэтому явно преобразуем обратно в double.
     final double progress = project.progress.clamp(0.0, 1.0).toDouble();
 
     final int percentage = (progress * 100).round();
 
     final statusColor = _statusColor(project.status, colors);
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: colors.surfaceContainerLow,
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colors.outlineVariant),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: colors.surfaceContainerLow,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: colors.outlineVariant),
+          ),
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      project.title.isEmpty ? 'Без названия' : project.title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: colors.onSurface,
-                        fontWeight: FontWeight.w700,
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          project.title.isEmpty
+                              ? 'Без названия'
+                              : project.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: colors.onSurface,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+
+                        const SizedBox(height: 5),
+
+                        Text(
+                          _formatOpenedAt(project),
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: colors.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(width: 12),
+
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: statusColor.withValues(
+                        alpha: theme.brightness == Brightness.dark
+                            ? 0.18
+                            : 0.10,
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      project.status.shortName,
+                      style: TextStyle(
+                        color: statusColor,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-
-                    const SizedBox(height: 5),
-
-                    Text(
-                      _formatUpdatedAt(project.updatedAt ?? project.createdAt),
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: colors.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
 
-              const SizedBox(width: 12),
+              const SizedBox(height: 18),
 
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: statusColor.withValues(
-                    alpha: theme.brightness == Brightness.dark ? 0.18 : 0.10,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Прогресс',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colors.onSurfaceVariant,
+                    ),
                   ),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  project.status.shortName,
-                  style: TextStyle(
-                    color: statusColor,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
+
+                  Text(
+                    '$percentage%',
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      color: colors.onSurface,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
+                ],
+              ),
+
+              const SizedBox(height: 8),
+
+              ClipRRect(
+                borderRadius: BorderRadius.circular(100),
+                child: LinearProgressIndicator(
+                  value: progress,
+                  minHeight: 7,
+                  backgroundColor: colors.surfaceContainerHighest,
+                  valueColor: AlwaysStoppedAnimation<Color>(colors.primary),
                 ),
               ),
             ],
           ),
-
-          const SizedBox(height: 18),
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Прогресс',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: colors.onSurfaceVariant,
-                ),
-              ),
-
-              Text(
-                '$percentage%',
-                style: theme.textTheme.labelLarge?.copyWith(
-                  color: colors.onSurface,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 8),
-
-          ClipRRect(
-            borderRadius: BorderRadius.circular(100),
-            child: LinearProgressIndicator(
-              value: progress,
-              minHeight: 7,
-              backgroundColor: colors.surfaceContainerHighest,
-              valueColor: AlwaysStoppedAnimation<Color>(colors.primary),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -703,13 +733,42 @@ class _ProjectCard extends StatelessWidget {
     }
   }
 
-  static String _formatUpdatedAt(DateTime date) {
+  static String _formatOpenedAt(Project project) {
+    final date = project.lastOpenedAt ?? project.updatedAt ?? project.createdAt;
+
     final now = DateTime.now();
 
     final difference = now.difference(date);
 
     if (difference.isNegative) {
-      return 'Обновлено недавно';
+      return 'Открыт недавно';
+    }
+
+    if (project.lastOpenedAt != null) {
+      if (difference.inMinutes < 1) {
+        return 'Открыт только что';
+      }
+
+      if (difference.inMinutes < 60) {
+        return 'Открыт ${difference.inMinutes} мин. назад';
+      }
+
+      if (difference.inHours < 24) {
+        return 'Открыт ${difference.inHours} ч. назад';
+      }
+
+      if (difference.inDays == 1) {
+        return 'Открыт вчера';
+      }
+
+      if (difference.inDays < 7) {
+        return 'Открыт ${difference.inDays} дн. назад';
+      }
+
+      return 'Открыт '
+          '${date.day.toString().padLeft(2, '0')}.'
+          '${date.month.toString().padLeft(2, '0')}.'
+          '${date.year}';
     }
 
     if (difference.inMinutes < 1) {

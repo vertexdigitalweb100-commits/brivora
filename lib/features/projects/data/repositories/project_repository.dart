@@ -41,6 +41,7 @@ class ProjectRepository {
       ownerId: user.uid,
       createdAt: now,
       updatedAt: now,
+      lastOpenedAt: null,
       progress: 0.0,
       status: ProjectStatus.active,
       coverImageUrl: null,
@@ -82,7 +83,11 @@ class ProjectRepository {
 
           projects.add(project);
 
-          debugPrint('PROJECT: ${project.id} | ${project.title}');
+          debugPrint(
+            'PROJECT: ${project.id} | '
+            '${project.title} | '
+            'lastOpened=${project.lastOpenedAt}',
+          );
         } catch (e, stackTrace) {
           debugPrint('PROJECT PARSE ERROR: ${doc.id}');
           debugPrint('$e');
@@ -135,7 +140,8 @@ class ProjectRepository {
                 'PROJECT DOCUMENT: '
                 '${doc.id} '
                 'owner=${data['ownerId']} '
-                'title=${data['title']}',
+                'title=${data['title']} '
+                'lastOpenedAt=${data['lastOpenedAt']}',
               );
 
               final project = Project.fromFirestore(data, documentId: doc.id);
@@ -161,11 +167,57 @@ class ProjectRepository {
   // ============================================================
 
   int _compareByRecent(Project a, Project b) {
-    final aDate = a.updatedAt ?? a.createdAt;
+    /*
+     * Главный приоритет:
+     *
+     * 1. lastOpenedAt — когда проект последний раз открывали.
+     *
+     * Если проект ещё ни разу не открывался:
+     *
+     * 2. updatedAt — когда проект последний раз изменяли.
+     *
+     * Если updatedAt тоже отсутствует:
+     *
+     * 3. createdAt — когда проект был создан.
+     */
 
-    final bDate = b.updatedAt ?? b.createdAt;
+    final aDate = a.lastOpenedAt ?? a.updatedAt ?? a.createdAt;
+
+    final bDate = b.lastOpenedAt ?? b.updatedAt ?? b.createdAt;
 
     return bDate.compareTo(aDate);
+  }
+
+  // ============================================================
+  // MARK PROJECT AS OPENED
+  // ============================================================
+
+  Future<void> markProjectAsOpened(String projectId) async {
+    final userId = currentUserId;
+
+    if (userId == null) {
+      throw Exception('Пользователь не авторизован');
+    }
+
+    if (projectId.trim().isEmpty) {
+      throw Exception('Некорректный ID проекта');
+    }
+
+    final project = await getProjectById(projectId);
+
+    if (project == null) {
+      throw Exception('Проект не найден');
+    }
+
+    await _projectsCollectionRef.doc(projectId).update({
+      'lastOpenedAt': Timestamp.now(),
+    });
+
+    debugPrint(
+      'PROJECT OPENED: '
+      '${project.id} | '
+      '${project.title}',
+    );
   }
 
   // ============================================================
