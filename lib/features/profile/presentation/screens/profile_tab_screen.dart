@@ -101,10 +101,6 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
 
                   const SizedBox(height: 20),
 
-                  _buildAppearanceCard(),
-
-                  const SizedBox(height: 20),
-
                   _buildSettingsCard(),
 
                   const SizedBox(height: 20),
@@ -148,13 +144,6 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
               ),
 
               const Spacer(),
-
-              _buildHeaderButton(
-                icon: Icons.settings_outlined,
-                onTap: () {
-                  Navigator.of(context).pushNamed('/settings');
-                },
-              ),
             ],
           ),
 
@@ -691,23 +680,6 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
       width: 1,
       height: 45,
       color: colors.outline.withValues(alpha: 0.45),
-    );
-  }
-
-  Widget _buildAppearanceCard() {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-
-    return _buildCard(
-      child: _buildMenuItem(
-        icon: Icons.palette_outlined,
-        title: 'Оформление',
-        subtitle: 'Тема, язык и валюта',
-        iconColor: primary,
-        onTap: () {
-          Navigator.of(context).pushNamed('/settings');
-        },
-      ),
     );
   }
 
