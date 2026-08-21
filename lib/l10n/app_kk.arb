@@ -1,41 +1,300 @@
 {
-  "@@locale": "kk",
+"@@locale": "kk",
 
-  "appName": "Brivora",
+"appName": "Brivora",
 
-  "home": "Басты бет",
-  "projects": "Жобалар",
-  "ai": "Жасанды интеллект",
-  "profile": "Профиль",
+"home": "Басты бет",
+"projects": "Жобалар",
+"ai": "Жасанды интеллект",
+"profile": "Профиль",
 
-  "settings": "Баптаулар",
-  "appearance": "Безендіру",
-  "language": "Тіл",
+"settings": "Баптаулар",
+"appearance": "Безендіру",
+"language": "Тіл",
 
-  "russian": "Орысша",
-  "kazakh": "Қазақша",
+"russian": "Орысша",
+"kazakh": "Қазақша",
 
-  "recentProjects": "Соңғы жобалар",
-  "noRecentProjects": "Соңғы жобалар жоқ",
+"recentProjects": "Соңғы жобалар",
+"noRecentProjects": "Соңғы жобалар жоқ",
 
-  "tasks": "Тапсырмалар",
-  "notes": "Жазбалар",
-  "photos": "Фотолар",
-  "estimate": "Смета",
-  "calculators": "Калькуляторлар",
+"tasks": "Тапсырмалар",
+"notes": "Жазбалар",
+"photos": "Фотолар",
+"estimate": "Смета",
+"calculators": "Калькуляторлар",
 
-  "notifications": "Хабарландырулар",
+"notifications": "Хабарландырулар",
 
-  "save": "Сақтау",
-  "cancel": "Болдырмау",
-  "delete": "Жою",
-  "edit": "Өзгерту",
-  "close": "Жабу",
-  "back": "Артқа",
-  "add": "Қосу",
-  "done": "Дайын",
+"save": "Сақтау",
+"cancel": "Болдырмау",
+"delete": "Жою",
+"edit": "Өзгерту",
+"close": "Жабу",
+"back": "Артқа",
+"add": "Қосу",
+"done": "Дайын",
 
-  "darkTheme": "Қараңғы тақырып",
-  "lightTheme": "Жарық тақырып",
-  "systemTheme": "Жүйе бойынша"
+"darkTheme": "Қараңғы тақырып",
+"lightTheme": "Жарық тақырып",
+"systemTheme": "Жүйе бойынша",
+
+"loading": "Жүктелуде...",
+
+"quickActions": "Жылдам әрекеттер",
+"welcome": "Қош келдіңіз",
+"helloUser": "Сәлеметсіз бе, {name}",
+"projectsDescription": "Жобаларыңызды бір жерден басқарыңыз",
+"noProjects": "Сізде әзірге жобалар жоқ",
+"createFirstProject": "Алғашқы жобаңызды жасаңыз",
+"projectsCount": "{count}",
+"completed": "Аяқталған",
+"inProgress": "Орындалуда",
+"overview": "Шолу",
+
+"noRecentProjectsTitle": "Соңғы жобалар жоқ",
+"noRecentProjectsSubtitle": "Жоба жасаңыз, сонда ол осы жерде пайда болады",
+"all": "Барлығы",
+"newProject": "Жаңа жоба",
+"create": "Жасау",
+"materials": "Материалдар",
+"untitled": "Атаусыз",
+"progress": "Прогресс",
+
+"statusCompleted": "Аяқталған",
+"statusPlanning": "Жоспарлау",
+"statusArchived": "Мұрағатталған",
+"statusActive": "Белсенді",
+
+"openedRecently": "Жақында ашылған",
+"openedJustNow": "Жаңа ғана ашылды",
+"openedMinutesAgo": "{count} мин. бұрын ашылды",
+"openedHoursAgo": "{count} сағ. бұрын ашылды",
+"openedYesterday": "Кеше ашылды",
+"openedDaysAgo": "{count} күн бұрын ашылды",
+"openedDate": "{date} ашылды",
+
+"updatedJustNow": "Жаңа ғана жаңартылды",
+"updatedMinutesAgo": "{count} мин. бұрын жаңартылды",
+"updatedHoursAgo": "{count} сағ. бұрын жаңартылды",
+"updatedYesterday": "Кеше жаңартылды",
+"updatedDaysAgo": "{count} күн бұрын жаңартылды",
+"updatedDate": "{date} жаңартылды",
+
+"registration": "Тіркелу",
+"createAccount": "Аккаунт жасау",
+"createAccountDescription": "Brivora қолдану үшін аккаунт жасаңыз",
+"fullName": "Толық аты-жөні",
+"fullNameHint": "Толық аты-жөніңізді енгізіңіз",
+"enterName": "Атыңызды енгізіңіз",
+"nameMinLength": "Аты кемінде 2 таңбадан тұруы керек",
+
+"email": "Электрондық пошта",
+"emailHint": "Электрондық поштаңызды енгізіңіз",
+"enterEmail": "Электрондық поштаңызды енгізіңіз",
+"invalidEmail": "Дұрыс электрондық пошта енгізіңіз",
+
+"password": "Құпиясөз",
+"passwordHint": "Құпиясөзді енгізіңіз",
+"enterPassword": "Құпиясөзді енгізіңіз",
+"passwordMinLength": "Құпиясөз кемінде 6 таңбадан тұруы керек",
+
+"confirmPassword": "Құпиясөзді растаңыз",
+"confirmPasswordHint": "Құпиясөзді қайта енгізіңіз",
+"confirmPasswordRequired": "Құпиясөзді растаңыз",
+
+"agreeToTerms": "Мен",
+"termsOfUse": "пайдалану шарттарын қабылдаймын",
+"passwordsDoNotMatch": "Құпиясөздер сәйкес келмейді",
+
+"register": "Тіркелу",
+"alreadyHaveAccount": "Аккаунтыңыз бар ма?",
+"login": "Кіру",
+
+"genericError": "Қате орын алды",
+"emailAlreadyInUse": "Бұл электрондық пошта бұрыннан қолданылуда",
+"weakPassword": "Құпиясөз тым әлсіз",
+"invalidEmailAuth": "Электрондық пошта мекенжайы дұрыс емес",
+"registrationError": "Аккаунт жасау мүмкін болмады",
+
+"addName": "Атыңызды қосыңыз",
+"addRoleAndCompany": "Лауазым мен компанияны көрсетіңіз",
+
+"chooseFromGallery": "Галереядан таңдау",
+"takePhoto": "Суретке түсіру",
+"deletePhoto": "Суретті өшіру",
+
+"avatarUpdated": "Аватар сәтті жаңартылды",
+"avatarUploadError": "Аватарды жүктеу мүмкін болмады: {error}",
+"avatarDeleted": "Аватар өшірілді",
+"avatarDeleteError": "Аватарды өшіру мүмкін болмады: {error}",
+
+"profileData": "Профиль деректері",
+"firstName": "Аты",
+"lastName": "Тегі",
+"position": "Лауазымы",
+"positionExample": "Мысалы: Прораб",
+"company": "Компания",
+"companyExample": "Мысалы: ЖК Иванов И.И.",
+
+"saveError": "Сақтау мүмкін болмады: {error}",
+
+"photosCount": "{count}",
+"activeProjects": "{count}",
+
+"settingsSubtitle": "Қолданба баптаулары",
+
+"proSubscription": "Pro жазылымы",
+"comingSoon": "Жақында",
+
+"security": "Қауіпсіздік",
+"securitySubtitle": "Аккаунт пен деректерді қорғау",
+
+"feedback": "Кері байланыс",
+"feedbackSubtitle": "Brivora-ны жақсартуға көмектесіңіз",
+
+"logout": "Шығу",
+"version": "Нұсқа",
+
+"logoutQuestion": "Аккаунттан шығу керек пе?",
+"logoutConfirmation": "Шынымен аккаунттан шыққыңыз келе ме?",
+
+"logoutError": "Шығу мүмкін болмады: {error}",
+"featureComingSoon": "{feature} — жақында қолжетімді болады",
+
+"@helloUser": {
+"placeholders": {
+"name": {
+"type": "String"
+}
+}
+},
+
+"@projectsCount": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+
+"@openedMinutesAgo": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+
+"@openedHoursAgo": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+
+"@openedDaysAgo": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+
+"@openedDate": {
+"placeholders": {
+"date": {
+"type": "String"
+}
+}
+},
+
+"@updatedMinutesAgo": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+
+"@updatedHoursAgo": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+
+"@updatedDaysAgo": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+
+"@updatedDate": {
+"placeholders": {
+"date": {
+"type": "String"
+}
+}
+},
+
+"@avatarUploadError": {
+"placeholders": {
+"error": {
+"type": "String"
+}
+}
+},
+
+"@avatarDeleteError": {
+"placeholders": {
+"error": {
+"type": "String"
+}
+}
+},
+
+"@saveError": {
+"placeholders": {
+"error": {
+"type": "String"
+}
+}
+},
+
+"@photosCount": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+
+"@activeProjects": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+
+"@logoutError": {
+"placeholders": {
+"error": {
+"type": "String"
+}
+}
+},
+
+"@featureComingSoon": {
+"placeholders": {
+"feature": {
+"type": "String"
+}
+}
+}
 }

@@ -2,10 +2,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-
+import '../../../../l10n/app_localizations.dart';
 import '../../../photos/data/repositories/photo_repository.dart';
 import '../../../projects/domain/models/project.dart';
 import '../../../projects/presentation/providers/projects_provider.dart';
+import '../../../settings/presentation/screens/settings_screen.dart';
 import '../../data/repositories/profile_repository.dart';
 import '../../domain/models/user_profile.dart';
 
@@ -25,7 +26,7 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
   bool _isProfileLoading = true;
   bool _isAvatarLoading = false;
 
-  int? _photoCount;
+  int _photoCount = 0;
 
   static const Color primary = Color(0xFF2563EB);
 
@@ -35,7 +36,6 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-
       context.read<ProjectsProvider>().listenToProjects();
     });
 
@@ -83,7 +83,6 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colors = theme.colorScheme;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -92,23 +91,16 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
           physics: const BouncingScrollPhysics(),
           slivers: [
             SliverToBoxAdapter(child: _buildProfileHeader()),
-
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 28),
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
                   _buildStatistics(),
-
                   const SizedBox(height: 20),
-
                   _buildSettingsCard(),
-
                   const SizedBox(height: 20),
-
                   _buildLogoutButton(),
-
                   const SizedBox(height: 14),
-
                   _buildVersion(),
                 ]),
               ),
@@ -124,12 +116,12 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
     final colors = theme.colorScheme;
 
     final hasName = _profile.fullName.isNotEmpty;
-    final hasRoleLine = _profile.roleLine.isNotEmpty;
+    final hasRole = _profile.roleLine.isNotEmpty;
 
     return Container(
       width: double.infinity,
-      color: theme.scaffoldBackgroundColor,
       padding: const EdgeInsets.fromLTRB(20, 18, 20, 25),
+      color: theme.scaffoldBackgroundColor,
       child: Column(
         children: [
           Row(
@@ -142,18 +134,13 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                   letterSpacing: -0.4,
                 ),
               ),
-
-              const Spacer(),
             ],
           ),
-
           const SizedBox(height: 25),
-
           Stack(
             clipBehavior: Clip.none,
             children: [
               _buildAvatar(),
-
               Positioned(
                 right: 2,
                 bottom: 2,
@@ -170,7 +157,6 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                   ),
                 ),
               ),
-
               Positioned(
                 right: -3,
                 top: -3,
@@ -208,9 +194,7 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
               ),
             ],
           ),
-
           const SizedBox(height: 14),
-
           GestureDetector(
             onTap: _showEditProfileDialog,
             child: Row(
@@ -227,9 +211,7 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                     fontStyle: hasName ? FontStyle.normal : FontStyle.italic,
                   ),
                 ),
-
                 const SizedBox(width: 6),
-
                 Icon(
                   Icons.edit_outlined,
                   size: 16,
@@ -238,17 +220,15 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
               ],
             ),
           ),
-
           const SizedBox(height: 5),
-
           GestureDetector(
             onTap: _showEditProfileDialog,
             child: Text(
-              hasRoleLine ? _profile.roleLine : 'Укажите должность и ИП',
+              hasRole ? _profile.roleLine : 'Укажите должность и компанию',
               style: theme.textTheme.bodySmall?.copyWith(
                 color: colors.onSurfaceVariant,
                 fontWeight: FontWeight.w500,
-                fontStyle: hasRoleLine ? FontStyle.normal : FontStyle.italic,
+                fontStyle: hasRole ? FontStyle.normal : FontStyle.italic,
               ),
             ),
           ),
@@ -258,7 +238,6 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
   }
 
   Widget _buildAvatar() {
-    final theme = Theme.of(context);
     final url = _profile.avatarUrl;
 
     return Container(
@@ -306,37 +285,268 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
     );
   }
 
-  Widget _buildHeaderButton({
-    required IconData icon,
-    required VoidCallback onTap,
-  }) {
+  Widget _buildStatistics() {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
 
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(13),
-        child: Ink(
-          width: 42,
-          height: 42,
-          decoration: BoxDecoration(
-            color: colors.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(13),
+    final projectsProvider = context.watch<ProjectsProvider>();
+
+    final projectsCount = projectsProvider.projects.length;
+
+    final activeProjectsCount =
+        projectsProvider.getProjectCountByStatus()[ProjectStatus.active] ?? 0;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 18),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: colors.outline.withValues(alpha: 0.45)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: _buildStatItem(
+              icon: Icons.folder_outlined,
+              value: '$projectsCount',
+              label: 'Проекты',
+            ),
           ),
-          child: Icon(icon, size: 21, color: colors.onSurfaceVariant),
+          _buildVerticalDivider(),
+          Expanded(
+            child: _buildStatItem(
+              icon: Icons.photo_library_outlined,
+              value: '$_photoCount',
+              label: 'Фото',
+            ),
+          ),
+          _buildVerticalDivider(),
+          Expanded(
+            child: _buildStatItem(
+              icon: Icons.work_outline,
+              value: '$activeProjectsCount',
+              label: 'Активные',
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVerticalDivider() {
+    final colors = Theme.of(context).colorScheme;
+
+    return Container(
+      width: 1,
+      height: 42,
+      color: colors.outline.withValues(alpha: 0.35),
+    );
+  }
+
+  Widget _buildStatItem({
+    required IconData icon,
+    required String value,
+    required String label,
+  }) {
+    final colors = Theme.of(context).colorScheme;
+
+    return Column(
+      children: [
+        Icon(icon, size: 21, color: primary),
+        const SizedBox(height: 7),
+        Text(
+          value,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w800,
+            color: colors.onSurface,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+            color: colors.onSurfaceVariant,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSettingsCard() {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: colors.outline.withValues(alpha: 0.45)),
+      ),
+      child: Column(
+        children: [
+          ListTile(
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 18,
+              vertical: 5,
+            ),
+            leading: _buildSettingsIcon(Icons.settings_outlined),
+            title: Text(
+              l10n.settings,
+              style: const TextStyle(fontWeight: FontWeight.w700),
+            ),
+            subtitle: const Text('Настройки приложения и языка'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: _openSettings,
+          ),
+          Divider(
+            height: 1,
+            indent: 72,
+            color: colors.outline.withValues(alpha: 0.3),
+          ),
+          ListTile(
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 18,
+              vertical: 5,
+            ),
+            leading: _buildSettingsIcon(Icons.language_outlined),
+            title: Text(
+              l10n.language,
+              style: const TextStyle(fontWeight: FontWeight.w700),
+            ),
+            subtitle: Text(l10n.russian),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: _openSettings,
+          ),
+          Divider(
+            height: 1,
+            indent: 72,
+            color: colors.outline.withValues(alpha: 0.3),
+          ),
+          ListTile(
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 18,
+              vertical: 5,
+            ),
+            leading: _buildSettingsIcon(Icons.notifications_none_outlined),
+            title: Text(
+              l10n.notifications,
+              style: const TextStyle(fontWeight: FontWeight.w700),
+            ),
+            subtitle: const Text('Управление уведомлениями'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: _openSettings,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSettingsIcon(IconData icon) {
+    final colors = Theme.of(context).colorScheme;
+
+    return Container(
+      width: 42,
+      height: 42,
+      decoration: BoxDecoration(
+        color: primary.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(13),
+      ),
+      child: Icon(icon, color: primary, size: 21),
+    );
+  }
+
+  void _openSettings() {
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const SettingsScreen()));
+  }
+
+  Widget _buildLogoutButton() {
+    final colors = Theme.of(context).colorScheme;
+
+    return SizedBox(
+      width: double.infinity,
+      height: 52,
+      child: OutlinedButton.icon(
+        onPressed: _showLogoutDialog,
+        icon: const Icon(Icons.logout, color: Colors.red),
+        label: const Text(
+          'Выйти из аккаунта',
+          style: TextStyle(color: Colors.red, fontWeight: FontWeight.w700),
+        ),
+        style: OutlinedButton.styleFrom(
+          side: BorderSide(color: colors.outline.withValues(alpha: 0.5)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
         ),
       ),
     );
   }
 
+  Widget _buildVersion() {
+    final colors = Theme.of(context).colorScheme;
+
+    return Center(
+      child: Text(
+        'Brivora • версия 1.0.0',
+        style: Theme.of(
+          context,
+        ).textTheme.labelSmall?.copyWith(color: colors.onSurfaceVariant),
+      ),
+    );
+  }
+
+  Future<void> _showLogoutDialog() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Выйти из аккаунта?'),
+          content: const Text(
+            'После выхода потребуется снова войти в Brivora.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext, false);
+              },
+              child: const Text('Отмена'),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.pop(dialogContext, true);
+              },
+              style: FilledButton.styleFrom(backgroundColor: Colors.red),
+              child: const Text('Выйти'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true) return;
+
+    try {
+      await FirebaseAuth.instance.signOut();
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Не удалось выйти: $e')));
+    }
+  }
+
   Future<void> _showAvatarOptions() async {
-    final theme = Theme.of(context);
+    final colors = Theme.of(context).colorScheme;
 
     final action = await showModalBottomSheet<String>(
       context: context,
-      backgroundColor: theme.colorScheme.surface,
+      backgroundColor: colors.surface,
       showDragHandle: true,
       builder: (sheetContext) {
         return SafeArea(
@@ -350,7 +560,6 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                   Navigator.pop(sheetContext, 'gallery');
                 },
               ),
-
               ListTile(
                 leading: const Icon(Icons.camera_alt_outlined),
                 title: const Text('Сделать фото'),
@@ -358,7 +567,6 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                   Navigator.pop(sheetContext, 'camera');
                 },
               ),
-
               if (_profile.avatarUrl != null && _profile.avatarUrl!.isNotEmpty)
                 ListTile(
                   leading: const Icon(Icons.delete_outline, color: Colors.red),
@@ -373,12 +581,20 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
       },
     );
 
-    if (action == 'gallery') {
-      await _uploadAvatar(ImageSource.gallery);
-    } else if (action == 'camera') {
-      await _uploadAvatar(ImageSource.camera);
-    } else if (action == 'delete') {
-      await _deleteAvatar();
+    if (!mounted) return;
+
+    switch (action) {
+      case 'gallery':
+        await _uploadAvatar(ImageSource.gallery);
+        break;
+
+      case 'camera':
+        await _uploadAvatar(ImageSource.camera);
+        break;
+
+      case 'delete':
+        await _deleteAvatar();
+        break;
     }
   }
 
@@ -392,10 +608,18 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
     try {
       final url = await _profileRepository.pickAndUploadAvatar(source);
 
-      if (url == null || !mounted) return;
+      if (!mounted) return;
+
+      if (url == null) {
+        setState(() {
+          _isAvatarLoading = false;
+        });
+        return;
+      }
 
       setState(() {
         _profile = _profile.copyWith(avatarUrl: url);
+        _isAvatarLoading = false;
       });
 
       ScaffoldMessenger.of(
@@ -404,15 +628,13 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
     } catch (e) {
       if (!mounted) return;
 
+      setState(() {
+        _isAvatarLoading = false;
+      });
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Не удалось загрузить аватар: $e')),
       );
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isAvatarLoading = false;
-        });
-      }
     }
   }
 
@@ -430,6 +652,7 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
 
       setState(() {
         _profile = _profile.copyWith(avatarUrl: '');
+        _isAvatarLoading = false;
       });
 
       ScaffoldMessenger.of(
@@ -438,15 +661,13 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
     } catch (e) {
       if (!mounted) return;
 
+      setState(() {
+        _isAvatarLoading = false;
+      });
+
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Не удалось удалить аватар: $e')));
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isAvatarLoading = false;
-        });
-      }
     }
   }
 
@@ -468,7 +689,6 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
           builder: (context, setDialogState) {
             return AlertDialog(
               title: const Text('Данные профиля'),
-
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -476,42 +696,45 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                     TextField(
                       controller: firstNameController,
                       enabled: !isSaving,
-                      decoration: const InputDecoration(labelText: 'Имя'),
+                      textInputAction: TextInputAction.next,
+                      decoration: const InputDecoration(
+                        labelText: 'Имя',
+                        hintText: 'Введите имя',
+                      ),
                     ),
-
                     const SizedBox(height: 12),
-
                     TextField(
                       controller: lastNameController,
                       enabled: !isSaving,
-                      decoration: const InputDecoration(labelText: 'Фамилия'),
+                      textInputAction: TextInputAction.next,
+                      decoration: const InputDecoration(
+                        labelText: 'Фамилия',
+                        hintText: 'Введите фамилию',
+                      ),
                     ),
-
                     const SizedBox(height: 12),
-
                     TextField(
                       controller: roleController,
                       enabled: !isSaving,
+                      textInputAction: TextInputAction.next,
                       decoration: const InputDecoration(
                         labelText: 'Должность',
                         hintText: 'Например: Прораб',
                       ),
                     ),
-
                     const SizedBox(height: 12),
-
                     TextField(
                       controller: companyController,
                       enabled: !isSaving,
+                      textInputAction: TextInputAction.done,
                       decoration: const InputDecoration(
                         labelText: 'ИП / Компания',
-                        hintText: 'Например: ИП Иванов И.И.',
+                        hintText: 'Например: ИП Иванов',
                       ),
                     ),
                   ],
                 ),
               ),
-
               actions: [
                 TextButton(
                   onPressed: isSaving
@@ -521,7 +744,6 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                         },
                   child: const Text('Отмена'),
                 ),
-
                 FilledButton(
                   onPressed: isSaving
                       ? null
@@ -542,9 +764,7 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                               updatedProfile,
                             );
 
-                            if (!mounted) {
-                              return;
-                            }
+                            if (!mounted) return;
 
                             setState(() {
                               _profile = updatedProfile;
@@ -553,14 +773,18 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                             if (dialogContext.mounted) {
                               Navigator.pop(dialogContext);
                             }
-                          } catch (e) {
-                            setDialogState(() {
-                              isSaving = false;
-                            });
 
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Профиль сохранён')),
+                            );
+                          } catch (e) {
                             if (!dialogContext.mounted) {
                               return;
                             }
+
+                            setDialogState(() {
+                              isSaving = false;
+                            });
 
                             ScaffoldMessenger.of(dialogContext).showSnackBar(
                               SnackBar(
@@ -571,8 +795,8 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                         },
                   child: isSaving
                       ? const SizedBox(
-                          width: 16,
-                          height: 16,
+                          width: 17,
+                          height: 17,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : const Text('Сохранить'),
@@ -588,371 +812,5 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
     lastNameController.dispose();
     roleController.dispose();
     companyController.dispose();
-  }
-
-  Widget _buildStatistics() {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-
-    final projectsProvider = context.watch<ProjectsProvider>();
-
-    final projectsCount = projectsProvider.projects.length;
-
-    final activeCount =
-        projectsProvider.getProjectCountByStatus()[ProjectStatus.active] ?? 0;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 18),
-      decoration: BoxDecoration(
-        color: colors.surface,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: colors.outline.withValues(alpha: 0.45)),
-      ),
-      child: Row(
-        children: [
-          _buildStatistic(
-            icon: Icons.folder_outlined,
-            value: '$projectsCount',
-            label: 'Проектов',
-          ),
-
-          _buildStatisticDivider(),
-
-          _buildStatistic(
-            icon: Icons.photo_library_outlined,
-            value: _photoCount != null ? '$_photoCount' : '…',
-            label: 'Фотографии',
-          ),
-
-          _buildStatisticDivider(),
-
-          _buildStatistic(
-            icon: Icons.play_circle_outline,
-            value: '$activeCount',
-            label: 'Активные',
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatistic({
-    required IconData icon,
-    required String value,
-    required String label,
-  }) {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-
-    return Expanded(
-      child: Column(
-        children: [
-          Icon(icon, color: primary, size: 19),
-
-          const SizedBox(height: 7),
-
-          Text(
-            value,
-            style: theme.textTheme.titleLarge?.copyWith(
-              color: colors.onSurface,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-
-          const SizedBox(height: 2),
-
-          Text(
-            label,
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: colors.onSurfaceVariant,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatisticDivider() {
-    final colors = Theme.of(context).colorScheme;
-
-    return Container(
-      width: 1,
-      height: 45,
-      color: colors.outline.withValues(alpha: 0.45),
-    );
-  }
-
-  Widget _buildSettingsCard() {
-    return _buildCard(
-      child: Column(
-        children: [
-          _buildMenuItem(
-            icon: Icons.settings_outlined,
-            title: 'Настройки',
-            subtitle: 'Язык, тема, валюта и уведомления',
-            onTap: () {
-              Navigator.of(context).pushNamed('/settings');
-            },
-          ),
-
-          _buildDivider(),
-
-          _buildMenuItem(
-            icon: Icons.workspace_premium_outlined,
-            title: 'Подписка Pro',
-            subtitle: 'Скоро будет доступна',
-            iconColor: primary,
-            onTap: () {
-              _showComingSoon('Подписка Pro');
-            },
-          ),
-
-          _buildDivider(),
-
-          _buildMenuItem(
-            icon: Icons.security_outlined,
-            title: 'Безопасность',
-            subtitle: 'Пароль и вход',
-            onTap: () {
-              _showComingSoon('Безопасность');
-            },
-          ),
-
-          _buildDivider(),
-
-          _buildMenuItem(
-            icon: Icons.chat_bubble_outline,
-            title: 'Обратная связь',
-            subtitle: 'Сообщить о проблеме',
-            onTap: () {
-              _showComingSoon('Обратная связь');
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCard({required Widget child}) {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: colors.surface,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: colors.outline.withValues(alpha: 0.45)),
-      ),
-      child: child,
-    );
-  }
-
-  Widget _buildMenuItem({
-    required IconData icon,
-    required String title,
-    String? subtitle,
-    Widget? trailing,
-    Color? iconColor,
-    VoidCallback? onTap,
-  }) {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-
-    final actualIconColor = iconColor ?? colors.onSurfaceVariant;
-
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(18),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          child: Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: actualIconColor.withValues(alpha: 0.09),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(icon, color: actualIconColor, size: 20),
-              ),
-
-              const SizedBox(width: 13),
-
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        color: colors.onSurface,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-
-                    if (subtitle != null) ...[
-                      const SizedBox(height: 3),
-                      Text(
-                        subtitle,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: colors.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-
-              if (trailing != null)
-                trailing
-              else
-                Icon(
-                  Icons.chevron_right_rounded,
-                  color: colors.onSurfaceVariant.withValues(alpha: 0.65),
-                  size: 21,
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDivider() {
-    final colors = Theme.of(context).colorScheme;
-
-    return Padding(
-      padding: const EdgeInsets.only(left: 69),
-      child: Container(
-        height: 1,
-        color: colors.outline.withValues(alpha: 0.35),
-      ),
-    );
-  }
-
-  Widget _buildLogoutButton() {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: _showLogoutDialog,
-        borderRadius: BorderRadius.circular(16),
-        child: Ink(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 15),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFFFECACA)),
-          ),
-          child: const Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.logout_rounded, color: Color(0xFFEF4444), size: 19),
-              SizedBox(width: 8),
-              Text(
-                'Выйти',
-                style: TextStyle(
-                  color: Color(0xFFEF4444),
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildVersion() {
-    final colors = Theme.of(context).colorScheme;
-
-    return Center(
-      child: Text(
-        'Brivora · Версия 1.0.0',
-        style: TextStyle(
-          color: colors.onSurfaceVariant.withValues(alpha: 0.65),
-          fontSize: 11,
-        ),
-      ),
-    );
-  }
-
-  void _showLogoutDialog() {
-    final theme = Theme.of(context);
-
-    showDialog<void>(
-      context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          backgroundColor: theme.colorScheme.surface,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          title: const Text('Выйти из аккаунта?'),
-          content: Text(
-            'Вы действительно хотите выйти из аккаунта Brivora?',
-            style: TextStyle(
-              color: theme.colorScheme.onSurfaceVariant,
-              fontSize: 14,
-              height: 1.4,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(dialogContext);
-              },
-              child: const Text('Отмена'),
-            ),
-            TextButton(
-              onPressed: () {
-                _logout(dialogContext);
-              },
-              child: const Text(
-                'Выйти',
-                style: TextStyle(
-                  color: Color(0xFFEF4444),
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Future<void> _logout(BuildContext dialogContext) async {
-    Navigator.pop(dialogContext);
-
-    try {
-      await FirebaseAuth.instance.signOut();
-
-      if (!mounted) return;
-
-      Navigator.of(context).pushReplacementNamed('/login');
-    } catch (e) {
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Ошибка при выходе: $e')));
-    }
-  }
-
-  void _showComingSoon(String title) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('$title — скоро будет доступно'),
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 2),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-    );
   }
 }

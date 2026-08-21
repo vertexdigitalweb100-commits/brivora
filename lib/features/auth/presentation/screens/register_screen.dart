@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/custom_button.dart';
 
@@ -12,10 +13,12 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
-  late TextEditingController _nameController;
-  late TextEditingController _emailController;
-  late TextEditingController _passwordController;
-  late TextEditingController _confirmPasswordController;
+
+  late final TextEditingController _nameController;
+  late final TextEditingController _emailController;
+  late final TextEditingController _passwordController;
+  late final TextEditingController _confirmPasswordController;
+
   bool _isLoading = false;
   String? _errorMessage;
   bool _agreeToTerms = false;
@@ -23,6 +26,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   void initState() {
     super.initState();
+
     _nameController = TextEditingController();
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
@@ -39,214 +43,229 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Future<void> _register() async {
-    if (_formKey.currentState!.validate()) {
-      if (!_agreeToTerms) {
-        setState(() {
-          _errorMessage = 'Пожалуйста, согласитесь с условиями использования';
-        });
+    final l10n = AppLocalizations.of(context)!;
+
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    if (!_agreeToTerms) {
+      setState(() {
+        _errorMessage = '${l10n.agreeToTerms} ${l10n.termsOfUse}';
+      });
+      return;
+    }
+
+    if (_passwordController.text != _confirmPasswordController.text) {
+      setState(() {
+        _errorMessage = l10n.passwordsDoNotMatch;
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
+
+      await FirebaseAuth.instance.currentUser?.updateDisplayName(
+        _nameController.text.trim(),
+      );
+
+      if (!mounted) {
         return;
       }
 
-      if (_passwordController.text != _confirmPasswordController.text) {
-        setState(() {
-          _errorMessage = 'Пароли не совпадают';
-        });
+      Navigator.of(context).pushReplacementNamed('/home');
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) {
         return;
       }
 
       setState(() {
-        _isLoading = true;
-        _errorMessage = null;
+        _errorMessage = _getErrorMessage(e.code, l10n);
+        _isLoading = false;
       });
-
-      try {
-        // Создаем пользователя
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: _emailController.text.trim(),
-          password: _passwordController.text,
-        );
-
-        // Обновляем отображаемое имя
-        await FirebaseAuth.instance.currentUser?.updateDisplayName(
-          _nameController.text.trim(),
-        );
-
-        if (mounted) {
-          Navigator.of(context).pushReplacementNamed('/home');
-        }
-      } on FirebaseAuthException catch (e) {
-        setState(() {
-          _errorMessage = _getErrorMessage(e.code);
-          _isLoading = false;
-        });
-      } catch (e) {
-        setState(() {
-          _errorMessage = 'Произошла ошибка. Попробуйте позже.';
-          _isLoading = false;
-        });
+    } catch (_) {
+      if (!mounted) {
+        return;
       }
+
+      setState(() {
+        _errorMessage = l10n.genericError;
+        _isLoading = false;
+      });
     }
   }
 
-  String _getErrorMessage(String code) {
+  String _getErrorMessage(String code, AppLocalizations l10n) {
     switch (code) {
       case 'email-already-in-use':
-        return 'Этот email уже используется';
+        return l10n.emailAlreadyInUse;
+
       case 'weak-password':
-        return 'Пароль слишком слабый';
+        return l10n.weakPassword;
+
       case 'invalid-email':
-        return 'Неверный формат email';
+        return l10n.invalidEmailAuth;
+
       default:
-        return 'Ошибка при регистрации. Попробуйте позже.';
+        return l10n.registrationError;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text('Создать аккаунт'),
+        title: Text(l10n.createAccount),
         centerTitle: true,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 16),
-              
-              // Заголовок
-              const Text(
-                'Регистрация',
-                style: TextStyle(
+
+              Text(
+                l10n.registration,
+                style: const TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
                 ),
               ),
+
               const SizedBox(height: 8),
-              const Text(
-                'Создайте новый аккаунт для начала работы',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
-                ),
+
+              Text(
+                l10n.createAccountDescription,
+                style: const TextStyle(fontSize: 14, color: Colors.grey),
               ),
+
               const SizedBox(height: 32),
 
-              // Форма
               Form(
                 key: _formKey,
                 child: Column(
                   children: [
-                    // Имя
                     CustomTextField(
-                      label: 'Полное имя',
-                      hintText: 'Иван Петров',
+                      label: l10n.fullName,
+                      hintText: l10n.fullNameHint,
                       controller: _nameController,
                       prefixIcon: Icons.person_outline,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Пожалуйста, введите имя';
+                          return l10n.enterName;
                         }
+
                         if (value.length < 2) {
-                          return 'Имя должно быть не менее 2 символов';
+                          return l10n.nameMinLength;
                         }
+
                         return null;
                       },
                     ),
+
                     const SizedBox(height: 16),
 
-                    // Email
                     CustomTextField(
-                      label: 'Email',
-                      hintText: 'example@email.com',
+                      label: l10n.email,
+                      hintText: l10n.emailHint,
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
                       prefixIcon: Icons.email_outlined,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Пожалуйста, введите email';
+                          return l10n.enterEmail;
                         }
+
                         if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                          return 'Введите корректный email';
+                          return l10n.invalidEmail;
                         }
+
                         return null;
                       },
                     ),
+
                     const SizedBox(height: 16),
 
-                    // Пароль
                     CustomTextField(
-                      label: 'Пароль',
-                      hintText: 'Минимум 6 символов',
+                      label: l10n.password,
+                      hintText: l10n.passwordHint,
                       controller: _passwordController,
                       isPassword: true,
                       prefixIcon: Icons.lock_outline,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Пожалуйста, введите пароль';
+                          return l10n.enterPassword;
                         }
+
                         if (value.length < 6) {
-                          return 'Пароль должен быть не менее 6 символов';
+                          return l10n.passwordMinLength;
                         }
+
                         return null;
                       },
                     ),
+
                     const SizedBox(height: 16),
 
-                    // Подтверждение пароля
                     CustomTextField(
-                      label: 'Подтвердите пароль',
-                      hintText: 'Повторите пароль',
+                      label: l10n.confirmPassword,
+                      hintText: l10n.confirmPasswordHint,
                       controller: _confirmPasswordController,
                       isPassword: true,
                       prefixIcon: Icons.lock_outline,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Пожалуйста, подтвердите пароль';
+                          return l10n.confirmPasswordRequired;
                         }
+
                         return null;
                       },
                     ),
+
                     const SizedBox(height: 24),
 
-                    // Сообщение об ошибке
                     if (_errorMessage != null)
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.error.withOpacity(0.1),
+                          color: colorScheme.error.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: Theme.of(context).colorScheme.error,
-                          ),
+                          border: Border.all(color: colorScheme.error),
                         ),
                         child: Row(
                           children: [
-                            Icon(
-                              Icons.error_outline,
-                              color: Theme.of(context).colorScheme.error,
-                            ),
+                            Icon(Icons.error_outline, color: colorScheme.error),
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
                                 _errorMessage!,
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.error,
-                                ),
+                                style: TextStyle(color: colorScheme.error),
                               ),
                             ),
                           ],
                         ),
                       ),
+
                     if (_errorMessage != null) const SizedBox(height: 24),
 
-                    // Согласие с условиями
                     Row(
                       children: [
                         Checkbox(
@@ -266,13 +285,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             },
                             child: RichText(
                               text: TextSpan(
-                                style: const TextStyle(color: Colors.black87),
+                                style: TextStyle(color: colorScheme.onSurface),
                                 children: [
-                                  const TextSpan(text: 'Я согласен с '),
+                                  TextSpan(text: '${l10n.agreeToTerms} '),
                                   TextSpan(
-                                    text: 'условиями использования',
+                                    text: l10n.termsOfUse,
                                     style: TextStyle(
-                                      color: Theme.of(context).colorScheme.primary,
+                                      color: colorScheme.primary,
                                       decoration: TextDecoration.underline,
                                     ),
                                   ),
@@ -283,30 +302,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ],
                     ),
+
                     const SizedBox(height: 24),
 
-                    // Кнопка регистрации
                     CustomButton(
-                      label: 'Зарегистрироваться',
+                      label: l10n.register,
                       onPressed: _register,
                       isLoading: _isLoading,
                     ),
                   ],
                 ),
               ),
+
               const SizedBox(height: 24),
 
-              // Уже есть аккаунт
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text('Уже есть аккаунт? '),
+                  Text('${l10n.alreadyHaveAccount} '),
                   GestureDetector(
                     onTap: () => Navigator.of(context).pop(),
                     child: Text(
-                      'Войти',
+                      l10n.login,
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
+                        color: colorScheme.primary,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

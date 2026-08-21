@@ -250,13 +250,6 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
       );
     }
 
-    /*
-     * ProjectsProvider получает проекты из
-     * ProjectRepository уже отсортированными
-     * по lastOpenedAt.
-     *
-     * Поэтому здесь берём первые три.
-     */
     final recentProjects = projects.take(3).toList();
 
     return Column(
@@ -430,7 +423,6 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
     final colors = theme.colorScheme;
 
     late Color iconColor;
@@ -519,7 +511,6 @@ class _QuickActionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
     final colors = theme.colorScheme;
 
     return Material(
@@ -594,7 +585,6 @@ class _ProjectCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
     final colors = theme.colorScheme;
 
     final double progress = project.progress.clamp(0.0, 1.0).toDouble();

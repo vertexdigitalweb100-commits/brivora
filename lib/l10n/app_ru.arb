@@ -1,41 +1,300 @@
 {
-  "@@locale": "ru",
+"@@locale": "ru",
 
-  "appName": "Brivora",
+"appName": "Brivora",
 
-  "home": "Главная",
-  "projects": "Проекты",
-  "ai": "Искусственный интеллект",
-  "profile": "Профиль",
+"home": "Главная",
+"projects": "Проекты",
+"ai": "Искусственный интеллект",
+"profile": "Профиль",
 
-  "settings": "Настройки",
-  "appearance": "Оформление",
-  "language": "Язык",
+"settings": "Настройки",
+"appearance": "Оформление",
+"language": "Язык",
 
-  "russian": "Русский",
-  "kazakh": "Қазақша",
+"russian": "Русский",
+"kazakh": "Қазақша",
 
-  "recentProjects": "Недавние проекты",
-  "noRecentProjects": "Нет недавних проектов",
+"recentProjects": "Недавние проекты",
+"noRecentProjects": "Нет недавних проектов",
 
-  "tasks": "Задачи",
-  "notes": "Заметки",
-  "photos": "Фото",
-  "estimate": "Смета",
-  "calculators": "Калькуляторы",
+"tasks": "Задачи",
+"notes": "Заметки",
+"photos": "Фото",
+"estimate": "Смета",
+"calculators": "Калькуляторы",
 
-  "notifications": "Уведомления",
+"notifications": "Уведомления",
 
-  "save": "Сохранить",
-  "cancel": "Отмена",
-  "delete": "Удалить",
-  "edit": "Изменить",
-  "close": "Закрыть",
-  "back": "Назад",
-  "add": "Добавить",
-  "done": "Готово",
+"save": "Сохранить",
+"cancel": "Отмена",
+"delete": "Удалить",
+"edit": "Изменить",
+"close": "Закрыть",
+"back": "Назад",
+"add": "Добавить",
+"done": "Готово",
 
-  "darkTheme": "Тёмная тема",
-  "lightTheme": "Светлая тема",
-  "systemTheme": "Как в системе"
+"darkTheme": "Тёмная тема",
+"lightTheme": "Светлая тема",
+"systemTheme": "Как в системе",
+
+"loading": "Загрузка...",
+
+"quickActions": "Быстрые действия",
+"welcome": "Добро пожаловать",
+"helloUser": "Здравствуйте, {name}",
+"projectsDescription": "Управляйте своими проектами в одном месте",
+"noProjects": "У вас пока нет проектов",
+"createFirstProject": "Создайте свой первый проект",
+"projectsCount": "{count}",
+"completed": "Завершено",
+"inProgress": "В работе",
+"overview": "Обзор",
+
+"noRecentProjectsTitle": "Нет недавних проектов",
+"noRecentProjectsSubtitle": "Создайте проект, чтобы он появился здесь",
+"all": "Все",
+"newProject": "Новый проект",
+"create": "Создать",
+"materials": "Материалы",
+"untitled": "Без названия",
+"progress": "Прогресс",
+
+"statusCompleted": "Завершён",
+"statusPlanning": "Планирование",
+"statusArchived": "Архивирован",
+"statusActive": "Активен",
+
+"openedRecently": "Открыт недавно",
+"openedJustNow": "Открыт только что",
+"openedMinutesAgo": "Открыт {count} мин. назад",
+"openedHoursAgo": "Открыт {count} ч. назад",
+"openedYesterday": "Открыт вчера",
+"openedDaysAgo": "Открыт {count} дн. назад",
+"openedDate": "Открыт {date}",
+
+"updatedJustNow": "Обновлён только что",
+"updatedMinutesAgo": "Обновлён {count} мин. назад",
+"updatedHoursAgo": "Обновлён {count} ч. назад",
+"updatedYesterday": "Обновлён вчера",
+"updatedDaysAgo": "Обновлён {count} дн. назад",
+"updatedDate": "Обновлён {date}",
+
+"registration": "Регистрация",
+"createAccount": "Создать аккаунт",
+"createAccountDescription": "Создайте аккаунт, чтобы пользоваться Brivora",
+"fullName": "Полное имя",
+"fullNameHint": "Введите ваше полное имя",
+"enterName": "Введите имя",
+"nameMinLength": "Имя должно содержать минимум 2 символа",
+
+"email": "Электронная почта",
+"emailHint": "Введите электронную почту",
+"enterEmail": "Введите электронную почту",
+"invalidEmail": "Введите корректный адрес электронной почты",
+
+"password": "Пароль",
+"passwordHint": "Введите пароль",
+"enterPassword": "Введите пароль",
+"passwordMinLength": "Пароль должен содержать минимум 6 символов",
+
+"confirmPassword": "Подтвердите пароль",
+"confirmPasswordHint": "Введите пароль ещё раз",
+"confirmPasswordRequired": "Подтвердите пароль",
+
+"agreeToTerms": "Я принимаю",
+"termsOfUse": "условия использования",
+"passwordsDoNotMatch": "Пароли не совпадают",
+
+"register": "Зарегистрироваться",
+"alreadyHaveAccount": "Уже есть аккаунт?",
+"login": "Войти",
+
+"genericError": "Произошла ошибка",
+"emailAlreadyInUse": "Эта электронная почта уже используется",
+"weakPassword": "Пароль слишком простой",
+"invalidEmailAuth": "Некорректный адрес электронной почты",
+"registrationError": "Не удалось зарегистрировать аккаунт",
+
+"addName": "Добавьте имя",
+"addRoleAndCompany": "Укажите должность и компанию",
+
+"chooseFromGallery": "Выбрать из галереи",
+"takePhoto": "Сделать фото",
+"deletePhoto": "Удалить фотографию",
+
+"avatarUpdated": "Аватар успешно обновлён",
+"avatarUploadError": "Не удалось загрузить аватар: {error}",
+"avatarDeleted": "Аватар удалён",
+"avatarDeleteError": "Не удалось удалить аватар: {error}",
+
+"profileData": "Данные профиля",
+"firstName": "Имя",
+"lastName": "Фамилия",
+"position": "Должность",
+"positionExample": "Например: Прораб",
+"company": "Компания",
+"companyExample": "Например: ИП Иванов И.И.",
+
+"saveError": "Не удалось сохранить: {error}",
+
+"photosCount": "{count}",
+"activeProjects": "{count}",
+
+"settingsSubtitle": "Настройки приложения",
+
+"proSubscription": "Pro-подписка",
+"comingSoon": "Скоро",
+
+"security": "Безопасность",
+"securitySubtitle": "Защита аккаунта и данных",
+
+"feedback": "Обратная связь",
+"feedbackSubtitle": "Помогите улучшить Brivora",
+
+"logout": "Выйти",
+"version": "Версия",
+
+"logoutQuestion": "Выйти из аккаунта?",
+"logoutConfirmation": "Вы действительно хотите выйти?",
+
+"logoutError": "Не удалось выйти: {error}",
+"featureComingSoon": "{feature} — скоро будет доступно",
+
+"@helloUser": {
+"placeholders": {
+"name": {
+"type": "String"
+}
+}
+},
+
+"@projectsCount": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+
+"@openedMinutesAgo": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+
+"@openedHoursAgo": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+
+"@openedDaysAgo": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+
+"@openedDate": {
+"placeholders": {
+"date": {
+"type": "String"
+}
+}
+},
+
+"@updatedMinutesAgo": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+
+"@updatedHoursAgo": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+
+"@updatedDaysAgo": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+
+"@updatedDate": {
+"placeholders": {
+"date": {
+"type": "String"
+}
+}
+},
+
+"@avatarUploadError": {
+"placeholders": {
+"error": {
+"type": "String"
+}
+}
+},
+
+"@avatarDeleteError": {
+"placeholders": {
+"error": {
+"type": "String"
+}
+}
+},
+
+"@saveError": {
+"placeholders": {
+"error": {
+"type": "String"
+}
+}
+},
+
+"@photosCount": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+
+"@activeProjects": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+
+"@logoutError": {
+"placeholders": {
+"error": {
+"type": "String"
+}
+}
+},
+
+"@featureComingSoon": {
+"placeholders": {
+"feature": {
+"type": "String"
+}
+}
+}
 }

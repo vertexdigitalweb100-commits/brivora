@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:provider/provider.dart';
 
-import '../core/routes/app_routes.dart';
 import '../core/providers/locale_controller.dart';
+import '../core/routes/app_routes.dart';
 import '../features/estimates/presentation/providers/estimate_provider.dart';
 import '../features/notes/presentation/providers/notes_provider.dart';
 import '../features/photos/presentation/providers/photos_provider.dart';

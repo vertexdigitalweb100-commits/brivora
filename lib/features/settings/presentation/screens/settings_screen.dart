@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../../app/theme_controller.dart';
 import '../../../../app/theme.dart';
+import '../../../../app/theme_controller.dart';
+import '../../../../core/providers/locale_controller.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -15,12 +17,9 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   static const String _currencyKey = 'brivora_currency';
   static const String _notificationsKey = 'brivora_notifications';
-  static const String _languageKey = 'brivora_language';
 
   String _currency = '₸';
-  String _language = 'Русский';
   bool _notificationsEnabled = true;
-
   bool _isLoading = true;
 
   @override
@@ -36,11 +35,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     setState(() {
       _currency = preferences.getString(_currencyKey) ?? '₸';
-
-      _language = preferences.getString(_languageKey) ?? 'Русский';
-
       _notificationsEnabled = preferences.getBool(_notificationsKey) ?? true;
-
       _isLoading = false;
     });
   }
@@ -57,20 +52,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
   }
 
-  Future<void> _setLanguage(String language) async {
-    final preferences = await SharedPreferences.getInstance();
-
-    await preferences.setString(_languageKey, language);
-
-    if (!mounted) return;
-
-    setState(() {
-      _language = language;
-    });
-
-    _showMessage(language == 'Русский' ? 'Язык сохранён' : 'Тіл сақталды');
-  }
-
   Future<void> _setNotifications(bool enabled) async {
     final preferences = await SharedPreferences.getInstance();
 
@@ -84,6 +65,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showMessage(String message) {
+    if (!mounted) return;
+
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
@@ -98,31 +81,36 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final themeController = context.watch<ThemeController>();
+    final localeController = context.watch<LocaleController>();
+    final l10n = AppLocalizations.of(context)!;
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     if (_isLoading) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Настройки')),
+        appBar: AppBar(
+          title: Text(
+            l10n.settings,
+            style: const TextStyle(fontWeight: FontWeight.w700),
+          ),
+        ),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-
       appBar: AppBar(
-        title: const Text(
-          'Настройки',
-          style: TextStyle(fontWeight: FontWeight.w700),
+        title: Text(
+          l10n.settings,
+          style: const TextStyle(fontWeight: FontWeight.w700),
         ),
       ),
-
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
           children: [
-            _buildSectionTitle('Внешний вид', isDark),
+            _buildSectionTitle(l10n.appearance, isDark),
 
             const SizedBox(height: 10),
 
@@ -130,11 +118,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: [
                 _buildSettingsTile(
                   icon: Icons.palette_outlined,
-                  title: 'Тема',
-                  subtitle: _getThemeName(themeController.themeMode),
+                  title: l10n.appearance,
+                  subtitle: _getThemeName(themeController.themeMode, l10n),
                   trailing: const Icon(Icons.chevron_right_rounded),
                   onTap: () {
-                    _showThemeSelector(themeController);
+                    _showThemeSelector(themeController, l10n);
                   },
                 ),
 
@@ -142,10 +130,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                 _buildSettingsTile(
                   icon: Icons.language_outlined,
-                  title: 'Язык',
-                  subtitle: _language,
+                  title: l10n.language,
+                  subtitle: localeController.isKazakh
+                      ? l10n.kazakh
+                      : l10n.russian,
                   trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: _showLanguageSelector,
+                  onTap: () {
+                    _showLanguageSelector(localeController, l10n);
+                  },
                 ),
 
                 _buildDivider(),
@@ -162,7 +154,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
             const SizedBox(height: 28),
 
-            _buildSectionTitle('Уведомления', isDark),
+            _buildSectionTitle(l10n.notifications, isDark),
 
             const SizedBox(height: 10),
 
@@ -170,9 +162,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: [
                 _buildSwitchTile(
                   icon: Icons.notifications_none_rounded,
-                  title: 'Уведомления Brivora',
-                  subtitle:
-                      'Напоминания по проектам, задачам и системные уведомления',
+                  title: l10n.notifications,
+                  subtitle: localeController.isKazakh
+                      ? 'Жобалар, тапсырмалар және жүйелік хабарландырулар туралы еске салғыштар'
+                      : 'Напоминания по проектам, задачам и системные уведомления',
                   value: _notificationsEnabled,
                   onChanged: _setNotifications,
                 ),
@@ -181,7 +174,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
             const SizedBox(height: 28),
 
-            _buildSectionTitle('Аккаунт', isDark),
+            _buildSectionTitle(
+              localeController.isKazakh ? 'Аккаунт' : 'Аккаунт',
+              isDark,
+            ),
 
             const SizedBox(height: 10),
 
@@ -189,8 +185,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: [
                 _buildSettingsTile(
                   icon: Icons.person_outline_rounded,
-                  title: 'Профиль',
-                  subtitle: 'Личные данные и информация о компании',
+                  title: l10n.profile,
+                  subtitle: localeController.isKazakh
+                      ? 'Жеке деректер және компания туралы ақпарат'
+                      : 'Личные данные и информация о компании',
                   trailing: const Icon(Icons.chevron_right_rounded),
                   onTap: () {
                     Navigator.pop(context);
@@ -201,7 +199,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
             const SizedBox(height: 28),
 
-            _buildSectionTitle('Поддержка', isDark),
+            _buildSectionTitle(
+              localeController.isKazakh ? 'Қолдау' : 'Поддержка',
+              isDark,
+            ),
 
             const SizedBox(height: 10),
 
@@ -209,20 +210,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: [
                 _buildSettingsTile(
                   icon: Icons.help_outline_rounded,
-                  title: 'Помощь',
-                  subtitle: 'Ответы на вопросы и поддержка Brivora',
+                  title: localeController.isKazakh ? 'Көмек' : 'Помощь',
+                  subtitle: localeController.isKazakh
+                      ? 'Сұрақтарға жауаптар және Brivora қолдауы'
+                      : 'Ответы на вопросы и поддержка Brivora',
                   trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: _showHelp,
+                  onTap: () => _showHelp(localeController),
                 ),
 
                 _buildDivider(),
 
                 _buildSettingsTile(
                   icon: Icons.info_outline_rounded,
-                  title: 'О Brivora',
-                  subtitle: 'Версия приложения и информация',
+                  title: 'Brivora туралы',
+                  subtitle: localeController.isKazakh
+                      ? 'Қолданба нұсқасы және ақпарат'
+                      : 'Версия приложения и информация',
                   trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: _showAbout,
+                  onTap: () => _showAbout(localeController),
                 ),
               ],
             ),
@@ -231,7 +236,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
             Center(
               child: Text(
-                'Brivora',
+                l10n.appName,
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.primary,
                   fontSize: 16,
@@ -245,7 +250,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
             Center(
               child: Text(
-                'Ваш строительный помощник',
+                localeController.isKazakh
+                    ? 'Сіздің құрылыс көмекшіңіз'
+                    : 'Ваш строительный помощник',
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ),
@@ -434,59 +441,65 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  String _getThemeName(ThemeMode mode) {
+  String _getThemeName(ThemeMode mode, AppLocalizations l10n) {
     switch (mode) {
       case ThemeMode.light:
-        return 'Светлая';
+        return l10n.lightTheme;
 
       case ThemeMode.dark:
-        return 'Тёмная';
+        return l10n.darkTheme;
 
       case ThemeMode.system:
-        return 'Системная';
+        return l10n.systemTheme;
     }
   }
 
-  Future<void> _showThemeSelector(ThemeController controller) async {
+  Future<void> _showThemeSelector(
+    ThemeController controller,
+    AppLocalizations l10n,
+  ) async {
     final selected = await showModalBottomSheet<ThemeMode>(
       context: context,
       showDragHandle: true,
-      builder: (context) {
+      builder: (sheetContext) {
         return SafeArea(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Padding(
-                padding: EdgeInsets.fromLTRB(20, 4, 20, 14),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 4, 20, 14),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'Тема приложения',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+                    l10n.appearance,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               ),
 
               _buildThemeOption(
                 mode: ThemeMode.light,
-                title: 'Светлая',
-                subtitle: 'Светлый интерфейс Brivora',
+                title: l10n.lightTheme,
+                subtitle: l10n.lightTheme,
                 icon: Icons.light_mode_outlined,
                 selected: controller.themeMode == ThemeMode.light,
               ),
 
               _buildThemeOption(
                 mode: ThemeMode.dark,
-                title: 'Тёмная',
-                subtitle: 'Тёмный интерфейс Brivora',
+                title: l10n.darkTheme,
+                subtitle: l10n.darkTheme,
                 icon: Icons.dark_mode_outlined,
                 selected: controller.themeMode == ThemeMode.dark,
               ),
 
               _buildThemeOption(
                 mode: ThemeMode.system,
-                title: 'Системная',
-                subtitle: 'Следовать настройкам телефона',
+                title: l10n.systemTheme,
+                subtitle: l10n.systemTheme,
                 icon: Icons.brightness_auto_outlined,
                 selected: controller.themeMode == ThemeMode.system,
               ),
@@ -538,41 +551,47 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Future<void> _showLanguageSelector() async {
+  Future<void> _showLanguageSelector(
+    LocaleController controller,
+    AppLocalizations l10n,
+  ) async {
     final selected = await showModalBottomSheet<String>(
       context: context,
       showDragHandle: true,
-      builder: (context) {
+      builder: (sheetContext) {
         return SafeArea(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Padding(
-                padding: EdgeInsets.fromLTRB(20, 4, 20, 14),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 4, 20, 14),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'Язык приложения',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+                    l10n.language,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               ),
 
               _buildSelectionTile(
                 icon: Icons.language,
-                title: 'Русский',
-                selected: _language == 'Русский',
+                title: l10n.russian,
+                selected: controller.isRussian,
                 onTap: () {
-                  Navigator.pop(context, 'Русский');
+                  Navigator.pop(context, 'ru');
                 },
               ),
 
               _buildSelectionTile(
                 icon: Icons.language,
-                title: 'Қазақша',
-                selected: _language == 'Қазақша',
+                title: l10n.kazakh,
+                selected: controller.isKazakh,
                 onTap: () {
-                  Navigator.pop(context, 'Қазақша');
+                  Navigator.pop(context, 'kk');
                 },
               ),
 
@@ -585,14 +604,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     if (selected == null) return;
 
-    await _setLanguage(selected);
+    if (selected == 'kk') {
+      await controller.setKazakh();
+    } else {
+      await controller.setRussian();
+    }
+
+    if (!mounted) return;
+
+    final message = selected == 'kk' ? 'Тіл сақталды' : 'Язык сохранён';
+
+    _showMessage(message);
   }
 
   Future<void> _showCurrencySelector() async {
     final selected = await showModalBottomSheet<String>(
       context: context,
       showDragHandle: true,
-      builder: (context) {
+      builder: (sheetContext) {
         return SafeArea(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -657,24 +686,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  void _showHelp() {
+  void _showHelp(LocaleController controller) {
+    final isKazakh = controller.isKazakh;
+
     showDialog<void>(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Помощь'),
-          content: const Text(
-            'Если у вас возникла проблема с Brivora, '
-            'обратитесь в службу поддержки. '
-            'В будущем здесь будет подключена '
-            'поддержка через Telegram-бот Brivora.',
+          title: Text(isKazakh ? 'Көмек' : 'Помощь'),
+          content: Text(
+            isKazakh
+                ? 'Brivora қолданбасында мәселе туындаса, '
+                      'қолдау қызметіне хабарласыңыз. '
+                      'Болашақта мұнда Brivora Telegram-боты арқылы '
+                      'қолдау қосылады.'
+                : 'Если у вас возникла проблема с Brivora, '
+                      'обратитесь в службу поддержки. '
+                      'В будущем здесь будет подключена '
+                      'поддержка через Telegram-бот Brivora.',
           ),
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.pop(context);
+                Navigator.pop(dialogContext);
               },
-              child: const Text('Понятно'),
+              child: Text(isKazakh ? 'Түсінікті' : 'Понятно'),
             ),
           ],
         );
@@ -682,7 +718,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  void _showAbout() {
+  void _showAbout(LocaleController controller) {
+    final isKazakh = controller.isKazakh;
+
     showAboutDialog(
       context: context,
       applicationName: 'Brivora',
@@ -696,11 +734,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         child: const Icon(Icons.construction_rounded, color: Colors.white),
       ),
-      children: const [
+      children: [
         Text(
-          'Brivora — строительный помощник '
-          'для управления проектами, задачами, '
-          'расчётами и сметами.',
+          isKazakh
+              ? 'Brivora — жобаларды, тапсырмаларды, '
+                    'есептеулерді және сметаларды басқаруға '
+                    'арналған құрылыс көмекшісі.'
+              : 'Brivora — строительный помощник '
+                    'для управления проектами, задачами, '
+                    'расчётами и сметами.',
         ),
       ],
     );

@@ -94,4 +94,330 @@ class AppLocalizationsKk extends AppLocalizations {
 
   @override
   String get systemTheme => 'Жүйе бойынша';
+
+  @override
+  String get loading => 'Жүктелуде...';
+
+  @override
+  String get quickActions => 'Жылдам әрекеттер';
+
+  @override
+  String get welcome => 'Қош келдіңіз';
+
+  @override
+  String helloUser(String name) {
+    return 'Сәлеметсіз бе, $name';
+  }
+
+  @override
+  String get projectsDescription => 'Жобаларыңызды бір жерден басқарыңыз';
+
+  @override
+  String get noProjects => 'Сізде әзірге жобалар жоқ';
+
+  @override
+  String get createFirstProject => 'Алғашқы жобаңызды жасаңыз';
+
+  @override
+  String projectsCount(int count) {
+    return '$count';
+  }
+
+  @override
+  String get completed => 'Аяқталған';
+
+  @override
+  String get inProgress => 'Орындалуда';
+
+  @override
+  String get overview => 'Шолу';
+
+  @override
+  String get noRecentProjectsTitle => 'Соңғы жобалар жоқ';
+
+  @override
+  String get noRecentProjectsSubtitle =>
+      'Жоба жасаңыз, сонда ол осы жерде пайда болады';
+
+  @override
+  String get all => 'Барлығы';
+
+  @override
+  String get newProject => 'Жаңа жоба';
+
+  @override
+  String get create => 'Жасау';
+
+  @override
+  String get materials => 'Материалдар';
+
+  @override
+  String get untitled => 'Атаусыз';
+
+  @override
+  String get progress => 'Прогресс';
+
+  @override
+  String get statusCompleted => 'Аяқталған';
+
+  @override
+  String get statusPlanning => 'Жоспарлау';
+
+  @override
+  String get statusArchived => 'Мұрағатталған';
+
+  @override
+  String get statusActive => 'Белсенді';
+
+  @override
+  String get openedRecently => 'Жақында ашылған';
+
+  @override
+  String get openedJustNow => 'Жаңа ғана ашылды';
+
+  @override
+  String openedMinutesAgo(int count) {
+    return '$count мин. бұрын ашылды';
+  }
+
+  @override
+  String openedHoursAgo(int count) {
+    return '$count сағ. бұрын ашылды';
+  }
+
+  @override
+  String get openedYesterday => 'Кеше ашылды';
+
+  @override
+  String openedDaysAgo(int count) {
+    return '$count күн бұрын ашылды';
+  }
+
+  @override
+  String openedDate(String date) {
+    return '$date ашылды';
+  }
+
+  @override
+  String get updatedJustNow => 'Жаңа ғана жаңартылды';
+
+  @override
+  String updatedMinutesAgo(int count) {
+    return '$count мин. бұрын жаңартылды';
+  }
+
+  @override
+  String updatedHoursAgo(int count) {
+    return '$count сағ. бұрын жаңартылды';
+  }
+
+  @override
+  String get updatedYesterday => 'Кеше жаңартылды';
+
+  @override
+  String updatedDaysAgo(int count) {
+    return '$count күн бұрын жаңартылды';
+  }
+
+  @override
+  String updatedDate(String date) {
+    return '$date жаңартылды';
+  }
+
+  @override
+  String get registration => 'Тіркелу';
+
+  @override
+  String get createAccount => 'Аккаунт жасау';
+
+  @override
+  String get createAccountDescription => 'Brivora қолдану үшін аккаунт жасаңыз';
+
+  @override
+  String get fullName => 'Толық аты-жөні';
+
+  @override
+  String get fullNameHint => 'Толық аты-жөніңізді енгізіңіз';
+
+  @override
+  String get enterName => 'Атыңызды енгізіңіз';
+
+  @override
+  String get nameMinLength => 'Аты кемінде 2 таңбадан тұруы керек';
+
+  @override
+  String get email => 'Электрондық пошта';
+
+  @override
+  String get emailHint => 'Электрондық поштаңызды енгізіңіз';
+
+  @override
+  String get enterEmail => 'Электрондық поштаңызды енгізіңіз';
+
+  @override
+  String get invalidEmail => 'Дұрыс электрондық пошта енгізіңіз';
+
+  @override
+  String get password => 'Құпиясөз';
+
+  @override
+  String get passwordHint => 'Құпиясөзді енгізіңіз';
+
+  @override
+  String get enterPassword => 'Құпиясөзді енгізіңіз';
+
+  @override
+  String get passwordMinLength => 'Құпиясөз кемінде 6 таңбадан тұруы керек';
+
+  @override
+  String get confirmPassword => 'Құпиясөзді растаңыз';
+
+  @override
+  String get confirmPasswordHint => 'Құпиясөзді қайта енгізіңіз';
+
+  @override
+  String get confirmPasswordRequired => 'Құпиясөзді растаңыз';
+
+  @override
+  String get agreeToTerms => 'Мен';
+
+  @override
+  String get termsOfUse => 'пайдалану шарттарын қабылдаймын';
+
+  @override
+  String get passwordsDoNotMatch => 'Құпиясөздер сәйкес келмейді';
+
+  @override
+  String get register => 'Тіркелу';
+
+  @override
+  String get alreadyHaveAccount => 'Аккаунтыңыз бар ма?';
+
+  @override
+  String get login => 'Кіру';
+
+  @override
+  String get genericError => 'Қате орын алды';
+
+  @override
+  String get emailAlreadyInUse => 'Бұл электрондық пошта бұрыннан қолданылуда';
+
+  @override
+  String get weakPassword => 'Құпиясөз тым әлсіз';
+
+  @override
+  String get invalidEmailAuth => 'Электрондық пошта мекенжайы дұрыс емес';
+
+  @override
+  String get registrationError => 'Аккаунт жасау мүмкін болмады';
+
+  @override
+  String get addName => 'Атыңызды қосыңыз';
+
+  @override
+  String get addRoleAndCompany => 'Лауазым мен компанияны көрсетіңіз';
+
+  @override
+  String get chooseFromGallery => 'Галереядан таңдау';
+
+  @override
+  String get takePhoto => 'Суретке түсіру';
+
+  @override
+  String get deletePhoto => 'Суретті өшіру';
+
+  @override
+  String get avatarUpdated => 'Аватар сәтті жаңартылды';
+
+  @override
+  String avatarUploadError(String error) {
+    return 'Аватарды жүктеу мүмкін болмады: $error';
+  }
+
+  @override
+  String get avatarDeleted => 'Аватар өшірілді';
+
+  @override
+  String avatarDeleteError(String error) {
+    return 'Аватарды өшіру мүмкін болмады: $error';
+  }
+
+  @override
+  String get profileData => 'Профиль деректері';
+
+  @override
+  String get firstName => 'Аты';
+
+  @override
+  String get lastName => 'Тегі';
+
+  @override
+  String get position => 'Лауазымы';
+
+  @override
+  String get positionExample => 'Мысалы: Прораб';
+
+  @override
+  String get company => 'Компания';
+
+  @override
+  String get companyExample => 'Мысалы: ЖК Иванов И.И.';
+
+  @override
+  String saveError(String error) {
+    return 'Сақтау мүмкін болмады: $error';
+  }
+
+  @override
+  String photosCount(int count) {
+    return '$count';
+  }
+
+  @override
+  String activeProjects(int count) {
+    return '$count';
+  }
+
+  @override
+  String get settingsSubtitle => 'Қолданба баптаулары';
+
+  @override
+  String get proSubscription => 'Pro жазылымы';
+
+  @override
+  String get comingSoon => 'Жақында';
+
+  @override
+  String get security => 'Қауіпсіздік';
+
+  @override
+  String get securitySubtitle => 'Аккаунт пен деректерді қорғау';
+
+  @override
+  String get feedback => 'Кері байланыс';
+
+  @override
+  String get feedbackSubtitle => 'Brivora-ны жақсартуға көмектесіңіз';
+
+  @override
+  String get logout => 'Шығу';
+
+  @override
+  String get version => 'Нұсқа';
+
+  @override
+  String get logoutQuestion => 'Аккаунттан шығу керек пе?';
+
+  @override
+  String get logoutConfirmation => 'Шынымен аккаунттан шыққыңыз келе ме?';
+
+  @override
+  String logoutError(String error) {
+    return 'Шығу мүмкін болмады: $error';
+  }
+
+  @override
+  String featureComingSoon(String feature) {
+    return '$feature — жақында қолжетімді болады';
+  }
 }

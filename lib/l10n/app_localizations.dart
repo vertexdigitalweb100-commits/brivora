@@ -271,6 +271,588 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Как в системе'**
   String get systemTheme;
+
+  /// No description provided for @loading.
+  ///
+  /// In ru, this message translates to:
+  /// **'Загрузка...'**
+  String get loading;
+
+  /// No description provided for @quickActions.
+  ///
+  /// In ru, this message translates to:
+  /// **'Быстрые действия'**
+  String get quickActions;
+
+  /// No description provided for @welcome.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добро пожаловать'**
+  String get welcome;
+
+  /// No description provided for @helloUser.
+  ///
+  /// In ru, this message translates to:
+  /// **'Здравствуйте, {name}'**
+  String helloUser(String name);
+
+  /// No description provided for @projectsDescription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Управляйте своими проектами в одном месте'**
+  String get projectsDescription;
+
+  /// No description provided for @noProjects.
+  ///
+  /// In ru, this message translates to:
+  /// **'У вас пока нет проектов'**
+  String get noProjects;
+
+  /// No description provided for @createFirstProject.
+  ///
+  /// In ru, this message translates to:
+  /// **'Создайте свой первый проект'**
+  String get createFirstProject;
+
+  /// No description provided for @projectsCount.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count}'**
+  String projectsCount(int count);
+
+  /// No description provided for @completed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Завершено'**
+  String get completed;
+
+  /// No description provided for @inProgress.
+  ///
+  /// In ru, this message translates to:
+  /// **'В работе'**
+  String get inProgress;
+
+  /// No description provided for @overview.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обзор'**
+  String get overview;
+
+  /// No description provided for @noRecentProjectsTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нет недавних проектов'**
+  String get noRecentProjectsTitle;
+
+  /// No description provided for @noRecentProjectsSubtitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Создайте проект, чтобы он появился здесь'**
+  String get noRecentProjectsSubtitle;
+
+  /// No description provided for @all.
+  ///
+  /// In ru, this message translates to:
+  /// **'Все'**
+  String get all;
+
+  /// No description provided for @newProject.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новый проект'**
+  String get newProject;
+
+  /// No description provided for @create.
+  ///
+  /// In ru, this message translates to:
+  /// **'Создать'**
+  String get create;
+
+  /// No description provided for @materials.
+  ///
+  /// In ru, this message translates to:
+  /// **'Материалы'**
+  String get materials;
+
+  /// No description provided for @untitled.
+  ///
+  /// In ru, this message translates to:
+  /// **'Без названия'**
+  String get untitled;
+
+  /// No description provided for @progress.
+  ///
+  /// In ru, this message translates to:
+  /// **'Прогресс'**
+  String get progress;
+
+  /// No description provided for @statusCompleted.
+  ///
+  /// In ru, this message translates to:
+  /// **'Завершён'**
+  String get statusCompleted;
+
+  /// No description provided for @statusPlanning.
+  ///
+  /// In ru, this message translates to:
+  /// **'Планирование'**
+  String get statusPlanning;
+
+  /// No description provided for @statusArchived.
+  ///
+  /// In ru, this message translates to:
+  /// **'Архивирован'**
+  String get statusArchived;
+
+  /// No description provided for @statusActive.
+  ///
+  /// In ru, this message translates to:
+  /// **'Активен'**
+  String get statusActive;
+
+  /// No description provided for @openedRecently.
+  ///
+  /// In ru, this message translates to:
+  /// **'Открыт недавно'**
+  String get openedRecently;
+
+  /// No description provided for @openedJustNow.
+  ///
+  /// In ru, this message translates to:
+  /// **'Открыт только что'**
+  String get openedJustNow;
+
+  /// No description provided for @openedMinutesAgo.
+  ///
+  /// In ru, this message translates to:
+  /// **'Открыт {count} мин. назад'**
+  String openedMinutesAgo(int count);
+
+  /// No description provided for @openedHoursAgo.
+  ///
+  /// In ru, this message translates to:
+  /// **'Открыт {count} ч. назад'**
+  String openedHoursAgo(int count);
+
+  /// No description provided for @openedYesterday.
+  ///
+  /// In ru, this message translates to:
+  /// **'Открыт вчера'**
+  String get openedYesterday;
+
+  /// No description provided for @openedDaysAgo.
+  ///
+  /// In ru, this message translates to:
+  /// **'Открыт {count} дн. назад'**
+  String openedDaysAgo(int count);
+
+  /// No description provided for @openedDate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Открыт {date}'**
+  String openedDate(String date);
+
+  /// No description provided for @updatedJustNow.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновлён только что'**
+  String get updatedJustNow;
+
+  /// No description provided for @updatedMinutesAgo.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновлён {count} мин. назад'**
+  String updatedMinutesAgo(int count);
+
+  /// No description provided for @updatedHoursAgo.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновлён {count} ч. назад'**
+  String updatedHoursAgo(int count);
+
+  /// No description provided for @updatedYesterday.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновлён вчера'**
+  String get updatedYesterday;
+
+  /// No description provided for @updatedDaysAgo.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновлён {count} дн. назад'**
+  String updatedDaysAgo(int count);
+
+  /// No description provided for @updatedDate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновлён {date}'**
+  String updatedDate(String date);
+
+  /// No description provided for @registration.
+  ///
+  /// In ru, this message translates to:
+  /// **'Регистрация'**
+  String get registration;
+
+  /// No description provided for @createAccount.
+  ///
+  /// In ru, this message translates to:
+  /// **'Создать аккаунт'**
+  String get createAccount;
+
+  /// No description provided for @createAccountDescription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Создайте аккаунт, чтобы пользоваться Brivora'**
+  String get createAccountDescription;
+
+  /// No description provided for @fullName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Полное имя'**
+  String get fullName;
+
+  /// No description provided for @fullNameHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите ваше полное имя'**
+  String get fullNameHint;
+
+  /// No description provided for @enterName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите имя'**
+  String get enterName;
+
+  /// No description provided for @nameMinLength.
+  ///
+  /// In ru, this message translates to:
+  /// **'Имя должно содержать минимум 2 символа'**
+  String get nameMinLength;
+
+  /// No description provided for @email.
+  ///
+  /// In ru, this message translates to:
+  /// **'Электронная почта'**
+  String get email;
+
+  /// No description provided for @emailHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите электронную почту'**
+  String get emailHint;
+
+  /// No description provided for @enterEmail.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите электронную почту'**
+  String get enterEmail;
+
+  /// No description provided for @invalidEmail.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите корректный адрес электронной почты'**
+  String get invalidEmail;
+
+  /// No description provided for @password.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пароль'**
+  String get password;
+
+  /// No description provided for @passwordHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите пароль'**
+  String get passwordHint;
+
+  /// No description provided for @enterPassword.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите пароль'**
+  String get enterPassword;
+
+  /// No description provided for @passwordMinLength.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пароль должен содержать минимум 6 символов'**
+  String get passwordMinLength;
+
+  /// No description provided for @confirmPassword.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подтвердите пароль'**
+  String get confirmPassword;
+
+  /// No description provided for @confirmPasswordHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите пароль ещё раз'**
+  String get confirmPasswordHint;
+
+  /// No description provided for @confirmPasswordRequired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подтвердите пароль'**
+  String get confirmPasswordRequired;
+
+  /// No description provided for @agreeToTerms.
+  ///
+  /// In ru, this message translates to:
+  /// **'Я принимаю'**
+  String get agreeToTerms;
+
+  /// No description provided for @termsOfUse.
+  ///
+  /// In ru, this message translates to:
+  /// **'условия использования'**
+  String get termsOfUse;
+
+  /// No description provided for @passwordsDoNotMatch.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пароли не совпадают'**
+  String get passwordsDoNotMatch;
+
+  /// No description provided for @register.
+  ///
+  /// In ru, this message translates to:
+  /// **'Зарегистрироваться'**
+  String get register;
+
+  /// No description provided for @alreadyHaveAccount.
+  ///
+  /// In ru, this message translates to:
+  /// **'Уже есть аккаунт?'**
+  String get alreadyHaveAccount;
+
+  /// No description provided for @login.
+  ///
+  /// In ru, this message translates to:
+  /// **'Войти'**
+  String get login;
+
+  /// No description provided for @genericError.
+  ///
+  /// In ru, this message translates to:
+  /// **'Произошла ошибка'**
+  String get genericError;
+
+  /// No description provided for @emailAlreadyInUse.
+  ///
+  /// In ru, this message translates to:
+  /// **'Эта электронная почта уже используется'**
+  String get emailAlreadyInUse;
+
+  /// No description provided for @weakPassword.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пароль слишком простой'**
+  String get weakPassword;
+
+  /// No description provided for @invalidEmailAuth.
+  ///
+  /// In ru, this message translates to:
+  /// **'Некорректный адрес электронной почты'**
+  String get invalidEmailAuth;
+
+  /// No description provided for @registrationError.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось зарегистрировать аккаунт'**
+  String get registrationError;
+
+  /// No description provided for @addName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавьте имя'**
+  String get addName;
+
+  /// No description provided for @addRoleAndCompany.
+  ///
+  /// In ru, this message translates to:
+  /// **'Укажите должность и компанию'**
+  String get addRoleAndCompany;
+
+  /// No description provided for @chooseFromGallery.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выбрать из галереи'**
+  String get chooseFromGallery;
+
+  /// No description provided for @takePhoto.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сделать фото'**
+  String get takePhoto;
+
+  /// No description provided for @deletePhoto.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить фотографию'**
+  String get deletePhoto;
+
+  /// No description provided for @avatarUpdated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Аватар успешно обновлён'**
+  String get avatarUpdated;
+
+  /// No description provided for @avatarUploadError.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось загрузить аватар: {error}'**
+  String avatarUploadError(String error);
+
+  /// No description provided for @avatarDeleted.
+  ///
+  /// In ru, this message translates to:
+  /// **'Аватар удалён'**
+  String get avatarDeleted;
+
+  /// No description provided for @avatarDeleteError.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось удалить аватар: {error}'**
+  String avatarDeleteError(String error);
+
+  /// No description provided for @profileData.
+  ///
+  /// In ru, this message translates to:
+  /// **'Данные профиля'**
+  String get profileData;
+
+  /// No description provided for @firstName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Имя'**
+  String get firstName;
+
+  /// No description provided for @lastName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Фамилия'**
+  String get lastName;
+
+  /// No description provided for @position.
+  ///
+  /// In ru, this message translates to:
+  /// **'Должность'**
+  String get position;
+
+  /// No description provided for @positionExample.
+  ///
+  /// In ru, this message translates to:
+  /// **'Например: Прораб'**
+  String get positionExample;
+
+  /// No description provided for @company.
+  ///
+  /// In ru, this message translates to:
+  /// **'Компания'**
+  String get company;
+
+  /// No description provided for @companyExample.
+  ///
+  /// In ru, this message translates to:
+  /// **'Например: ИП Иванов И.И.'**
+  String get companyExample;
+
+  /// No description provided for @saveError.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось сохранить: {error}'**
+  String saveError(String error);
+
+  /// No description provided for @photosCount.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count}'**
+  String photosCount(int count);
+
+  /// No description provided for @activeProjects.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count}'**
+  String activeProjects(int count);
+
+  /// No description provided for @settingsSubtitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Настройки приложения'**
+  String get settingsSubtitle;
+
+  /// No description provided for @proSubscription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Pro-подписка'**
+  String get proSubscription;
+
+  /// No description provided for @comingSoon.
+  ///
+  /// In ru, this message translates to:
+  /// **'Скоро'**
+  String get comingSoon;
+
+  /// No description provided for @security.
+  ///
+  /// In ru, this message translates to:
+  /// **'Безопасность'**
+  String get security;
+
+  /// No description provided for @securitySubtitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Защита аккаунта и данных'**
+  String get securitySubtitle;
+
+  /// No description provided for @feedback.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обратная связь'**
+  String get feedback;
+
+  /// No description provided for @feedbackSubtitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Помогите улучшить Brivora'**
+  String get feedbackSubtitle;
+
+  /// No description provided for @logout.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выйти'**
+  String get logout;
+
+  /// No description provided for @version.
+  ///
+  /// In ru, this message translates to:
+  /// **'Версия'**
+  String get version;
+
+  /// No description provided for @logoutQuestion.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выйти из аккаунта?'**
+  String get logoutQuestion;
+
+  /// No description provided for @logoutConfirmation.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вы действительно хотите выйти?'**
+  String get logoutConfirmation;
+
+  /// No description provided for @logoutError.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось выйти: {error}'**
+  String logoutError(String error);
+
+  /// No description provided for @featureComingSoon.
+  ///
+  /// In ru, this message translates to:
+  /// **'{feature} — скоро будет доступно'**
+  String featureComingSoon(String feature);
 }
 
 class _AppLocalizationsDelegate
