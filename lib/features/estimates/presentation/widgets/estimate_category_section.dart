@@ -33,7 +33,10 @@ class EstimateCategorySection extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(title, style: Theme.of(context).textTheme.titleMedium),
-                Text(EstimateItem.formatMoney(total), style: Theme.of(context).textTheme.titleMedium),
+                Text(
+                  EstimateItem.formatMoney(total),
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
               ],
             ),
             const SizedBox(height: 12),
@@ -43,8 +46,8 @@ class EstimateCategorySection extends StatelessWidget {
                 child: Text(
                   'Нет позиций в этой категории',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
               )
             else

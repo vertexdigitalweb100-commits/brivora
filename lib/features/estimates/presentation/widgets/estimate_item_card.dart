@@ -47,8 +47,14 @@ class EstimateItemCard extends StatelessWidget {
               runSpacing: 8,
               children: [
                 _buildInfoChip('Количество', '${item.quantity} ${item.unit}'),
-                _buildInfoChip('Цена', EstimateItem.formatMoney(item.unitPrice)),
-                _buildInfoChip('Итого', EstimateItem.formatMoney(item.totalPrice)),
+                _buildInfoChip(
+                  'Цена',
+                  EstimateItem.formatMoney(item.unitPrice),
+                ),
+                _buildInfoChip(
+                  'Итого',
+                  EstimateItem.formatMoney(item.totalPrice),
+                ),
               ],
             ),
             if (item.comment.isNotEmpty) ...[

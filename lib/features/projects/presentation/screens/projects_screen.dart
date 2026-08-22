@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/routes/app_routes.dart';
@@ -43,6 +44,8 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   }
 
   void _openCreateProjectDialog() {
+    final l10n = AppLocalizations.of(context)!;
+
     showDialog(
       context: context,
       builder: (dialogContext) {
@@ -57,7 +60,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
 
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Проект «$title» создан'),
+                content: Text(l10n.projectCreated(title)),
                 behavior: SnackBarBehavior.floating,
               ),
             );
@@ -105,22 +108,22 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     return result;
   }
 
-  String _sortLabel(_ProjectSort sort) {
+  String _sortLabel(_ProjectSort sort, AppLocalizations l10n) {
     switch (sort) {
       case _ProjectSort.newest:
-        return 'Новые';
+        return l10n.newestProjects;
 
       case _ProjectSort.oldest:
-        return 'Старые';
+        return l10n.oldestProjects;
 
       case _ProjectSort.progress:
-        return 'Прогресс';
+        return l10n.progress;
 
       case _ProjectSort.nameAsc:
-        return 'Название А–Я';
+        return l10n.nameAscending;
 
       case _ProjectSort.nameDesc:
-        return 'Название Я–А';
+        return l10n.nameDescending;
     }
   }
 
@@ -149,9 +152,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
             return LayoutBuilder(
               builder: (context, constraints) {
                 final width = constraints.maxWidth;
-
                 final isMobile = width < 700;
-
                 final horizontalPadding = isMobile ? 16.0 : 28.0;
 
                 return CustomScrollView(
@@ -168,7 +169,6 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                         child: _buildHeader(context, isMobile),
                       ),
                     ),
-
                     SliverPadding(
                       padding: EdgeInsets.fromLTRB(
                         horizontalPadding,
@@ -184,7 +184,6 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                         ),
                       ),
                     ),
-
                     SliverPadding(
                       padding: EdgeInsets.fromLTRB(
                         horizontalPadding,
@@ -197,7 +196,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                           children: [
                             Expanded(
                               child: Text(
-                                'Показано проектов: ${projects.length}',
+                                l10nFor(context).shownProjects(projects.length),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: theme.textTheme.bodySmall?.copyWith(
@@ -215,13 +214,12 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                                     _selectedFilter = null;
                                   });
                                 },
-                                child: const Text('Сбросить'),
+                                child: Text(l10nFor(context).reset),
                               ),
                           ],
                         ),
                       ),
                     ),
-
                     if (projects.isEmpty)
                       SliverFillRemaining(
                         hasScrollBody: false,
@@ -285,6 +283,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   Widget _buildHeader(BuildContext context, bool isMobile) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     final buttonWidth = isMobile ? 96.0 : 150.0;
 
@@ -296,7 +295,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Проекты',
+                l10n.projects,
                 style: theme.textTheme.headlineMedium?.copyWith(
                   color: colors.onSurface,
                   fontSize: isMobile ? 28 : 32,
@@ -306,7 +305,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
               ),
               const SizedBox(height: 5),
               Text(
-                'Управляйте строительными проектами',
+                l10n.projectsManagementDescription,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.bodyMedium?.copyWith(
@@ -316,11 +315,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
             ],
           ),
         ),
-
         const SizedBox(width: 12),
-
-        // ВАЖНО:
-        // FilledButton больше НЕ получает бесконечную ширину.
         SizedBox(
           width: buttonWidth,
           height: 48,
@@ -328,7 +323,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
             onPressed: _openCreateProjectDialog,
             icon: const Icon(Icons.add_rounded),
             label: Text(
-              isMobile ? 'Новый' : 'Новый проект',
+              isMobile ? l10n.newProjectShort : l10n.newProject,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -358,15 +353,11 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _buildSearchField(context),
-
           const SizedBox(height: 10),
-
           Row(
             children: [
               Expanded(child: _buildFilterBar(context, counts)),
-
               const SizedBox(width: 8),
-
               _buildSortButton(context),
             ],
           ),
@@ -377,13 +368,9 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     return Row(
       children: [
         Expanded(child: _buildSearchField(context)),
-
         const SizedBox(width: 14),
-
         Flexible(child: _buildFilterBar(context, counts)),
-
         const SizedBox(width: 10),
-
         _buildSortButton(context),
       ],
     );
@@ -391,6 +378,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
 
   Widget _buildSearchField(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return TextField(
       onChanged: (value) {
@@ -401,7 +389,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       style: TextStyle(color: colors.onSurface),
       cursorColor: colors.primary,
       decoration: InputDecoration(
-        hintText: 'Поиск проектов...',
+        hintText: l10n.searchProjects,
         hintStyle: TextStyle(color: colors.onSurfaceVariant),
         prefixIcon: Icon(Icons.search_rounded, color: colors.onSurfaceVariant),
         filled: true,
@@ -424,25 +412,26 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
 
   Widget _buildFilterBar(BuildContext context, Map<ProjectStatus, int> counts) {
     final colors = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     final items = <({String label, int count, ProjectStatus? status})>[
       (
-        label: 'Все',
+        label: l10n.all,
         count: counts.values.fold(0, (sum, value) => sum + value),
         status: null,
       ),
       (
-        label: 'Активные',
+        label: l10n.activeProjectsLabel,
         count: counts[ProjectStatus.active] ?? 0,
         status: ProjectStatus.active,
       ),
       (
-        label: 'Планирование',
+        label: l10n.statusPlanning,
         count: counts[ProjectStatus.planning] ?? 0,
         status: ProjectStatus.planning,
       ),
       (
-        label: 'Завершённые',
+        label: l10n.completedProjectsLabel,
         count: counts[ProjectStatus.completed] ?? 0,
         status: ProjectStatus.completed,
       ),
@@ -505,6 +494,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
 
   Widget _buildSortButton(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return SizedBox(
       width: 44,
@@ -520,7 +510,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           return _ProjectSort.values.map((sort) {
             return PopupMenuItem<_ProjectSort>(
               value: sort,
-              child: Text(_sortLabel(sort)),
+              child: Text(_sortLabel(sort, l10n)),
             );
           }).toList();
         },
@@ -542,6 +532,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   Widget _buildErrorState(BuildContext context, String error) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Center(
       child: SingleChildScrollView(
@@ -550,19 +541,15 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.error_outline_rounded, size: 52, color: colors.error),
-
             const SizedBox(height: 16),
-
             Text(
-              'Не удалось загрузить проекты',
+              l10n.projectsLoadError,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
               ),
               textAlign: TextAlign.center,
             ),
-
             const SizedBox(height: 8),
-
             Text(
               error,
               style: theme.textTheme.bodySmall?.copyWith(
@@ -570,9 +557,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
               ),
               textAlign: TextAlign.center,
             ),
-
             const SizedBox(height: 18),
-
             SizedBox(
               height: 48,
               child: FilledButton.icon(
@@ -580,7 +565,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                   context.read<ProjectsProvider>().restartListening();
                 },
                 icon: const Icon(Icons.refresh_rounded),
-                label: const Text('Повторить'),
+                label: Text(l10n.retry),
               ),
             ),
           ],
@@ -592,6 +577,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   Widget _buildEmptyState(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     final hasFilters = _searchQuery.isNotEmpty || _selectedFilter != null;
 
@@ -616,37 +602,31 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                 size: 32,
               ),
             ),
-
             const SizedBox(height: 16),
-
             Text(
-              hasFilters ? 'Ничего не найдено' : 'Пока нет проектов',
+              hasFilters ? l10n.nothingFound : l10n.noProjectsYet,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
               ),
             ),
-
             const SizedBox(height: 7),
-
             Text(
               hasFilters
-                  ? 'Попробуйте изменить поиск или фильтр.'
-                  : 'Создайте первый проект, чтобы начать работу.',
+                  ? l10n.changeSearchOrFilter
+                  : l10n.createFirstProjectDescription,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: colors.onSurfaceVariant,
               ),
             ),
-
             if (!hasFilters) ...[
               const SizedBox(height: 18),
-
               SizedBox(
                 height: 48,
                 child: FilledButton.icon(
                   onPressed: _openCreateProjectDialog,
                   icon: const Icon(Icons.add_rounded),
-                  label: const Text('Создать проект'),
+                  label: Text(l10n.createProject),
                 ),
               ),
             ],
@@ -655,4 +635,8 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       ),
     );
   }
+}
+
+AppLocalizations l10nFor(BuildContext context) {
+  return AppLocalizations.of(context)!;
 }

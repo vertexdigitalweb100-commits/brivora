@@ -24,32 +24,29 @@ class EstimateProvider extends ChangeNotifier {
     if (_selectedCategory == 'all') {
       return items;
     }
-    return items
-        .where((item) => item.category == _selectedCategory)
-        .toList();
+    return items.where((item) => item.category == _selectedCategory).toList();
   }
 
   List<EstimateItem> categoryItems(String category) {
     return _items.where((item) => item.category == category).toList();
   }
 
-  double get totalMaterials => categoryItems('material')
-      .fold(0, (sum, item) => sum + item.totalPrice);
+  double get totalMaterials =>
+      categoryItems('material').fold(0, (sum, item) => sum + item.totalPrice);
 
-  double get totalLabor => categoryItems('labor')
-      .fold(0, (sum, item) => sum + item.totalPrice);
+  double get totalLabor =>
+      categoryItems('labor').fold(0, (sum, item) => sum + item.totalPrice);
 
-  double get totalDelivery => categoryItems('delivery')
-      .fold(0, (sum, item) => sum + item.totalPrice);
+  double get totalDelivery =>
+      categoryItems('delivery').fold(0, (sum, item) => sum + item.totalPrice);
 
-  double get totalTools => categoryItems('tools')
-      .fold(0, (sum, item) => sum + item.totalPrice);
+  double get totalTools =>
+      categoryItems('tools').fold(0, (sum, item) => sum + item.totalPrice);
 
-  double get totalOther => categoryItems('other')
-      .fold(0, (sum, item) => sum + item.totalPrice);
+  double get totalOther =>
+      categoryItems('other').fold(0, (sum, item) => sum + item.totalPrice);
 
-  double get grandTotal =>
-      _items.fold(0, (sum, item) => sum + item.totalPrice);
+  double get grandTotal => _items.fold(0, (sum, item) => sum + item.totalPrice);
 
   void listenToProjectEstimates(String projectId) {
     if (_projectId == projectId) {
@@ -62,19 +59,21 @@ class EstimateProvider extends ChangeNotifier {
     notifyListeners();
 
     _subscription?.cancel();
-    _subscription = repository.getProjectEstimatesStream(projectId).listen(
-      (items) {
-        _items = items;
-        _isLoading = false;
-        _error = null;
-        notifyListeners();
-      },
-      onError: (error) {
-        _error = 'Ошибка загрузки сметы: $error';
-        _isLoading = false;
-        notifyListeners();
-      },
-    );
+    _subscription = repository
+        .getProjectEstimatesStream(projectId)
+        .listen(
+          (items) {
+            _items = items;
+            _isLoading = false;
+            _error = null;
+            notifyListeners();
+          },
+          onError: (error) {
+            _error = 'Ошибка загрузки сметы: $error';
+            _isLoading = false;
+            notifyListeners();
+          },
+        );
   }
 
   Future<void> addEstimateItem(EstimateItem item) async {

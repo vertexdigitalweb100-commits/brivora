@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
+
 class AITabScreen extends StatefulWidget {
   const AITabScreen({super.key});
 
@@ -11,38 +13,13 @@ class _AITabScreenState extends State<AITabScreen> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
-  final List<_ChatMessage> _messages = [
-    const _ChatMessage(
-      text:
-          'Привет! 👋\n\n'
-          'Я ИИ-помощник Brivora. Помогу с расчётами, сметами, '
-          'материалами и вопросами по ремонту.',
-      isUser: false,
-    ),
-  ];
+  final List<_ChatMessage> _messages = [];
 
-  final List<_QuickAction> _quickActions = const [
-    _QuickAction(
-      icon: Icons.calculate_outlined,
-      title: 'Рассчитать материал',
-      subtitle: 'Плитка, краска, обои',
-    ),
-    _QuickAction(
-      icon: Icons.receipt_long_outlined,
-      title: 'Создать смету',
-      subtitle: 'Быстро составить расчёт',
-    ),
-    _QuickAction(
-      icon: Icons.photo_camera_outlined,
-      title: 'Анализ фото',
-      subtitle: 'Найти проблемы на объекте',
-    ),
-    _QuickAction(
-      icon: Icons.lightbulb_outline,
-      title: 'Совет по ремонту',
-      subtitle: 'Получить рекомендацию',
-    ),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _messages.add(const _ChatMessage(text: '', isUser: false));
+  }
 
   @override
   void dispose() {
@@ -51,7 +28,32 @@ class _AITabScreenState extends State<AITabScreen> {
     super.dispose();
   }
 
-  void _sendMessage([String? presetMessage]) {
+  List<_QuickAction> _quickActions(AppLocalizations l10n) {
+    return [
+      _QuickAction(
+        icon: Icons.calculate_outlined,
+        title: l10n.aiCalculateMaterial,
+        subtitle: l10n.aiCalculateMaterialSubtitle,
+      ),
+      _QuickAction(
+        icon: Icons.receipt_long_outlined,
+        title: l10n.aiCreateEstimate,
+        subtitle: l10n.aiCreateEstimateSubtitle,
+      ),
+      _QuickAction(
+        icon: Icons.photo_camera_outlined,
+        title: l10n.aiAnalyzePhoto,
+        subtitle: l10n.aiAnalyzePhotoSubtitle,
+      ),
+      _QuickAction(
+        icon: Icons.lightbulb_outline,
+        title: l10n.aiRepairAdvice,
+        subtitle: l10n.aiRepairAdviceSubtitle,
+      ),
+    ];
+  }
+
+  void _sendMessage(AppLocalizations l10n, [String? presetMessage]) {
     final text = (presetMessage ?? _controller.text).trim();
 
     if (text.isEmpty) return;
@@ -69,7 +71,7 @@ class _AITabScreenState extends State<AITabScreen> {
 
       setState(() {
         _messages.add(
-          _ChatMessage(text: _generateDemoAnswer(text), isUser: false),
+          _ChatMessage(text: _generateDemoAnswer(l10n, text), isUser: false),
         );
       });
 
@@ -77,33 +79,31 @@ class _AITabScreenState extends State<AITabScreen> {
     });
   }
 
-  String _generateDemoAnswer(String question) {
+  String _generateDemoAnswer(AppLocalizations l10n, String question) {
     final lower = question.toLowerCase();
 
-    if (lower.contains('плит')) {
-      return 'Конечно. Для расчёта плитки мне понадобятся размеры помещения, '
-          'размер одной плитки и желаемый запас. Обычно рекомендую закладывать '
-          'около 10% на подрезку.';
+    if (lower.contains('плит') ||
+        lower.contains('кафель') ||
+        lower.contains('tile')) {
+      return l10n.aiTileAnswer;
     }
 
-    if (lower.contains('смет')) {
-      return 'Могу помочь составить смету. Укажи площадь объекта и список '
-          'работ или материалов — я помогу структурировать расчёт.';
+    if (lower.contains('смет') ||
+        lower.contains('расчёт') ||
+        lower.contains('расчет') ||
+        lower.contains('estimate')) {
+      return l10n.aiEstimateAnswer;
     }
 
-    if (lower.contains('краск')) {
-      return 'Для расчёта краски нужны площадь поверхности, количество слоёв '
-          'и расход краски на 1 м².';
+    if (lower.contains('краск') || lower.contains('paint')) {
+      return l10n.aiPaintAnswer;
     }
 
-    if (lower.contains('обои')) {
-      return 'Для расчёта обоев нужны размеры помещения, высота потолка, '
-          'ширина рулона и длина рулона.';
+    if (lower.contains('обои') || lower.contains('wallpaper')) {
+      return l10n.aiWallpaperAnswer;
     }
 
-    return 'Понял тебя 👍\n\n'
-        'Я могу помочь с расчётами материалов, сметами, ремонтом и '
-        'организацией работ. Попробуй сформулировать задачу подробнее.';
+    return l10n.aiDefaultAnswer;
   }
 
   void _scrollToBottom() {
@@ -120,6 +120,7 @@ class _AITabScreenState extends State<AITabScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
@@ -132,12 +133,18 @@ class _AITabScreenState extends State<AITabScreen> {
     final textSecondary = colors.onSurfaceVariant;
     final borderColor = colors.outline.withValues(alpha: 0.55);
 
+    final quickActions = _quickActions(l10n);
+
+    final hasOnlyInitialMessage =
+        _messages.length == 1 && _messages.first.text.isEmpty;
+
     return Scaffold(
       backgroundColor: backgroundColor,
       body: SafeArea(
         child: Column(
           children: [
             _buildHeader(
+              l10n: l10n,
               surfaceColor: surfaceColor,
               textPrimary: textPrimary,
               textSecondary: textSecondary,
@@ -145,8 +152,10 @@ class _AITabScreenState extends State<AITabScreen> {
               primaryColor: primaryColor,
             ),
             Expanded(
-              child: _messages.length == 1
+              child: hasOnlyInitialMessage
                   ? _buildInitialState(
+                      l10n: l10n,
+                      quickActions: quickActions,
                       surfaceColor: surfaceColor,
                       textPrimary: textPrimary,
                       textSecondary: textSecondary,
@@ -164,6 +173,7 @@ class _AITabScreenState extends State<AITabScreen> {
                     ),
             ),
             _buildInputArea(
+              l10n: l10n,
               surfaceColor: surfaceColor,
               textPrimary: textPrimary,
               textSecondary: textSecondary,
@@ -177,6 +187,7 @@ class _AITabScreenState extends State<AITabScreen> {
   }
 
   Widget _buildHeader({
+    required AppLocalizations l10n,
     required Color surfaceColor,
     required Color textPrimary,
     required Color textSecondary,
@@ -215,30 +226,26 @@ class _AITabScreenState extends State<AITabScreen> {
               size: 24,
             ),
           ),
-
           const SizedBox(width: 13),
-
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'ИИ-помощник',
+                  l10n.aiAssistant,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
                     color: textPrimary,
                   ),
                 ),
-
                 const SizedBox(height: 4),
-
                 Row(
                   children: [
                     const _OnlineDot(),
                     const SizedBox(width: 6),
                     Text(
-                      'Онлайн',
+                      l10n.online,
                       style: TextStyle(
                         fontSize: 13,
                         color: textSecondary,
@@ -250,7 +257,6 @@ class _AITabScreenState extends State<AITabScreen> {
               ],
             ),
           ),
-
           Container(
             width: 40,
             height: 40,
@@ -266,6 +272,8 @@ class _AITabScreenState extends State<AITabScreen> {
   }
 
   Widget _buildInitialState({
+    required AppLocalizations l10n,
+    required List<_QuickAction> quickActions,
     required Color surfaceColor,
     required Color textPrimary,
     required Color textSecondary,
@@ -280,29 +288,26 @@ class _AITabScreenState extends State<AITabScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildWelcomeCard(
+            l10n: l10n,
             textPrimary: textPrimary,
             textSecondary: textSecondary,
             primaryColor: primaryColor,
-            borderColor: borderColor,
             isDark: isDark,
           ),
-
           const SizedBox(height: 24),
-
           Text(
-            'Что я могу сделать?',
+            l10n.aiWhatCanIDo,
             style: TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w700,
               color: textPrimary,
             ),
           ),
-
           const SizedBox(height: 12),
-
-          ..._quickActions.map(
+          ...quickActions.map(
             (action) => _buildQuickAction(
               action,
+              onTap: () => _sendMessage(l10n, action.title),
               surfaceColor: surfaceColor,
               textPrimary: textPrimary,
               textSecondary: textSecondary,
@@ -311,10 +316,9 @@ class _AITabScreenState extends State<AITabScreen> {
               primaryContainer: primaryContainer,
             ),
           ),
-
           const SizedBox(height: 18),
-
           _buildHint(
+            l10n: l10n,
             textSecondary: textSecondary,
             backgroundColor: Theme.of(
               context,
@@ -326,10 +330,10 @@ class _AITabScreenState extends State<AITabScreen> {
   }
 
   Widget _buildWelcomeCard({
+    required AppLocalizations l10n,
     required Color textPrimary,
     required Color textSecondary,
     required Color primaryColor,
-    required Color borderColor,
     required bool isDark,
   }) {
     final lightStart = isDark
@@ -370,23 +374,18 @@ class _AITabScreenState extends State<AITabScreen> {
               size: 20,
             ),
           ),
-
           const SizedBox(height: 15),
-
           Text(
-            'Чем могу помочь?',
+            l10n.aiWelcomeTitle,
             style: TextStyle(
               fontSize: 21,
               fontWeight: FontWeight.w700,
               color: textPrimary,
             ),
           ),
-
           const SizedBox(height: 7),
-
           Text(
-            'Спроси меня о ремонте, материалах, расчётах '
-            'или создании сметы.',
+            l10n.aiWelcomeDescription,
             style: TextStyle(fontSize: 14, height: 1.5, color: textSecondary),
           ),
         ],
@@ -396,6 +395,7 @@ class _AITabScreenState extends State<AITabScreen> {
 
   Widget _buildQuickAction(
     _QuickAction action, {
+    required VoidCallback onTap,
     required Color surfaceColor,
     required Color textPrimary,
     required Color textSecondary,
@@ -404,7 +404,7 @@ class _AITabScreenState extends State<AITabScreen> {
     required Color primaryContainer,
   }) {
     return GestureDetector(
-      onTap: () => _sendMessage(action.title),
+      onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.all(15),
@@ -431,9 +431,7 @@ class _AITabScreenState extends State<AITabScreen> {
               ),
               child: Icon(action.icon, color: primaryColor, size: 21),
             ),
-
             const SizedBox(width: 13),
-
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -446,9 +444,7 @@ class _AITabScreenState extends State<AITabScreen> {
                       color: textPrimary,
                     ),
                   ),
-
                   const SizedBox(height: 3),
-
                   Text(
                     action.subtitle,
                     style: TextStyle(fontSize: 12, color: textSecondary),
@@ -456,7 +452,6 @@ class _AITabScreenState extends State<AITabScreen> {
                 ],
               ),
             ),
-
             Icon(
               Icons.arrow_forward_ios_rounded,
               size: 14,
@@ -469,6 +464,7 @@ class _AITabScreenState extends State<AITabScreen> {
   }
 
   Widget _buildHint({
+    required AppLocalizations l10n,
     required Color textSecondary,
     required Color backgroundColor,
   }) {
@@ -482,12 +478,10 @@ class _AITabScreenState extends State<AITabScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(Icons.info_outline, size: 18, color: textSecondary),
-
           const SizedBox(width: 10),
-
           Expanded(
             child: Text(
-              'Например: «Сколько плитки нужно для ванной 3×2 м?»',
+              l10n.aiExampleHint,
               style: TextStyle(
                 fontSize: 12.5,
                 height: 1.4,
@@ -515,7 +509,6 @@ class _AITabScreenState extends State<AITabScreen> {
         return _buildMessageBubble(
           _messages[index],
           textPrimary: textPrimary,
-          textSecondary: textSecondary,
           surfaceColor: surfaceColor,
           borderColor: borderColor,
           primaryColor: primaryColor,
@@ -527,7 +520,6 @@ class _AITabScreenState extends State<AITabScreen> {
   Widget _buildMessageBubble(
     _ChatMessage message, {
     required Color textPrimary,
-    required Color textSecondary,
     required Color surfaceColor,
     required Color borderColor,
     required Color primaryColor,
@@ -584,7 +576,6 @@ class _AITabScreenState extends State<AITabScreen> {
                 size: 17,
               ),
             ),
-
             Flexible(
               child: Container(
                 padding: const EdgeInsets.symmetric(
@@ -618,6 +609,7 @@ class _AITabScreenState extends State<AITabScreen> {
   }
 
   Widget _buildInputArea({
+    required AppLocalizations l10n,
     required Color surfaceColor,
     required Color textPrimary,
     required Color textSecondary,
@@ -650,7 +642,7 @@ class _AITabScreenState extends State<AITabScreen> {
                 textInputAction: TextInputAction.newline,
                 style: TextStyle(fontSize: 14, color: textPrimary),
                 decoration: InputDecoration(
-                  hintText: 'Напиши сообщение...',
+                  hintText: l10n.aiMessageHint,
                   hintStyle: TextStyle(fontSize: 14, color: textSecondary),
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(
@@ -658,20 +650,18 @@ class _AITabScreenState extends State<AITabScreen> {
                     vertical: 13,
                   ),
                 ),
-                onSubmitted: (_) => _sendMessage(),
+                onSubmitted: (_) => _sendMessage(l10n),
               ),
             ),
           ),
-
           const SizedBox(width: 10),
-
           ValueListenableBuilder<TextEditingValue>(
             valueListenable: _controller,
             builder: (context, value, child) {
               final hasText = value.text.trim().isNotEmpty;
 
               return GestureDetector(
-                onTap: hasText ? _sendMessage : null,
+                onTap: hasText ? () => _sendMessage(l10n) : null,
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 180),
                   width: 48,

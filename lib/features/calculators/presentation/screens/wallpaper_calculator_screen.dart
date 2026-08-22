@@ -342,7 +342,8 @@ class _WallpaperCalculatorScreenState extends State<WallpaperCalculatorScreen> {
                         quantity: provider.result!.rollsWithWaste.toDouble(),
                         unit: 'шт.',
                         category: 'material',
-                        comment: 'Обои ${provider.result!.rollsWithWaste} рулонов с запасом ${provider.result!.wastePercent.toStringAsFixed(0)}%',
+                        comment:
+                            'Обои ${provider.result!.rollsWithWaste} рулонов с запасом ${provider.result!.wastePercent.toStringAsFixed(0)}%',
                       ),
                     ],
                   ],

@@ -1,5 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import '../../../../core/routes/app_routes.dart';
+import '../../../../l10n/app_localizations.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -9,184 +12,331 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final _user = FirebaseAuth.instance.currentUser;
+  User? get _user => FirebaseAuth.instance.currentUser;
 
   Future<void> _logout() async {
+    final l10n = AppLocalizations.of(context)!;
+
     try {
       await FirebaseAuth.instance.signOut();
-      if (mounted) {
-        Navigator.of(context).pushReplacementNamed('/login');
-      }
+
+      if (!mounted) return;
+
+      Navigator.of(context).pushReplacementNamed(AppRoutes.login);
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Ошибка при выходе: $e')),
-        );
-      }
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${l10n.logoutError}: $e'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     }
+  }
+
+  void _openSettings() {
+    Navigator.of(context).pushNamed(AppRoutes.settings);
+  }
+
+  void _openCalculators() {
+    Navigator.of(context).pushNamed(AppRoutes.calculators);
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    final userName = _user?.displayName?.trim();
+
     return Scaffold(
+      backgroundColor: colors.surface,
       appBar: AppBar(
-        title: const Text('Brivora'),
+        title: Text(
+          l10n.appName,
+          style: const TextStyle(fontWeight: FontWeight.w700),
+        ),
         elevation: 0,
+        centerTitle: false,
         actions: [
-          PopupMenuButton(
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              switch (value) {
+                case 'settings':
+                  _openSettings();
+                  break;
+
+                case 'logout':
+                  _logout();
+                  break;
+              }
+            },
             itemBuilder: (context) => [
-              PopupMenuItem(
-                child: const Text('Профиль'),
-                onTap: () {
-                  // TODO: Переход на экран профиля
-                },
+              PopupMenuItem<String>(
+                value: 'settings',
+                child: Row(
+                  children: [
+                    const Icon(Icons.settings_outlined),
+                    const SizedBox(width: 12),
+                    Text(l10n.settings),
+                  ],
+                ),
               ),
-              PopupMenuItem(
-                child: const Text('Выход'),
-                onTap: _logout,
+              PopupMenuItem<String>(
+                value: 'logout',
+                child: Row(
+                  children: [
+                    const Icon(Icons.logout_rounded),
+                    const SizedBox(width: 12),
+                    Text(l10n.logout),
+                  ],
+                ),
               ),
             ],
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Приветствие
-            RichText(
-              text: TextSpan(
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-                children: [
-                  const TextSpan(text: 'Привет, '),
-                  TextSpan(
-                    text: _user?.displayName ?? 'пользователь',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
-                  const TextSpan(text: '!'),
-                ],
-              ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Добро пожаловать в Brivora',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey,
-              ),
-            ),
-            const SizedBox(height: 32),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final isMobile = constraints.maxWidth < 700;
+          final horizontalPadding = isMobile ? 20.0 : 32.0;
 
-            // Карточки функций
-            const Text(
-              'Основные функции',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+          return SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            padding: EdgeInsets.fromLTRB(
+              horizontalPadding,
+              isMobile ? 22 : 32,
+              horizontalPadding,
+              32,
             ),
-            const SizedBox(height: 16),
-
-            GridView.count(
-              crossAxisCount: 2,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              mainAxisSpacing: 16,
-              crossAxisSpacing: 16,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _FeatureCard(
-                  title: 'Проекты',
-                  icon: Icons.folder_open,
-                  color: Colors.blue,
-                  onTap: () {
-                    // TODO: Переход на экран проектов
-                  },
-                ),
-                _FeatureCard(
-                  title: 'Калькуляторы',
-                  icon: Icons.calculate,
-                  color: Colors.orange,
-                  onTap: () {
-                    // TODO: Переход на экран калькуляторов
-                  },
-                ),
-                _FeatureCard(
-                  title: 'Календарь',
-                  icon: Icons.calendar_today,
-                  color: Colors.green,
-                  onTap: () {
-                    // TODO: Переход на экран календаря
-                  },
-                ),
-                _FeatureCard(
-                  title: 'Финансы',
-                  icon: Icons.attach_money,
-                  color: Colors.purple,
-                  onTap: () {
-                    // TODO: Переход на экран финансов
-                  },
-                ),
-                _FeatureCard(
-                  title: 'Смет',
-                  icon: Icons.receipt_long,
-                  color: Colors.red,
-                  onTap: () {
-                    // TODO: Переход на экран смет
-                  },
-                ),
-                _FeatureCard(
-                  title: 'Настройки',
-                  icon: Icons.settings,
-                  color: Colors.grey,
-                  onTap: () {
-                    // TODO: Переход на экран настроек
-                  },
-                ),
+                _buildWelcomeSection(context, l10n, userName, isMobile),
+
+                const SizedBox(height: 30),
+
+                _buildSectionTitle(context, l10n.quickActions),
+
+                const SizedBox(height: 14),
+
+                _buildQuickActions(context, l10n, isMobile),
+
+                const SizedBox(height: 32),
+
+                _buildSectionTitle(context, l10n.profileData),
+
+                const SizedBox(height: 14),
+
+                _buildAccountCard(context, l10n, userName),
               ],
             ),
-            const SizedBox(height: 32),
+          );
+        },
+      ),
+    );
+  }
 
-            // Информация о пользователе
-            const Text(
-              'Информация об аккаунте',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+  Widget _buildWelcomeSection(
+    BuildContext context,
+    AppLocalizations l10n,
+    String? userName,
+    bool isMobile,
+  ) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    final displayName = userName?.isNotEmpty == true
+        ? userName!
+        : l10n.fullName;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          l10n.helloUser(displayName),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: theme.textTheme.headlineMedium?.copyWith(
+            fontSize: isMobile ? 27 : 34,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.8,
+            color: colors.onSurface,
+          ),
+        ),
+
+        const SizedBox(height: 8),
+
+        Text(
+          l10n.welcome,
+          style: theme.textTheme.bodyLarge?.copyWith(
+            color: colors.onSurfaceVariant,
+          ),
+        ),
+
+        const SizedBox(height: 4),
+
+        Text(
+          l10n.projectsDescription,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: colors.onSurfaceVariant,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSectionTitle(BuildContext context, String title) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    return Text(
+      title,
+      style: theme.textTheme.titleLarge?.copyWith(
+        color: colors.onSurface,
+        fontWeight: FontWeight.w700,
+        letterSpacing: -0.3,
+      ),
+    );
+  }
+
+  Widget _buildQuickActions(
+    BuildContext context,
+    AppLocalizations l10n,
+    bool isMobile,
+  ) {
+    final actions = [
+      _HomeAction(
+        title: l10n.projects,
+        subtitle: l10n.projectsDescription,
+        icon: Icons.folder_open_rounded,
+        onTap: () {
+          Navigator.of(context).maybePop();
+        },
+      ),
+      _HomeAction(
+        title: l10n.calculators,
+        subtitle: l10n.quickActions,
+        icon: Icons.calculate_rounded,
+        onTap: _openCalculators,
+      ),
+      _HomeAction(
+        title: l10n.estimate,
+        subtitle: l10n.materials,
+        icon: Icons.receipt_long_rounded,
+        onTap: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(l10n.featureComingSoon(l10n.estimate)),
+              behavior: SnackBarBehavior.floating,
             ),
-            const SizedBox(height: 16),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _InfoRow(
-                      label: 'Email:',
-                      value: _user?.email ?? 'Не указан',
-                    ),
-                    const SizedBox(height: 12),
-                    _InfoRow(
-                      label: 'Имя:',
-                      value: _user?.displayName ?? 'Не указано',
-                    ),
-                    const SizedBox(height: 12),
-                    _InfoRow(
-                      label: 'Статус:',
-                      value: _user?.emailVerified ?? false
-                          ? 'Проверен'
-                          : 'Не проверен',
-                    ),
-                  ],
-                ),
-              ),
+          );
+        },
+      ),
+      _HomeAction(
+        title: l10n.photos,
+        subtitle: l10n.photos,
+        icon: Icons.photo_library_outlined,
+        onTap: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(l10n.featureComingSoon(l10n.photos)),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        },
+      ),
+      _HomeAction(
+        title: l10n.notes,
+        subtitle: l10n.notes,
+        icon: Icons.notes_rounded,
+        onTap: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(l10n.featureComingSoon(l10n.notes)),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        },
+      ),
+      _HomeAction(
+        title: l10n.settings,
+        subtitle: l10n.settingsSubtitle,
+        icon: Icons.settings_outlined,
+        onTap: _openSettings,
+      ),
+    ];
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: actions.length,
+      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+        maxCrossAxisExtent: isMobile ? 260 : 300,
+        crossAxisSpacing: 14,
+        mainAxisSpacing: 14,
+        mainAxisExtent: isMobile ? 145 : 155,
+      ),
+      itemBuilder: (context, index) {
+        final action = actions[index];
+
+        return _HomeActionCard(action: action);
+      },
+    );
+  }
+
+  Widget _buildAccountCard(
+    BuildContext context,
+    AppLocalizations l10n,
+    String? userName,
+  ) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    final email = _user?.email?.trim();
+    final name = userName?.trim();
+
+    final emailValue = email?.isNotEmpty == true ? email! : l10n.email;
+
+    final nameValue = name?.isNotEmpty == true ? name! : l10n.fullName;
+
+    return Card(
+      elevation: 0,
+      margin: EdgeInsets.zero,
+      color: colors.surfaceContainerHighest.withValues(alpha: 0.45),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: colors.outlineVariant),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(18),
+        child: Column(
+          children: [
+            _InfoRow(label: l10n.email, value: emailValue),
+
+            const SizedBox(height: 14),
+
+            Divider(height: 1, color: colors.outlineVariant),
+
+            const SizedBox(height: 14),
+
+            _InfoRow(label: l10n.fullName, value: nameValue),
+
+            const SizedBox(height: 14),
+
+            Divider(height: 1, color: colors.outlineVariant),
+
+            const SizedBox(height: 14),
+
+            _InfoRow(
+              label: l10n.security,
+              value: _user?.emailVerified == true
+                  ? l10n.completed
+                  : l10n.inProgress,
             ),
           ],
         ),
@@ -195,50 +345,79 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class _FeatureCard extends StatelessWidget {
+class _HomeAction {
   final String title;
+  final String subtitle;
   final IconData icon;
-  final Color color;
   final VoidCallback onTap;
 
-  const _FeatureCard({
+  const _HomeAction({
     required this.title,
+    required this.subtitle,
     required this.icon,
-    required this.color,
     required this.onTap,
   });
+}
+
+class _HomeActionCard extends StatelessWidget {
+  final _HomeAction action;
+
+  const _HomeActionCard({required this.action});
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Card(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    return Material(
+      color: colors.surfaceContainerHighest.withValues(alpha: 0.45),
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        onTap: action.onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: colors.outlineVariant),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 46,
+                height: 46,
+                decoration: BoxDecoration(
+                  color: colors.primary.withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(13),
+                ),
+                child: Icon(action.icon, color: colors.primary, size: 24),
               ),
-              child: Icon(
-                icon,
-                color: color,
-                size: 32,
+
+              const Spacer(),
+
+              Text(
+                action.title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: colors.onSurface,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
+
+              const SizedBox(height: 3),
+
+              Text(
+                action.subtitle,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colors.onSurfaceVariant,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -249,28 +428,38 @@ class _InfoRow extends StatelessWidget {
   final String label;
   final String value;
 
-  const _InfoRow({
-    required this.label,
-    required this.value,
-  });
+  const _InfoRow({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontWeight: FontWeight.w500,
-            color: Colors.grey,
+        Expanded(
+          flex: 2,
+          child: Text(
+            label,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colors.onSurfaceVariant,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
+
+        const SizedBox(width: 16),
+
         Expanded(
+          flex: 3,
           child: Text(
             value,
             textAlign: TextAlign.right,
-            style: const TextStyle(
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colors.onSurface,
               fontWeight: FontWeight.w600,
             ),
           ),

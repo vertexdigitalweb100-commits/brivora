@@ -33,7 +33,7 @@ class AppLocalizationsKk extends AppLocalizations {
   String get language => 'Тіл';
 
   @override
-  String get russian => 'Орысша';
+  String get russian => 'Русский';
 
   @override
   String get kazakh => 'Қазақша';
@@ -66,7 +66,7 @@ class AppLocalizationsKk extends AppLocalizations {
   String get save => 'Сақтау';
 
   @override
-  String get cancel => 'Болдырмау';
+  String get cancel => 'Бас тарту';
 
   @override
   String get delete => 'Жою';
@@ -85,6 +85,15 @@ class AppLocalizationsKk extends AppLocalizations {
 
   @override
   String get done => 'Дайын';
+
+  @override
+  String get create => 'Жасау';
+
+  @override
+  String get reset => 'Қалпына келтіру';
+
+  @override
+  String get retry => 'Қайталап көру';
 
   @override
   String get darkTheme => 'Қараңғы тақырып';
@@ -110,7 +119,7 @@ class AppLocalizationsKk extends AppLocalizations {
   }
 
   @override
-  String get projectsDescription => 'Жобаларыңызды бір жерден басқарыңыз';
+  String get projectsDescription => 'Жобаларыңызды бір жерде басқарыңыз';
 
   @override
   String get noProjects => 'Сізде әзірге жобалар жоқ';
@@ -124,10 +133,10 @@ class AppLocalizationsKk extends AppLocalizations {
   }
 
   @override
-  String get completed => 'Аяқталған';
+  String get completed => 'Аяқталды';
 
   @override
-  String get inProgress => 'Орындалуда';
+  String get inProgress => 'Жұмыста';
 
   @override
   String get overview => 'Шолу';
@@ -136,8 +145,7 @@ class AppLocalizationsKk extends AppLocalizations {
   String get noRecentProjectsTitle => 'Соңғы жобалар жоқ';
 
   @override
-  String get noRecentProjectsSubtitle =>
-      'Жоба жасаңыз, сонда ол осы жерде пайда болады';
+  String get noRecentProjectsSubtitle => 'Осы жерден көру үшін жоба жасаңыз';
 
   @override
   String get all => 'Барлығы';
@@ -146,7 +154,10 @@ class AppLocalizationsKk extends AppLocalizations {
   String get newProject => 'Жаңа жоба';
 
   @override
-  String get create => 'Жасау';
+  String get newProjectShort => 'Жаңа';
+
+  @override
+  String get createProject => 'Жоба жасау';
 
   @override
   String get materials => 'Материалдар';
@@ -170,7 +181,7 @@ class AppLocalizationsKk extends AppLocalizations {
   String get statusActive => 'Белсенді';
 
   @override
-  String get openedRecently => 'Жақында ашылған';
+  String get openedRecently => 'Жақында ашылды';
 
   @override
   String get openedJustNow => 'Жаңа ғана ашылды';
@@ -225,6 +236,60 @@ class AppLocalizationsKk extends AppLocalizations {
   }
 
   @override
+  String get newestProjects => 'Жаңалары';
+
+  @override
+  String get oldestProjects => 'Ескілері';
+
+  @override
+  String get nameAscending => 'Атауы А–Я';
+
+  @override
+  String get nameDescending => 'Атауы Я–А';
+
+  @override
+  String shownProjects(int count) {
+    return 'Көрсетілген жобалар: $count';
+  }
+
+  @override
+  String get projectsManagementDescription => 'Құрылыс жобаларын басқарыңыз';
+
+  @override
+  String get searchProjects => 'Жобаларды іздеу...';
+
+  @override
+  String get activeProjectsLabel => 'Белсенді';
+
+  @override
+  String get planningProjectsLabel => 'Жоспарлау';
+
+  @override
+  String get completedProjectsLabel => 'Аяқталған';
+
+  @override
+  String get projectsLoadError => 'Жобаларды жүктеу мүмкін болмады';
+
+  @override
+  String get nothingFound => 'Ештеңе табылмады';
+
+  @override
+  String get noProjectsYet => 'Әзірге жобалар жоқ';
+
+  @override
+  String get changeSearchOrFilter =>
+      'Іздеу немесе сүзгі параметрлерін өзгертіп көріңіз.';
+
+  @override
+  String get createFirstProjectDescription =>
+      'Жұмысты бастау үшін алғашқы жобаңызды жасаңыз.';
+
+  @override
+  String projectCreated(String title) {
+    return '«$title» жобасы жасалды';
+  }
+
+  @override
   String get registration => 'Тіркелу';
 
   @override
@@ -255,13 +320,13 @@ class AppLocalizationsKk extends AppLocalizations {
   String get enterEmail => 'Электрондық поштаңызды енгізіңіз';
 
   @override
-  String get invalidEmail => 'Дұрыс электрондық пошта енгізіңіз';
+  String get invalidEmail => 'Дұрыс электрондық пошта мекенжайын енгізіңіз';
 
   @override
   String get password => 'Құпиясөз';
 
   @override
-  String get passwordHint => 'Құпиясөзді енгізіңіз';
+  String get passwordHint => 'Құпиясөзіңізді енгізіңіз';
 
   @override
   String get enterPassword => 'Құпиясөзді енгізіңіз';
@@ -279,10 +344,10 @@ class AppLocalizationsKk extends AppLocalizations {
   String get confirmPasswordRequired => 'Құпиясөзді растаңыз';
 
   @override
-  String get agreeToTerms => 'Мен';
+  String get agreeToTerms => 'Мен қабылдаймын';
 
   @override
-  String get termsOfUse => 'пайдалану шарттарын қабылдаймын';
+  String get termsOfUse => 'пайдалану шарттарын';
 
   @override
   String get passwordsDoNotMatch => 'Құпиясөздер сәйкес келмейді';
@@ -309,22 +374,22 @@ class AppLocalizationsKk extends AppLocalizations {
   String get invalidEmailAuth => 'Электрондық пошта мекенжайы дұрыс емес';
 
   @override
-  String get registrationError => 'Аккаунт жасау мүмкін болмады';
+  String get registrationError => 'Аккаунтты тіркеу мүмкін болмады';
 
   @override
   String get addName => 'Атыңызды қосыңыз';
 
   @override
-  String get addRoleAndCompany => 'Лауазым мен компанияны көрсетіңіз';
+  String get addRoleAndCompany => 'Лауазымыңыз бен компанияңызды көрсетіңіз';
 
   @override
   String get chooseFromGallery => 'Галереядан таңдау';
 
   @override
-  String get takePhoto => 'Суретке түсіру';
+  String get takePhoto => 'Фото түсіру';
 
   @override
-  String get deletePhoto => 'Суретті өшіру';
+  String get deletePhoto => 'Фотосуретті жою';
 
   @override
   String get avatarUpdated => 'Аватар сәтті жаңартылды';
@@ -335,11 +400,11 @@ class AppLocalizationsKk extends AppLocalizations {
   }
 
   @override
-  String get avatarDeleted => 'Аватар өшірілді';
+  String get avatarDeleted => 'Аватар жойылды';
 
   @override
   String avatarDeleteError(String error) {
-    return 'Аватарды өшіру мүмкін болмады: $error';
+    return 'Аватарды жою мүмкін болмады: $error';
   }
 
   @override
@@ -355,7 +420,7 @@ class AppLocalizationsKk extends AppLocalizations {
   String get position => 'Лауазымы';
 
   @override
-  String get positionExample => 'Мысалы: Прораб';
+  String get positionExample => 'Мысалы: Бригадир';
 
   @override
   String get company => 'Компания';
@@ -420,4 +485,73 @@ class AppLocalizationsKk extends AppLocalizations {
   String featureComingSoon(String feature) {
     return '$feature — жақында қолжетімді болады';
   }
+
+  @override
+  String get aiAssistant => 'ЖИ көмекшісі';
+
+  @override
+  String get online => 'Онлайн';
+
+  @override
+  String get aiWhatCanIDo => 'Мен не істей аламын?';
+
+  @override
+  String get aiWelcomeTitle => 'Қалай көмектесе аламын?';
+
+  @override
+  String get aiWelcomeDescription =>
+      'Жөндеу, материалдар, есептеулер немесе смета жасау туралы сұраңыз.';
+
+  @override
+  String get aiCalculateMaterial => 'Материалды есептеу';
+
+  @override
+  String get aiCalculateMaterialSubtitle => 'Плитка, бояу, тұсқағаз';
+
+  @override
+  String get aiCreateEstimate => 'Смета жасау';
+
+  @override
+  String get aiCreateEstimateSubtitle => 'Есепті жылдам құрастыру';
+
+  @override
+  String get aiAnalyzePhoto => 'Фотоны талдау';
+
+  @override
+  String get aiAnalyzePhotoSubtitle => 'Нысандағы мәселелерді табу';
+
+  @override
+  String get aiRepairAdvice => 'Жөндеу бойынша кеңес';
+
+  @override
+  String get aiRepairAdviceSubtitle => 'Ұсыныс алу';
+
+  @override
+  String get aiExampleHint => 'Мысалы: «3×2 м ваннаға қанша плитка қажет?»';
+
+  @override
+  String get aiMessageHint => 'Хабарлама жазыңыз...';
+
+  @override
+  String get aiTileAnswer =>
+      'Әрине. Плитканы есептеу үшін бөлменің өлшемдері, бір плитканың өлшемі және қажетті қор мөлшері керек. Әдетте кесуге шамамен 10% қор қосуды ұсынамын.';
+
+  @override
+  String get aiEstimateAnswer =>
+      'Смета жасауға көмектесе аламын. Нысанның ауданын және жұмыс немесе материалдар тізімін көрсетіңіз — есепті құрылымдауға көмектесемін.';
+
+  @override
+  String get aiPaintAnswer =>
+      'Бояу мөлшерін есептеу үшін бетінің ауданы, қабат саны және 1 м²-ге кететін бояу шығыны қажет.';
+
+  @override
+  String get aiWallpaperAnswer =>
+      'Тұсқағазды есептеу үшін бөлменің өлшемдері, төбенің биіктігі, орамның ені мен ұзындығы қажет.';
+
+  @override
+  String get aiDefaultAnswer =>
+      'Түсіндім 👍\n\nМатериалдарды есептеуге, смета жасауға, жөндеу және жұмыстарды ұйымдастыруға көмектесе аламын. Тапсырманы толығырақ сипаттап көріңіз.';
+
+  @override
+  String get accountStatus => 'Аккаунт күйі';
 }

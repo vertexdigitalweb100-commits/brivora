@@ -11,7 +11,8 @@ class LaminateCalculatorScreen extends StatefulWidget {
   const LaminateCalculatorScreen({super.key, this.project});
 
   @override
-  State<LaminateCalculatorScreen> createState() => _LaminateCalculatorScreenState();
+  State<LaminateCalculatorScreen> createState() =>
+      _LaminateCalculatorScreenState();
 }
 
 class _LaminateCalculatorScreenState extends State<LaminateCalculatorScreen> {
@@ -45,7 +46,11 @@ class _LaminateCalculatorScreenState extends State<LaminateCalculatorScreen> {
     provider.reset();
   }
 
-  String? _validatePositive(String? value, String label, {bool allowZero = false}) {
+  String? _validatePositive(
+    String? value,
+    String label, {
+    bool allowZero = false,
+  }) {
     if (value == null || value.trim().isEmpty) {
       return 'Введите $label';
     }
@@ -60,7 +65,11 @@ class _LaminateCalculatorScreenState extends State<LaminateCalculatorScreen> {
     return null;
   }
 
-  String? _validateInteger(String? value, String label, {bool allowZero = false}) {
+  String? _validateInteger(
+    String? value,
+    String label, {
+    bool allowZero = false,
+  }) {
     if (value == null || value.trim().isEmpty) {
       return 'Введите $label';
     }
@@ -147,8 +156,10 @@ class _LaminateCalculatorScreenState extends State<LaminateCalculatorScreen> {
                                 label: 'Панелей в упаковке',
                                 suffixText: 'шт.',
                                 onChanged: provider.setPanelsPerPack,
-                                validator: (value) =>
-                                    _validateInteger(value, 'панелей в упаковке'),
+                                validator: (value) => _validateInteger(
+                                  value,
+                                  'панелей в упаковке',
+                                ),
                               ),
                               const SizedBox(height: 16),
                               _buildNumberField(
@@ -166,7 +177,8 @@ class _LaminateCalculatorScreenState extends State<LaminateCalculatorScreen> {
                               ElevatedButton(
                                 onPressed: () {
                                   FocusScope.of(context).unfocus();
-                                  if (_formKey.currentState?.validate() ?? false) {
+                                  if (_formKey.currentState?.validate() ??
+                                      false) {
                                     provider.calculate();
                                   }
                                 },
@@ -217,13 +229,15 @@ class _LaminateCalculatorScreenState extends State<LaminateCalculatorScreen> {
                               _buildResultRow(
                                 context,
                                 label: 'Необходимо панелей',
-                                value: '${provider.result!.panelsWithoutWaste} шт.',
+                                value:
+                                    '${provider.result!.panelsWithoutWaste} шт.',
                               ),
                               const SizedBox(height: 12),
                               _buildResultRow(
                                 context,
                                 label: 'С запасом',
-                                value: '${provider.result!.panelsWithWaste} шт.',
+                                value:
+                                    '${provider.result!.panelsWithWaste} шт.',
                               ),
                               const SizedBox(height: 12),
                               _buildResultRow(
@@ -242,7 +256,8 @@ class _LaminateCalculatorScreenState extends State<LaminateCalculatorScreen> {
                         quantity: provider.result!.packs.toDouble(),
                         unit: 'уп.',
                         category: 'material',
-                        comment: 'Ламинат ${provider.result!.packs} упак. с запасом ${provider.result!.wastePercent.toStringAsFixed(0)}%',
+                        comment:
+                            'Ламинат ${provider.result!.packs} упак. с запасом ${provider.result!.wastePercent.toStringAsFixed(0)}%',
                       ),
                     ],
                   ],
@@ -284,10 +299,9 @@ class _LaminateCalculatorScreenState extends State<LaminateCalculatorScreen> {
         ),
         Text(
           value,
-          style: Theme.of(context)
-              .textTheme
-              .bodyLarge
-              ?.copyWith(fontWeight: FontWeight.w700),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w700),
         ),
       ],
     );

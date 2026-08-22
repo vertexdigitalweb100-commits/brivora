@@ -2,18 +2,16 @@ import 'package:flutter/material.dart';
 import '../../domain/models/project.dart';
 
 /// Пользовательский AppBar для экрана Project Details
-/// 
+///
 /// Отображает:
 /// - Кнопку "Назад"
 /// - Название проекта
 /// - Статус проекта в виде badge
-class ProjectDetailsAppBar extends StatelessWidget implements PreferredSizeWidget {
+class ProjectDetailsAppBar extends StatelessWidget
+    implements PreferredSizeWidget {
   final Project project;
 
-  const ProjectDetailsAppBar({
-    super.key,
-    required this.project,
-  });
+  const ProjectDetailsAppBar({super.key, required this.project});
 
   /// Возвращает цвет badge в зависимости от статуса проекта
   Color _getStatusColor(BuildContext context, ProjectStatus status) {

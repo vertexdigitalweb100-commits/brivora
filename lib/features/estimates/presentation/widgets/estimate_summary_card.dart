@@ -22,7 +22,9 @@ class EstimateSummaryCard extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               EstimateItem.formatMoney(provider.grandTotal),
-              style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 20),
             _buildSummaryRow('Материалы', provider.totalMaterials, context),
@@ -45,7 +47,10 @@ class EstimateSummaryCard extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(title, style: Theme.of(context).textTheme.bodyLarge),
-        Text(EstimateItem.formatMoney(value), style: Theme.of(context).textTheme.bodyLarge),
+        Text(
+          EstimateItem.formatMoney(value),
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
       ],
     );
   }

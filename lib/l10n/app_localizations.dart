@@ -254,6 +254,24 @@ abstract class AppLocalizations {
   /// **'Готово'**
   String get done;
 
+  /// No description provided for @create.
+  ///
+  /// In ru, this message translates to:
+  /// **'Создать'**
+  String get create;
+
+  /// No description provided for @reset.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сбросить'**
+  String get reset;
+
+  /// No description provided for @retry.
+  ///
+  /// In ru, this message translates to:
+  /// **'Повторить'**
+  String get retry;
+
   /// No description provided for @darkTheme.
   ///
   /// In ru, this message translates to:
@@ -362,11 +380,17 @@ abstract class AppLocalizations {
   /// **'Новый проект'**
   String get newProject;
 
-  /// No description provided for @create.
+  /// No description provided for @newProjectShort.
   ///
   /// In ru, this message translates to:
-  /// **'Создать'**
-  String get create;
+  /// **'Новый'**
+  String get newProjectShort;
+
+  /// No description provided for @createProject.
+  ///
+  /// In ru, this message translates to:
+  /// **'Создать проект'**
+  String get createProject;
 
   /// No description provided for @materials.
   ///
@@ -487,6 +511,102 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Обновлён {date}'**
   String updatedDate(String date);
+
+  /// No description provided for @newestProjects.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новые'**
+  String get newestProjects;
+
+  /// No description provided for @oldestProjects.
+  ///
+  /// In ru, this message translates to:
+  /// **'Старые'**
+  String get oldestProjects;
+
+  /// No description provided for @nameAscending.
+  ///
+  /// In ru, this message translates to:
+  /// **'Название А–Я'**
+  String get nameAscending;
+
+  /// No description provided for @nameDescending.
+  ///
+  /// In ru, this message translates to:
+  /// **'Название Я–А'**
+  String get nameDescending;
+
+  /// No description provided for @shownProjects.
+  ///
+  /// In ru, this message translates to:
+  /// **'Показано проектов: {count}'**
+  String shownProjects(int count);
+
+  /// No description provided for @projectsManagementDescription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Управляйте строительными проектами'**
+  String get projectsManagementDescription;
+
+  /// No description provided for @searchProjects.
+  ///
+  /// In ru, this message translates to:
+  /// **'Поиск проектов...'**
+  String get searchProjects;
+
+  /// No description provided for @activeProjectsLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Активные'**
+  String get activeProjectsLabel;
+
+  /// No description provided for @planningProjectsLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Планирование'**
+  String get planningProjectsLabel;
+
+  /// No description provided for @completedProjectsLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Завершённые'**
+  String get completedProjectsLabel;
+
+  /// No description provided for @projectsLoadError.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось загрузить проекты'**
+  String get projectsLoadError;
+
+  /// No description provided for @nothingFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ничего не найдено'**
+  String get nothingFound;
+
+  /// No description provided for @noProjectsYet.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пока нет проектов'**
+  String get noProjectsYet;
+
+  /// No description provided for @changeSearchOrFilter.
+  ///
+  /// In ru, this message translates to:
+  /// **'Попробуйте изменить поиск или фильтр.'**
+  String get changeSearchOrFilter;
+
+  /// No description provided for @createFirstProjectDescription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Создайте первый проект, чтобы начать работу.'**
+  String get createFirstProjectDescription;
+
+  /// No description provided for @projectCreated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проект «{title}» создан'**
+  String projectCreated(String title);
 
   /// No description provided for @registration.
   ///
@@ -853,6 +973,132 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'{feature} — скоро будет доступно'**
   String featureComingSoon(String feature);
+
+  /// No description provided for @aiAssistant.
+  ///
+  /// In ru, this message translates to:
+  /// **'ИИ-помощник'**
+  String get aiAssistant;
+
+  /// No description provided for @online.
+  ///
+  /// In ru, this message translates to:
+  /// **'Онлайн'**
+  String get online;
+
+  /// No description provided for @aiWhatCanIDo.
+  ///
+  /// In ru, this message translates to:
+  /// **'Что я могу сделать?'**
+  String get aiWhatCanIDo;
+
+  /// No description provided for @aiWelcomeTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Чем могу помочь?'**
+  String get aiWelcomeTitle;
+
+  /// No description provided for @aiWelcomeDescription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Спроси меня о ремонте, материалах, расчётах или создании сметы.'**
+  String get aiWelcomeDescription;
+
+  /// No description provided for @aiCalculateMaterial.
+  ///
+  /// In ru, this message translates to:
+  /// **'Рассчитать материал'**
+  String get aiCalculateMaterial;
+
+  /// No description provided for @aiCalculateMaterialSubtitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Плитка, краска, обои'**
+  String get aiCalculateMaterialSubtitle;
+
+  /// No description provided for @aiCreateEstimate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Создать смету'**
+  String get aiCreateEstimate;
+
+  /// No description provided for @aiCreateEstimateSubtitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Быстро составить расчёт'**
+  String get aiCreateEstimateSubtitle;
+
+  /// No description provided for @aiAnalyzePhoto.
+  ///
+  /// In ru, this message translates to:
+  /// **'Анализ фото'**
+  String get aiAnalyzePhoto;
+
+  /// No description provided for @aiAnalyzePhotoSubtitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Найти проблемы на объекте'**
+  String get aiAnalyzePhotoSubtitle;
+
+  /// No description provided for @aiRepairAdvice.
+  ///
+  /// In ru, this message translates to:
+  /// **'Совет по ремонту'**
+  String get aiRepairAdvice;
+
+  /// No description provided for @aiRepairAdviceSubtitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Получить рекомендацию'**
+  String get aiRepairAdviceSubtitle;
+
+  /// No description provided for @aiExampleHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Например: «Сколько плитки нужно для ванной 3×2 м?»'**
+  String get aiExampleHint;
+
+  /// No description provided for @aiMessageHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Напиши сообщение...'**
+  String get aiMessageHint;
+
+  /// No description provided for @aiTileAnswer.
+  ///
+  /// In ru, this message translates to:
+  /// **'Конечно. Для расчёта плитки мне понадобятся размеры помещения, размер одной плитки и желаемый запас. Обычно рекомендую закладывать около 10% на подрезку.'**
+  String get aiTileAnswer;
+
+  /// No description provided for @aiEstimateAnswer.
+  ///
+  /// In ru, this message translates to:
+  /// **'Могу помочь составить смету. Укажи площадь объекта и список работ или материалов — я помогу структурировать расчёт.'**
+  String get aiEstimateAnswer;
+
+  /// No description provided for @aiPaintAnswer.
+  ///
+  /// In ru, this message translates to:
+  /// **'Для расчёта краски нужны площадь поверхности, количество слоёв и расход краски на 1 м².'**
+  String get aiPaintAnswer;
+
+  /// No description provided for @aiWallpaperAnswer.
+  ///
+  /// In ru, this message translates to:
+  /// **'Для расчёта обоев нужны размеры помещения, высота потолка, ширина рулона и длина рулона.'**
+  String get aiWallpaperAnswer;
+
+  /// No description provided for @aiDefaultAnswer.
+  ///
+  /// In ru, this message translates to:
+  /// **'Понял тебя 👍\n\nЯ могу помочь с расчётами материалов, сметами, ремонтом и организацией работ. Попробуй сформулировать задачу подробнее.'**
+  String get aiDefaultAnswer;
+
+  /// No description provided for @accountStatus.
+  ///
+  /// In ru, this message translates to:
+  /// **'Статус аккаунта'**
+  String get accountStatus;
 }
 
 class _AppLocalizationsDelegate

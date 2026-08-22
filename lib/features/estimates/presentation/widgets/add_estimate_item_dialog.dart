@@ -27,14 +27,18 @@ class _AddEstimateItemDialogState extends State<AddEstimateItemDialog> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.existingItem?.name ?? '');
+    _nameController = TextEditingController(
+      text: widget.existingItem?.name ?? '',
+    );
     _quantityController = TextEditingController(
       text: widget.existingItem?.quantity.toString() ?? '1',
     );
     _unitPriceController = TextEditingController(
       text: widget.existingItem?.unitPrice.toString() ?? '0',
     );
-    _commentController = TextEditingController(text: widget.existingItem?.comment ?? '');
+    _commentController = TextEditingController(
+      text: widget.existingItem?.comment ?? '',
+    );
     _category = widget.existingItem?.category ?? 'material';
     _unit = widget.existingItem?.unit ?? 'шт.';
   }
@@ -49,23 +53,29 @@ class _AddEstimateItemDialogState extends State<AddEstimateItemDialog> {
   }
 
   double get _quantity {
-    return double.tryParse(_quantityController.text.replaceAll(',', '.')) ?? 0.0;
+    return double.tryParse(_quantityController.text.replaceAll(',', '.')) ??
+        0.0;
   }
 
   double get _unitPrice {
-    return double.tryParse(_unitPriceController.text.replaceAll(',', '.')) ?? 0.0;
+    return double.tryParse(_unitPriceController.text.replaceAll(',', '.')) ??
+        0.0;
   }
 
   double get _totalPrice => _quantity * _unitPrice;
 
   bool get _canSave {
-    return _nameController.text.trim().isNotEmpty && _quantity > 0 && _unitPrice >= 0;
+    return _nameController.text.trim().isNotEmpty &&
+        _quantity > 0 &&
+        _unitPrice >= 0;
   }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(widget.existingItem == null ? 'Новая позиция' : 'Редактировать позицию'),
+      title: Text(
+        widget.existingItem == null ? 'Новая позиция' : 'Редактировать позицию',
+      ),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -79,10 +89,12 @@ class _AddEstimateItemDialogState extends State<AddEstimateItemDialog> {
             DropdownButtonFormField<String>(
               initialValue: _category,
               items: EstimateItem.categories
-                  .map((category) => DropdownMenuItem(
-                        value: category,
-                        child: Text(EstimateItem.categoryTitle(category)),
-                      ))
+                  .map(
+                    (category) => DropdownMenuItem(
+                      value: category,
+                      child: Text(EstimateItem.categoryTitle(category)),
+                    ),
+                  )
                   .toList(),
               onChanged: (value) {
                 if (value != null) {
@@ -97,7 +109,9 @@ class _AddEstimateItemDialogState extends State<AddEstimateItemDialog> {
                 Expanded(
                   child: TextField(
                     controller: _quantityController,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
                     decoration: const InputDecoration(labelText: 'Количество'),
                     onChanged: (_) => setState(() {}),
                   ),
@@ -107,10 +121,10 @@ class _AddEstimateItemDialogState extends State<AddEstimateItemDialog> {
                   child: DropdownButtonFormField<String>(
                     initialValue: _unit,
                     items: EstimateItem.units
-                        .map((unit) => DropdownMenuItem(
-                              value: unit,
-                              child: Text(unit),
-                            ))
+                        .map(
+                          (unit) =>
+                              DropdownMenuItem(value: unit, child: Text(unit)),
+                        )
                         .toList(),
                     onChanged: (value) {
                       if (value != null) {
@@ -125,7 +139,9 @@ class _AddEstimateItemDialogState extends State<AddEstimateItemDialog> {
             const SizedBox(height: 12),
             TextField(
               controller: _unitPriceController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               decoration: const InputDecoration(labelText: 'Цена за единицу'),
               onChanged: (_) => setState(() {}),
             ),

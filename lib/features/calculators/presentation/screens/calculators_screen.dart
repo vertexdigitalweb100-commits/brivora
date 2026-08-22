@@ -205,7 +205,9 @@ class CalculatorsScreen extends StatelessWidget {
                         height: 56,
                         width: 56,
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.tertiary.withOpacity(0.12),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.tertiary.withOpacity(0.12),
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Icon(

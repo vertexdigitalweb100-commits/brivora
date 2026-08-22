@@ -50,11 +50,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: const Icon(
-                Icons.business,
-                size: 60,
-                color: Colors.blue,
-              ),
+              child: const Icon(Icons.business, size: 60, color: Colors.blue),
             ),
             const SizedBox(height: 24),
             // Название приложения
@@ -69,10 +65,7 @@ class _SplashScreenState extends State<SplashScreen> {
             const SizedBox(height: 8),
             const Text(
               'Project Management',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.white70,
-              ),
+              style: TextStyle(fontSize: 14, color: Colors.white70),
             ),
             const SizedBox(height: 48),
             // Индикатор загрузки

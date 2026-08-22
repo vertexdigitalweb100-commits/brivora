@@ -72,7 +72,9 @@ class EstimateItem {
     };
   }
 
-  factory EstimateItem.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+  factory EstimateItem.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
     final data = doc.data() ?? {};
     final quantity = (data['quantity'] ?? 0).toDouble();
     final unitPrice = (data['unitPrice'] ?? 0).toDouble();
@@ -84,7 +86,8 @@ class EstimateItem {
       quantity: quantity,
       unit: data['unit'] as String? ?? 'шт.',
       unitPrice: unitPrice,
-      totalPrice: (data['totalPrice'] as num?)?.toDouble() ?? quantity * unitPrice,
+      totalPrice:
+          (data['totalPrice'] as num?)?.toDouble() ?? quantity * unitPrice,
       comment: data['comment'] as String? ?? '',
       createdAt: data['createdAt'] is Timestamp
           ? (data['createdAt'] as Timestamp).toDate()

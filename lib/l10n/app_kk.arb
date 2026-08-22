@@ -1,300 +1,366 @@
 {
-"@@locale": "kk",
+  "@@locale": "kk",
 
-"appName": "Brivora",
+  "appName": "Brivora",
 
-"home": "Басты бет",
-"projects": "Жобалар",
-"ai": "Жасанды интеллект",
-"profile": "Профиль",
+  "home": "Басты бет",
+  "projects": "Жобалар",
+  "ai": "Жасанды интеллект",
+  "profile": "Профиль",
 
-"settings": "Баптаулар",
-"appearance": "Безендіру",
-"language": "Тіл",
+  "settings": "Баптаулар",
+  "appearance": "Безендіру",
+  "language": "Тіл",
 
-"russian": "Орысша",
-"kazakh": "Қазақша",
+  "russian": "Русский",
+  "kazakh": "Қазақша",
 
-"recentProjects": "Соңғы жобалар",
-"noRecentProjects": "Соңғы жобалар жоқ",
+  "recentProjects": "Соңғы жобалар",
+  "noRecentProjects": "Соңғы жобалар жоқ",
 
-"tasks": "Тапсырмалар",
-"notes": "Жазбалар",
-"photos": "Фотолар",
-"estimate": "Смета",
-"calculators": "Калькуляторлар",
+  "tasks": "Тапсырмалар",
+  "notes": "Жазбалар",
+  "photos": "Фотолар",
+  "estimate": "Смета",
+  "calculators": "Калькуляторлар",
 
-"notifications": "Хабарландырулар",
+  "notifications": "Хабарландырулар",
 
-"save": "Сақтау",
-"cancel": "Болдырмау",
-"delete": "Жою",
-"edit": "Өзгерту",
-"close": "Жабу",
-"back": "Артқа",
-"add": "Қосу",
-"done": "Дайын",
+  "save": "Сақтау",
+  "cancel": "Бас тарту",
+  "delete": "Жою",
+  "edit": "Өзгерту",
+  "close": "Жабу",
+  "back": "Артқа",
+  "add": "Қосу",
+  "done": "Дайын",
+  "create": "Жасау",
+  "reset": "Қалпына келтіру",
+  "retry": "Қайталап көру",
 
-"darkTheme": "Қараңғы тақырып",
-"lightTheme": "Жарық тақырып",
-"systemTheme": "Жүйе бойынша",
+  "darkTheme": "Қараңғы тақырып",
+  "lightTheme": "Жарық тақырып",
+  "systemTheme": "Жүйе бойынша",
 
-"loading": "Жүктелуде...",
+  "loading": "Жүктелуде...",
 
-"quickActions": "Жылдам әрекеттер",
-"welcome": "Қош келдіңіз",
-"helloUser": "Сәлеметсіз бе, {name}",
-"projectsDescription": "Жобаларыңызды бір жерден басқарыңыз",
-"noProjects": "Сізде әзірге жобалар жоқ",
-"createFirstProject": "Алғашқы жобаңызды жасаңыз",
-"projectsCount": "{count}",
-"completed": "Аяқталған",
-"inProgress": "Орындалуда",
-"overview": "Шолу",
+  "quickActions": "Жылдам әрекеттер",
+  "welcome": "Қош келдіңіз",
+  "helloUser": "Сәлеметсіз бе, {name}",
+  "projectsDescription": "Жобаларыңызды бір жерде басқарыңыз",
+  "noProjects": "Сізде әзірге жобалар жоқ",
+  "createFirstProject": "Алғашқы жобаңызды жасаңыз",
+  "projectsCount": "{count}",
+  "completed": "Аяқталды",
+  "inProgress": "Жұмыста",
+  "overview": "Шолу",
 
-"noRecentProjectsTitle": "Соңғы жобалар жоқ",
-"noRecentProjectsSubtitle": "Жоба жасаңыз, сонда ол осы жерде пайда болады",
-"all": "Барлығы",
-"newProject": "Жаңа жоба",
-"create": "Жасау",
-"materials": "Материалдар",
-"untitled": "Атаусыз",
-"progress": "Прогресс",
+  "noRecentProjectsTitle": "Соңғы жобалар жоқ",
+  "noRecentProjectsSubtitle": "Осы жерден көру үшін жоба жасаңыз",
 
-"statusCompleted": "Аяқталған",
-"statusPlanning": "Жоспарлау",
-"statusArchived": "Мұрағатталған",
-"statusActive": "Белсенді",
+  "all": "Барлығы",
+  "newProject": "Жаңа жоба",
+  "newProjectShort": "Жаңа",
+  "createProject": "Жоба жасау",
+  "materials": "Материалдар",
+  "untitled": "Атаусыз",
+  "progress": "Прогресс",
 
-"openedRecently": "Жақында ашылған",
-"openedJustNow": "Жаңа ғана ашылды",
-"openedMinutesAgo": "{count} мин. бұрын ашылды",
-"openedHoursAgo": "{count} сағ. бұрын ашылды",
-"openedYesterday": "Кеше ашылды",
-"openedDaysAgo": "{count} күн бұрын ашылды",
-"openedDate": "{date} ашылды",
+  "statusCompleted": "Аяқталған",
+  "statusPlanning": "Жоспарлау",
+  "statusArchived": "Мұрағатталған",
+  "statusActive": "Белсенді",
 
-"updatedJustNow": "Жаңа ғана жаңартылды",
-"updatedMinutesAgo": "{count} мин. бұрын жаңартылды",
-"updatedHoursAgo": "{count} сағ. бұрын жаңартылды",
-"updatedYesterday": "Кеше жаңартылды",
-"updatedDaysAgo": "{count} күн бұрын жаңартылды",
-"updatedDate": "{date} жаңартылды",
+  "openedRecently": "Жақында ашылды",
+  "openedJustNow": "Жаңа ғана ашылды",
+  "openedMinutesAgo": "{count} мин. бұрын ашылды",
+  "openedHoursAgo": "{count} сағ. бұрын ашылды",
+  "openedYesterday": "Кеше ашылды",
+  "openedDaysAgo": "{count} күн бұрын ашылды",
+  "openedDate": "{date} ашылды",
 
-"registration": "Тіркелу",
-"createAccount": "Аккаунт жасау",
-"createAccountDescription": "Brivora қолдану үшін аккаунт жасаңыз",
-"fullName": "Толық аты-жөні",
-"fullNameHint": "Толық аты-жөніңізді енгізіңіз",
-"enterName": "Атыңызды енгізіңіз",
-"nameMinLength": "Аты кемінде 2 таңбадан тұруы керек",
+  "updatedJustNow": "Жаңа ғана жаңартылды",
+  "updatedMinutesAgo": "{count} мин. бұрын жаңартылды",
+  "updatedHoursAgo": "{count} сағ. бұрын жаңартылды",
+  "updatedYesterday": "Кеше жаңартылды",
+  "updatedDaysAgo": "{count} күн бұрын жаңартылды",
+  "updatedDate": "{date} жаңартылды",
 
-"email": "Электрондық пошта",
-"emailHint": "Электрондық поштаңызды енгізіңіз",
-"enterEmail": "Электрондық поштаңызды енгізіңіз",
-"invalidEmail": "Дұрыс электрондық пошта енгізіңіз",
+  "newestProjects": "Жаңалары",
+  "oldestProjects": "Ескілері",
+  "nameAscending": "Атауы А–Я",
+  "nameDescending": "Атауы Я–А",
 
-"password": "Құпиясөз",
-"passwordHint": "Құпиясөзді енгізіңіз",
-"enterPassword": "Құпиясөзді енгізіңіз",
-"passwordMinLength": "Құпиясөз кемінде 6 таңбадан тұруы керек",
+  "shownProjects": "Көрсетілген жобалар: {count}",
 
-"confirmPassword": "Құпиясөзді растаңыз",
-"confirmPasswordHint": "Құпиясөзді қайта енгізіңіз",
-"confirmPasswordRequired": "Құпиясөзді растаңыз",
+  "projectsManagementDescription": "Құрылыс жобаларын басқарыңыз",
+  "searchProjects": "Жобаларды іздеу...",
+  "activeProjectsLabel": "Белсенді",
+  "planningProjectsLabel": "Жоспарлау",
+  "completedProjectsLabel": "Аяқталған",
 
-"agreeToTerms": "Мен",
-"termsOfUse": "пайдалану шарттарын қабылдаймын",
-"passwordsDoNotMatch": "Құпиясөздер сәйкес келмейді",
+  "projectsLoadError": "Жобаларды жүктеу мүмкін болмады",
+  "nothingFound": "Ештеңе табылмады",
+  "noProjectsYet": "Әзірге жобалар жоқ",
+  "changeSearchOrFilter": "Іздеу немесе сүзгі параметрлерін өзгертіп көріңіз.",
+  "createFirstProjectDescription": "Жұмысты бастау үшін алғашқы жобаңызды жасаңыз.",
 
-"register": "Тіркелу",
-"alreadyHaveAccount": "Аккаунтыңыз бар ма?",
-"login": "Кіру",
+  "projectCreated": "«{title}» жобасы жасалды",
 
-"genericError": "Қате орын алды",
-"emailAlreadyInUse": "Бұл электрондық пошта бұрыннан қолданылуда",
-"weakPassword": "Құпиясөз тым әлсіз",
-"invalidEmailAuth": "Электрондық пошта мекенжайы дұрыс емес",
-"registrationError": "Аккаунт жасау мүмкін болмады",
+  "registration": "Тіркелу",
+  "createAccount": "Аккаунт жасау",
+  "createAccountDescription": "Brivora қолдану үшін аккаунт жасаңыз",
 
-"addName": "Атыңызды қосыңыз",
-"addRoleAndCompany": "Лауазым мен компанияны көрсетіңіз",
+  "fullName": "Толық аты-жөні",
+  "fullNameHint": "Толық аты-жөніңізді енгізіңіз",
+  "enterName": "Атыңызды енгізіңіз",
+  "nameMinLength": "Аты кемінде 2 таңбадан тұруы керек",
 
-"chooseFromGallery": "Галереядан таңдау",
-"takePhoto": "Суретке түсіру",
-"deletePhoto": "Суретті өшіру",
+  "email": "Электрондық пошта",
+  "emailHint": "Электрондық поштаңызды енгізіңіз",
+  "enterEmail": "Электрондық поштаңызды енгізіңіз",
+  "invalidEmail": "Дұрыс электрондық пошта мекенжайын енгізіңіз",
 
-"avatarUpdated": "Аватар сәтті жаңартылды",
-"avatarUploadError": "Аватарды жүктеу мүмкін болмады: {error}",
-"avatarDeleted": "Аватар өшірілді",
-"avatarDeleteError": "Аватарды өшіру мүмкін болмады: {error}",
+  "password": "Құпиясөз",
+  "passwordHint": "Құпиясөзіңізді енгізіңіз",
+  "enterPassword": "Құпиясөзді енгізіңіз",
+  "passwordMinLength": "Құпиясөз кемінде 6 таңбадан тұруы керек",
 
-"profileData": "Профиль деректері",
-"firstName": "Аты",
-"lastName": "Тегі",
-"position": "Лауазымы",
-"positionExample": "Мысалы: Прораб",
-"company": "Компания",
-"companyExample": "Мысалы: ЖК Иванов И.И.",
+  "confirmPassword": "Құпиясөзді растаңыз",
+  "confirmPasswordHint": "Құпиясөзді қайта енгізіңіз",
+  "confirmPasswordRequired": "Құпиясөзді растаңыз",
 
-"saveError": "Сақтау мүмкін болмады: {error}",
+  "agreeToTerms": "Мен қабылдаймын",
+  "termsOfUse": "пайдалану шарттарын",
+  "passwordsDoNotMatch": "Құпиясөздер сәйкес келмейді",
 
-"photosCount": "{count}",
-"activeProjects": "{count}",
+  "register": "Тіркелу",
+  "alreadyHaveAccount": "Аккаунтыңыз бар ма?",
+  "login": "Кіру",
 
-"settingsSubtitle": "Қолданба баптаулары",
+  "genericError": "Қате орын алды",
+  "emailAlreadyInUse": "Бұл электрондық пошта бұрыннан қолданылуда",
+  "weakPassword": "Құпиясөз тым әлсіз",
+  "invalidEmailAuth": "Электрондық пошта мекенжайы дұрыс емес",
+  "registrationError": "Аккаунтты тіркеу мүмкін болмады",
 
-"proSubscription": "Pro жазылымы",
-"comingSoon": "Жақында",
+  "addName": "Атыңызды қосыңыз",
+  "addRoleAndCompany": "Лауазымыңыз бен компанияңызды көрсетіңіз",
 
-"security": "Қауіпсіздік",
-"securitySubtitle": "Аккаунт пен деректерді қорғау",
+  "chooseFromGallery": "Галереядан таңдау",
+  "takePhoto": "Фото түсіру",
+  "deletePhoto": "Фотосуретті жою",
 
-"feedback": "Кері байланыс",
-"feedbackSubtitle": "Brivora-ны жақсартуға көмектесіңіз",
+  "avatarUpdated": "Аватар сәтті жаңартылды",
+  "avatarUploadError": "Аватарды жүктеу мүмкін болмады: {error}",
+  "avatarDeleted": "Аватар жойылды",
+  "avatarDeleteError": "Аватарды жою мүмкін болмады: {error}",
 
-"logout": "Шығу",
-"version": "Нұсқа",
+  "profileData": "Профиль деректері",
+  "firstName": "Аты",
+  "lastName": "Тегі",
+  "position": "Лауазымы",
+  "positionExample": "Мысалы: Бригадир",
+  "company": "Компания",
+  "companyExample": "Мысалы: ЖК Иванов И.И.",
 
-"logoutQuestion": "Аккаунттан шығу керек пе?",
-"logoutConfirmation": "Шынымен аккаунттан шыққыңыз келе ме?",
+  "saveError": "Сақтау мүмкін болмады: {error}",
 
-"logoutError": "Шығу мүмкін болмады: {error}",
-"featureComingSoon": "{feature} — жақында қолжетімді болады",
+  "photosCount": "{count}",
+  "activeProjects": "{count}",
 
-"@helloUser": {
-"placeholders": {
-"name": {
-"type": "String"
-}
-}
-},
+  "settingsSubtitle": "Қолданба баптаулары",
 
-"@projectsCount": {
-"placeholders": {
-"count": {
-"type": "int"
-}
-}
-},
+  "proSubscription": "Pro жазылымы",
+  "comingSoon": "Жақында",
 
-"@openedMinutesAgo": {
-"placeholders": {
-"count": {
-"type": "int"
-}
-}
-},
+  "security": "Қауіпсіздік",
+  "securitySubtitle": "Аккаунт пен деректерді қорғау",
 
-"@openedHoursAgo": {
-"placeholders": {
-"count": {
-"type": "int"
-}
-}
-},
+  "feedback": "Кері байланыс",
+  "feedbackSubtitle": "Brivora-ны жақсартуға көмектесіңіз",
 
-"@openedDaysAgo": {
-"placeholders": {
-"count": {
-"type": "int"
-}
-}
-},
+  "logout": "Шығу",
+  "version": "Нұсқа",
 
-"@openedDate": {
-"placeholders": {
-"date": {
-"type": "String"
-}
-}
-},
+  "logoutQuestion": "Аккаунттан шығу керек пе?",
+  "logoutConfirmation": "Шынымен аккаунттан шыққыңыз келе ме?",
+  "logoutError": "Шығу мүмкін болмады: {error}",
 
-"@updatedMinutesAgo": {
-"placeholders": {
-"count": {
-"type": "int"
-}
-}
-},
+  "featureComingSoon": "{feature} — жақында қолжетімді болады",
 
-"@updatedHoursAgo": {
-"placeholders": {
-"count": {
-"type": "int"
-}
-}
-},
+  "aiAssistant": "ЖИ көмекшісі",
+  "online": "Онлайн",
+  "aiWhatCanIDo": "Мен не істей аламын?",
+  "aiWelcomeTitle": "Қалай көмектесе аламын?",
+  "aiWelcomeDescription": "Жөндеу, материалдар, есептеулер немесе смета жасау туралы сұраңыз.",
+  "aiCalculateMaterial": "Материалды есептеу",
+  "aiCalculateMaterialSubtitle": "Плитка, бояу, тұсқағаз",
+  "aiCreateEstimate": "Смета жасау",
+  "aiCreateEstimateSubtitle": "Есепті жылдам құрастыру",
+  "aiAnalyzePhoto": "Фотоны талдау",
+  "aiAnalyzePhotoSubtitle": "Нысандағы мәселелерді табу",
+  "aiRepairAdvice": "Жөндеу бойынша кеңес",
+  "aiRepairAdviceSubtitle": "Ұсыныс алу",
+  "aiExampleHint": "Мысалы: «3×2 м ваннаға қанша плитка қажет?»",
+  "aiMessageHint": "Хабарлама жазыңыз...",
+  "aiTileAnswer": "Әрине. Плитканы есептеу үшін бөлменің өлшемдері, бір плитканың өлшемі және қажетті қор мөлшері керек. Әдетте кесуге шамамен 10% қор қосуды ұсынамын.",
+  "aiEstimateAnswer": "Смета жасауға көмектесе аламын. Нысанның ауданын және жұмыс немесе материалдар тізімін көрсетіңіз — есепті құрылымдауға көмектесемін.",
+  "aiPaintAnswer": "Бояу мөлшерін есептеу үшін бетінің ауданы, қабат саны және 1 м²-ге кететін бояу шығыны қажет.",
+  "aiWallpaperAnswer": "Тұсқағазды есептеу үшін бөлменің өлшемдері, төбенің биіктігі, орамның ені мен ұзындығы қажет.",
+  "aiDefaultAnswer": "Түсіндім 👍\n\nМатериалдарды есептеуге, смета жасауға, жөндеу және жұмыстарды ұйымдастыруға көмектесе аламын. Тапсырманы толығырақ сипаттап көріңіз.",
 
-"@updatedDaysAgo": {
-"placeholders": {
-"count": {
-"type": "int"
-}
-}
-},
+  "accountStatus": "Аккаунт күйі",
 
-"@updatedDate": {
-"placeholders": {
-"date": {
-"type": "String"
-}
-}
-},
+  "@helloUser": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
 
-"@avatarUploadError": {
-"placeholders": {
-"error": {
-"type": "String"
-}
-}
-},
+  "@projectsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
 
-"@avatarDeleteError": {
-"placeholders": {
-"error": {
-"type": "String"
-}
-}
-},
+  "@shownProjects": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
 
-"@saveError": {
-"placeholders": {
-"error": {
-"type": "String"
-}
-}
-},
+  "@openedMinutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
 
-"@photosCount": {
-"placeholders": {
-"count": {
-"type": "int"
-}
-}
-},
+  "@openedHoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
 
-"@activeProjects": {
-"placeholders": {
-"count": {
-"type": "int"
-}
-}
-},
+  "@openedDaysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
 
-"@logoutError": {
-"placeholders": {
-"error": {
-"type": "String"
-}
-}
-},
+  "@openedDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
 
-"@featureComingSoon": {
-"placeholders": {
-"feature": {
-"type": "String"
-}
-}
-}
+  "@updatedMinutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "@updatedHoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "@updatedDaysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "@updatedDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+
+  "@projectCreated": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+
+  "@avatarUploadError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+
+  "@avatarDeleteError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+
+  "@saveError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+
+  "@photosCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "@activeProjects": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "@logoutError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+
+  "@featureComingSoon": {
+    "placeholders": {
+      "feature": {
+        "type": "String"
+      }
+    }
+  }
 }

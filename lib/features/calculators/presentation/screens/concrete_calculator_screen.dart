@@ -11,7 +11,8 @@ class ConcreteCalculatorScreen extends StatefulWidget {
   const ConcreteCalculatorScreen({super.key, this.project});
 
   @override
-  State<ConcreteCalculatorScreen> createState() => _ConcreteCalculatorScreenState();
+  State<ConcreteCalculatorScreen> createState() =>
+      _ConcreteCalculatorScreenState();
 }
 
 class _ConcreteCalculatorScreenState extends State<ConcreteCalculatorScreen> {
@@ -46,7 +47,11 @@ class _ConcreteCalculatorScreenState extends State<ConcreteCalculatorScreen> {
     provider.reset();
   }
 
-  String? _validatePositive(String? value, String label, {bool allowZero = false}) {
+  String? _validatePositive(
+    String? value,
+    String label, {
+    bool allowZero = false,
+  }) {
     if (value == null || value.trim().isEmpty) {
       return 'Введите $label';
     }
@@ -97,7 +102,8 @@ class _ConcreteCalculatorScreenState extends State<ConcreteCalculatorScreen> {
                                 label: 'Длина',
                                 suffixText: 'м',
                                 onChanged: provider.setLength,
-                                validator: (value) => _validatePositive(value, 'длину'),
+                                validator: (value) =>
+                                    _validatePositive(value, 'длину'),
                               ),
                               const SizedBox(height: 16),
                               _buildNumberField(
@@ -105,7 +111,8 @@ class _ConcreteCalculatorScreenState extends State<ConcreteCalculatorScreen> {
                                 label: 'Ширина',
                                 suffixText: 'м',
                                 onChanged: provider.setWidth,
-                                validator: (value) => _validatePositive(value, 'ширину'),
+                                validator: (value) =>
+                                    _validatePositive(value, 'ширину'),
                               ),
                               const SizedBox(height: 16),
                               _buildNumberField(
@@ -113,7 +120,8 @@ class _ConcreteCalculatorScreenState extends State<ConcreteCalculatorScreen> {
                                 label: 'Толщина',
                                 suffixText: 'см',
                                 onChanged: provider.setThickness,
-                                validator: (value) => _validatePositive(value, 'толщину'),
+                                validator: (value) =>
+                                    _validatePositive(value, 'толщину'),
                               ),
                               const SizedBox(height: 16),
                               Text(
@@ -128,7 +136,8 @@ class _ConcreteCalculatorScreenState extends State<ConcreteCalculatorScreen> {
                                   return ChoiceChip(
                                     label: Text(type),
                                     selected: provider.constructionType == type,
-                                    onSelected: (_) => provider.setConstructionType(type),
+                                    onSelected: (_) =>
+                                        provider.setConstructionType(type),
                                   );
                                 }).toList(),
                               ),
@@ -148,7 +157,8 @@ class _ConcreteCalculatorScreenState extends State<ConcreteCalculatorScreen> {
                               ElevatedButton(
                                 onPressed: () {
                                   FocusScope.of(context).unfocus();
-                                  if (_formKey.currentState?.validate() ?? false) {
+                                  if (_formKey.currentState?.validate() ??
+                                      false) {
                                     provider.calculate();
                                   }
                                 },
@@ -185,25 +195,29 @@ class _ConcreteCalculatorScreenState extends State<ConcreteCalculatorScreen> {
                               _buildResultRow(
                                 context,
                                 label: 'Площадь поверхности',
-                                value: '${provider.result!.surfaceArea.toStringAsFixed(2)} м²',
+                                value:
+                                    '${provider.result!.surfaceArea.toStringAsFixed(2)} м²',
                               ),
                               const SizedBox(height: 12),
                               _buildResultRow(
                                 context,
                                 label: 'Объём без запаса',
-                                value: '${provider.result!.volumeWithoutWaste.toStringAsFixed(2)} м³',
+                                value:
+                                    '${provider.result!.volumeWithoutWaste.toStringAsFixed(2)} м³',
                               ),
                               const SizedBox(height: 12),
                               _buildResultRow(
                                 context,
                                 label: 'Объём с запасом',
-                                value: '${provider.result!.volumeWithWaste.toStringAsFixed(2)} м³',
+                                value:
+                                    '${provider.result!.volumeWithWaste.toStringAsFixed(2)} м³',
                               ),
                               const SizedBox(height: 12),
                               _buildResultRow(
                                 context,
                                 label: 'Необходимо бетона',
-                                value: '${provider.result!.volumeLiters.toStringAsFixed(0)} л',
+                                value:
+                                    '${provider.result!.volumeLiters.toStringAsFixed(0)} л',
                               ),
                             ],
                           ),
@@ -259,9 +273,9 @@ class _ConcreteCalculatorScreenState extends State<ConcreteCalculatorScreen> {
         ),
         Text(
           value,
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w700),
         ),
       ],
     );

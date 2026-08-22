@@ -87,6 +87,15 @@ class AppLocalizationsRu extends AppLocalizations {
   String get done => 'Готово';
 
   @override
+  String get create => 'Создать';
+
+  @override
+  String get reset => 'Сбросить';
+
+  @override
+  String get retry => 'Повторить';
+
+  @override
   String get darkTheme => 'Тёмная тема';
 
   @override
@@ -146,7 +155,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get newProject => 'Новый проект';
 
   @override
-  String get create => 'Создать';
+  String get newProjectShort => 'Новый';
+
+  @override
+  String get createProject => 'Создать проект';
 
   @override
   String get materials => 'Материалы';
@@ -222,6 +234,60 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String updatedDate(String date) {
     return 'Обновлён $date';
+  }
+
+  @override
+  String get newestProjects => 'Новые';
+
+  @override
+  String get oldestProjects => 'Старые';
+
+  @override
+  String get nameAscending => 'Название А–Я';
+
+  @override
+  String get nameDescending => 'Название Я–А';
+
+  @override
+  String shownProjects(int count) {
+    return 'Показано проектов: $count';
+  }
+
+  @override
+  String get projectsManagementDescription =>
+      'Управляйте строительными проектами';
+
+  @override
+  String get searchProjects => 'Поиск проектов...';
+
+  @override
+  String get activeProjectsLabel => 'Активные';
+
+  @override
+  String get planningProjectsLabel => 'Планирование';
+
+  @override
+  String get completedProjectsLabel => 'Завершённые';
+
+  @override
+  String get projectsLoadError => 'Не удалось загрузить проекты';
+
+  @override
+  String get nothingFound => 'Ничего не найдено';
+
+  @override
+  String get noProjectsYet => 'Пока нет проектов';
+
+  @override
+  String get changeSearchOrFilter => 'Попробуйте изменить поиск или фильтр.';
+
+  @override
+  String get createFirstProjectDescription =>
+      'Создайте первый проект, чтобы начать работу.';
+
+  @override
+  String projectCreated(String title) {
+    return 'Проект «$title» создан';
   }
 
   @override
@@ -421,4 +487,74 @@ class AppLocalizationsRu extends AppLocalizations {
   String featureComingSoon(String feature) {
     return '$feature — скоро будет доступно';
   }
+
+  @override
+  String get aiAssistant => 'ИИ-помощник';
+
+  @override
+  String get online => 'Онлайн';
+
+  @override
+  String get aiWhatCanIDo => 'Что я могу сделать?';
+
+  @override
+  String get aiWelcomeTitle => 'Чем могу помочь?';
+
+  @override
+  String get aiWelcomeDescription =>
+      'Спроси меня о ремонте, материалах, расчётах или создании сметы.';
+
+  @override
+  String get aiCalculateMaterial => 'Рассчитать материал';
+
+  @override
+  String get aiCalculateMaterialSubtitle => 'Плитка, краска, обои';
+
+  @override
+  String get aiCreateEstimate => 'Создать смету';
+
+  @override
+  String get aiCreateEstimateSubtitle => 'Быстро составить расчёт';
+
+  @override
+  String get aiAnalyzePhoto => 'Анализ фото';
+
+  @override
+  String get aiAnalyzePhotoSubtitle => 'Найти проблемы на объекте';
+
+  @override
+  String get aiRepairAdvice => 'Совет по ремонту';
+
+  @override
+  String get aiRepairAdviceSubtitle => 'Получить рекомендацию';
+
+  @override
+  String get aiExampleHint =>
+      'Например: «Сколько плитки нужно для ванной 3×2 м?»';
+
+  @override
+  String get aiMessageHint => 'Напиши сообщение...';
+
+  @override
+  String get aiTileAnswer =>
+      'Конечно. Для расчёта плитки мне понадобятся размеры помещения, размер одной плитки и желаемый запас. Обычно рекомендую закладывать около 10% на подрезку.';
+
+  @override
+  String get aiEstimateAnswer =>
+      'Могу помочь составить смету. Укажи площадь объекта и список работ или материалов — я помогу структурировать расчёт.';
+
+  @override
+  String get aiPaintAnswer =>
+      'Для расчёта краски нужны площадь поверхности, количество слоёв и расход краски на 1 м².';
+
+  @override
+  String get aiWallpaperAnswer =>
+      'Для расчёта обоев нужны размеры помещения, высота потолка, ширина рулона и длина рулона.';
+
+  @override
+  String get aiDefaultAnswer =>
+      'Понял тебя 👍\n\nЯ могу помочь с расчётами материалов, сметами, ремонтом и организацией работ. Попробуй сформулировать задачу подробнее.';
+
+  @override
+  String get accountStatus => 'Статус аккаунта';
 }
